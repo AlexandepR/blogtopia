@@ -14,7 +14,8 @@ const blogSchema = new mongoose.Schema<BlogType>({
 
 @Module({
   imports:[
-    MongooseModule.forFeature([{name: Blog.name, schema: blogSchema}]),
+    // MongooseModule.forFeature([{name: Blog.name, schema: blogSchema}]),
+    // MongooseModule.forFeature([{name: Blog.name, schema: blogSchema}]),
   ],
   controllers: [BlogsController],
   providers: [BlogsService],

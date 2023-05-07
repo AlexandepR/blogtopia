@@ -8,11 +8,12 @@ export class BlogsController {
 
   @Get()
   findAll() {
-    return this.blogsService.findAll()
+    return   'Happy hacking'
+    // return this.blogsService.findAll()
   }
 
-  @Post()
-  createOne(@Body() createBlogDto: CreateBlogDto) {
-    return this.blogsService.createOne(createBlogDto);
-  }
+  // @Post()
+  // // createOne(@Body() createBlogDto: CreateBlogDto) {
+  //   return this.blogsService.createOne(createBlogDto);
+  // }
 }
