@@ -1,5 +1,5 @@
-import dotenv from 'dotenv';
-dotenv.config();
+// import dotenv from 'dotenv';
+// dotenv.config();
 
 export const settingsEnv = {
   // const mongoUri : process.env.mongoURI || "mongodb://0.0.0.0:27017";
@@ -15,4 +15,5 @@ export const settingsEnv = {
   JWT_REFRESH_TOKEN_SECRET: process.env.JWT_REFRESH_TOKEN_SECRET as string,
   JWT_TOKEN_LIFE: process.env.JWT_TOKEN_LIFE,
   JWT_REFRESH_TOKEN_LIFE: process.env.JWT_REFRESH_TOKEN_LIFE,
+  NODE_ENV: process.env.NODE_ENV,
 }
