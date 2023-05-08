@@ -1,19 +1,17 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { BlogType } from "./blogs.module";
+import { BlogsRepository } from "./blogs.repository";
+import { CreateBlogInputModelType } from "./type/blogsType";
 
 
 @Injectable()
 export class BlogsService {
-  constructor(
-    // @InjectModel(Blog.name) private blogModel: any,
-  ) {}
+  constructor(protected blogsRepository: BlogsRepository) {}
 
-  // async findAll(): Promise<BlogType[]>{
-  //   return await this.blogModel.find().exec();
-  // }
-  // async createOne(createProductDto: CreateBlogDto): Promise<any> {
-  //   const blog = new this.blogModel(createProductDto);
-  //   return blog.save()
-  // }
+  findAll(term:string) {
+    return this.blogsRepository.findBlogs(term)
+  }
+  create(inputModel: CreateBlogInputModelType) {
+
+  }
 }
