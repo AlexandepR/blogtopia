@@ -20,10 +20,10 @@ import { Blog, BlogSchema } from "./blogs/type/blogs.schema";
       serveRoot: process.env.NODE_ENV === "development" ? "/" : "/swagger"
     }),
     ConfigModule.forRoot(),
-    // MongooseModule.forRoot(process.env.MONGO_URL, {
-    MongooseModule.forRoot('mongodb:127.0.0.1:27017', {
-      dbName: 'blogtopia',
-      loggerLevel: 'debug',
+    MongooseModule.forRoot(process.env.MONGO_URL, {
+    // MongooseModule.forRoot('mongodb:127.0.0.1:27017', {
+    //   dbName: 'blogtopia',
+    //   loggerLevel: 'debug',
     }),
     MongooseModule.forFeature([
       {
@@ -31,7 +31,7 @@ import { Blog, BlogSchema } from "./blogs/type/blogs.schema";
         schema: BlogSchema,
       },
     ])
-    // BlogsRepository
+    // PostsRepository
   ],
   controllers: [AppController, BlogsController],
   providers: [AppService, BlogsService, BlogsRepository]

@@ -6,7 +6,7 @@ import { BlogsService } from "./blogs/blogs.service";
 export class AppController {
   constructor(
     private readonly appService: AppService,
-    // private readonly blogsService: BlogsService,
+    // private readonly blogsService: PostsService,
     ) {}
 
   @Get()
