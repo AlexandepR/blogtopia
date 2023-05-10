@@ -34,6 +34,7 @@ export type CreateBlogInputModelType = {
 }
 export type PutBlogInputModelType = {
   name: string,
+  description: string,
   websiteUrl: string,
 }
 export type FilterBlogType = {
