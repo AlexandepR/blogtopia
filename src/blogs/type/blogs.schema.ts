@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { HydratedDocument, Model, Types, ObjectId } from "mongoose";
-import { CreateBlogInputModelType, PutBlogInputModelType } from "./blogsType";
+import { CreateBlogInputModelType, PutBlogDtoType } from "./blogsType";
 // import ObjectId = module
 
 
@@ -26,7 +26,6 @@ const { ObjectId } = mongoose.Types;
 @Schema()
 export class Blog {
   // @Prop({
-  //   required:true,
   //   type: mongoose.Schema.Types.ObjectId
   // })
   _id: Types.ObjectId;
@@ -62,7 +61,7 @@ export class Blog {
   //   if (newAge <= 0) throw new Error("Bade age");
   //   this.age = newAge;
   // }
-  updateBlog( updateBlogInfo: PutBlogInputModelType) {
+  updateBlog(updateBlogInfo: PutBlogDtoType) {
     this.name = updateBlogInfo.name;
     this.description = updateBlogInfo.description;
     this.websiteUrl = updateBlogInfo.websiteUrl;
@@ -72,7 +71,7 @@ export class Blog {
   //   createdBlog.setAge(100);
   //   return createdBlog;
   // }
-  static createStaticBlog(dto: CreateBlogInputModelType, BlogModel: BlogModelType): BlogDocument {
+  static create(dto: CreateBlogInputModelType, BlogModel: BlogModelType): BlogDocument {
     if (!dto) throw new Error("Bad request");
     const createNewBlog = new BlogModel();
 
@@ -91,11 +90,11 @@ BlogSchema.methods = {
   updateBlog: Blog.prototype.updateBlog
 };
 const blogStaticMethods: BlogModelStaticType = {
-  createStaticBlog: Blog.createStaticBlog
+  create: Blog.create
 };
 BlogSchema.statics = blogStaticMethods;
 export type BlogModelStaticType = {
-  createStaticBlog: (dto: CreateBlogInputModelType, BlogModel: BlogModelType) => BlogDocument
+  create: (dto: CreateBlogInputModelType, BlogModel: BlogModelType) => BlogDocument
 }
 export type BlogDocument = HydratedDocument<Blog>;
 export type BlogModelType = Model<BlogDocument> & BlogModelStaticType
