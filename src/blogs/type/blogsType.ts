@@ -32,10 +32,15 @@ export type CreateBlogInputModelType = {
   description: string,
   websiteUrl: string,
 }
-export type PutBlogInputModelType = {
+export type PutBlogDtoType = {
   name: string,
   description: string,
   websiteUrl: string,
+}
+export type createPostForBlogInputModel = {
+  title: string,
+  shortDescription: string,
+  content: string
 }
 export type FilterBlogType = {
   name?: {
