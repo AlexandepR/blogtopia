@@ -1,54 +1,66 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query } from "@nestjs/common";
 import { BlogsService } from "./blogs.service";
-import { CreateBlogInputModelType, PutBlogInputModelType } from "./type/blogsType";
+import { CreateBlogInputModelType, createPostForBlogInputModel, PutBlogDtoType } from "./type/blogsType";
+import { ParamsType } from "../types/types";
 
 
 @Controller("blogs")
 export class BlogsController {
   // constructor(private blogsService: PostsService) {}
   constructor(protected blogsService: BlogsService) {
+
   }
   @Get()
   // getBlogs(@Query("term") term: string) {
   async getBlogs(
-    @Query() query: { term: string }
+    @Query() query: ParamsType
   ) {
-    return this.blogsService.findAll(query.term);
+    return this.blogsService.findAll(query);
   }
   @Get(":id")
-  async getBlog(@Param("id") blogId: string) {
-
+  async getBlog(
+    @Param("id")
+      id: string
+  ) {
+    return await this.blogsService.getBlog(id);
   }
-  @Get()
-  async GetPostsByBlog() {
-
+  @Get("/:id/posts")
+  async GetPostsByBlog(
+    @Param("id")
+      id: string,
+    @Query() query: ParamsType
+  ) {
+    return await this.blogsService.getPosts(id, query);
   }
-  @Post("blogs")
+  @Post()
   async createBlog(@Body() dto: CreateBlogInputModelType) {
-    return this.blogsService.create(dto);
+    return await this.blogsService.createBlog(dto);
   }
-  // @Post()
-  // createPostForBlog(@Body() inputModel: PutBlogInputModelType ) {
-  //
-  // }
+  @Post("/:id/posts")
+  async createPostForBlog(
+    @Body() dto: createPostForBlogInputModel,
+    @Param("id") id: string
+  ) {
+    return await this.blogsService.createPostForBlog(dto);
+  }
   @Put(":id")
   async updateBlog(
     @Param("id")
-    @Body() model: PutBlogInputModelType) {
-      const blogs = await this.blogsService.findAll('WrongData');
-      const result = blogs.find((b) => b.name === 'a')!;
-
-      result.setAge(2000000000)
-    // return this.blogsService.save({} as CreateBlogInputModelType)
-
+      id: string,
+    @Body() dto: PutBlogDtoType
+  ) {
+    return await this.blogsService.updateBlog(id, dto);
   }
-  @Delete((":id"))
-  async deleteBlog(@Param("id") blogId: string) {
-
+  @Delete(":id")
+  async deleteBlog(
+    @Param("id")
+      id: string) {
+    await this.blogsService.deleteBlog(id);
+    return `This blog #${id} removes`;
   }
   @Delete()
   async deleteAllBlog() {
-
+    await this.blogsService.deleteAllBlog();
   }
 
 }
