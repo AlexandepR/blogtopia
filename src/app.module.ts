@@ -24,6 +24,7 @@ import { CommentsService } from "./comments/comments.service";
 import { CommentsRepository } from "./comments/comments.repository";
 import { TestingService } from "./test/testing.service";
 import { TestingRepository } from "./test/testing.repository";
+import { settingsEnv } from "./settings/settings";
 
 
 @Module({
@@ -31,10 +32,10 @@ import { TestingRepository } from "./test/testing.repository";
     // MongooseModule.forRoot(settingsEnv.MONGO_URL),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, "..", "swagger-static"),
-      serveRoot: process.env.NODE_ENV === "development" ? "/" : "/swagger"
+      serveRoot: settingsEnv.NODE_ENV === "development" ? "/" : "/swagger"
     }),
     ConfigModule.forRoot(),
-    MongooseModule.forRoot(process.env.MONGO_URL, {
+    MongooseModule.forRoot(settingsEnv.MONGO_URL, {
     // MongooseModule.forRoot('mongodb:127.0.0.1:27017', {
     //   dbName: 'blogtopia',
     //   loggerLevel: 'debug',
