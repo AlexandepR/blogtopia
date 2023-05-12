@@ -6,7 +6,7 @@ import { ParamsType } from "../types/types";
 
 @Controller("blogs")
 export class BlogsController {
-  // constructor(private blogsService: PostsService) {}
+  // constructor(private blogsService: UsersService) {}
   constructor(protected blogsService: BlogsService) {
 
   }
@@ -33,7 +33,9 @@ export class BlogsController {
     return await this.blogsService.getPosts(id, query);
   }
   @Post()
-  async createBlog(@Body() dto: CreateBlogInputModelType) {
+  async createBlog(
+    @Body() dto: CreateBlogInputModelType
+  ) {
     return await this.blogsService.createBlog(dto);
   }
   @Post("/:id/posts")
@@ -41,7 +43,7 @@ export class BlogsController {
     @Body() dto: createPostForBlogInputModel,
     @Param("id") id: string
   ) {
-    return await this.blogsService.createPostForBlog(dto);
+    return await this.blogsService.createPostForBlog(dto,id);
   }
   @Put(":id")
   async updateBlog(

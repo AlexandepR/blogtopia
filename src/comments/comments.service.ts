@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { CommentsRepository } from "./comments.repository";
 import { PaginationType } from "../types/types";
 import { pagesCounter, parseQueryPaginator, skipPage } from "../utils/helpers";
-import { PostsRepository } from "../posts/posts.repository";
+import { UsersRepository } from "../users/users.repository";
 import { CommentType } from "./type/commentsType";
 
 
@@ -10,7 +10,7 @@ import { CommentType } from "./type/commentsType";
 export class CommentsService {
   constructor(
     protected commentsRepository: CommentsRepository,
-    protected postsRepository: PostsRepository,
+    protected postsRepository: UsersRepository,
   ) {}
 
   async findAll(query): Promise<PaginationType<Omit<CommentType, 'postId' | 'likesInfo'>[]> | null> {

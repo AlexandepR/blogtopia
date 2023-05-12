@@ -1,11 +1,11 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query } from "@nestjs/common";
-import { CreatePostInputModelType, PutPostInputModelType } from "../posts/type/postsType";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query } from "@nestjs/common";
+import { CreatePostInputModelType, PutPostInputModelType } from "./type/postsType";
 import { ParamsType } from "../types/types";
 import { PostsService } from "./posts.service";
 
 
 @Controller("posts")
-export class UsersController {
+export class PostsController {
   constructor(protected postsService: PostsService) {
   }
   @Get()
@@ -40,12 +40,14 @@ export class UsersController {
   //
   // }
   @Put(":id")
+  @HttpCode(HttpStatus.NO_CONTENT)
   async updatePost(
     @Param("id")
       id: string,
     @Body() dto: PutPostInputModelType
   ) {
-    return await this.postsService.updatePost(id, dto);
+     await this.postsService.updatePost(id, dto);
+     return
   }
   @Delete(":id")
   async deletePost(

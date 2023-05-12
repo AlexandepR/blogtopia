@@ -17,15 +17,17 @@ export class PostsService {
   constructor(
     protected postsRepository: PostsRepository,
     protected blogsRepository: BlogsRepository
-  ) {}
+  ) {
+  }
 
   async findAll(query): Promise<PaginationType<PostsTypeFiltered[]>> {
+    // async findAll(query): Promise<any> {
     const { term, pageSize, pageNumber, sortDirection, sortBy } = parseQueryPaginator(query);
     const filter = term ? { name: { $regex: term, $options: "i" } } : {};
     const totalCountPosts = await this.postsRepository.getTotalCountPosts(filter);
     const skip = skipPage(pageNumber, pageSize);
     const pagesCount = pagesCounter(totalCountPosts, pageSize);
-    const posts = await this.postsRepository.getPosts(pageSize, skip, filter, sortBy, sortDirection);
+    const posts = await this.postsRepository.getPosts(skip, pageSize, filter, sortBy, sortDirection);
     if (posts) {
       const postsFilterId = posts.map(({
                                          _id,
@@ -33,7 +35,8 @@ export class PostsService {
                                          shortDescription,
                                          content,
                                          blogId,
-                                         extendedLikesInfo,
+                                         blogName,
+                                         // extendedLikesInfo,
                                          extendedLikesInfo: {
                                            likesCount,
                                            dislikesCount,
@@ -43,10 +46,10 @@ export class PostsService {
                                            newestLikes,
                                            ...restExtendedLikesInfo
                                          },
-                                         __v,
+                                         // __v,
                                          ...rest
                                        }) => {
-          let userStatus: 'None' | 'Like' | 'Dislike' = 'None';
+          let userStatus: "None" | "Like" | "Dislike" = "None";
           // if (userId) {
           //   const userLike = extendedLikesInfo.likesData.find((like) => like.userId.toString() === userId.toString());
           //   const userDislike = extendedLikesInfo.dislikesData.find((dislike) => dislike.userId.toString() === userId.toString());
@@ -58,6 +61,7 @@ export class PostsService {
             shortDescription,
             content,
             blogId: blogId,
+            blogName,
             ...rest,
             extendedLikesInfo: {
               likesCount,
@@ -65,7 +69,7 @@ export class PostsService {
               myStatus: userStatus,
               ...restExtendedLikesInfo,
               newestLikes
-            },
+            }
           };
         }
       );
@@ -74,16 +78,18 @@ export class PostsService {
         page: pageNumber,
         pageSize: pageSize,
         totalCount: totalCountPosts,
-        items: postsFilterId,
+        items: postsFilterId
+        // items: posts,
       };
     }
+    // return posts
     return null;
   }
 
   async createPost(dto: CreatePostInputModelType): Promise<outputPostModelType | null> {
-    const blogId = new Types.ObjectId(dto.blogId)
-    const getBlog = await this.blogsRepository.findBlogById(blogId)
-    const createPost = await this.postsRepository.createPost(dto,getBlog);
+    const blogId = new Types.ObjectId(dto.blogId);
+    const getBlog = await this.blogsRepository.findBlogById(blogId);
+    const createPost = await this.postsRepository.createPost(dto, getBlog);
     return {
       id: createPost._id.toString(),
       title: createPost.title,
@@ -98,10 +104,10 @@ export class PostsService {
         myStatus: createPost.extendedLikesInfo.myStatus,
         newestLikes: createPost.extendedLikesInfo.newestLikes
       }
-    }
+    };
 
   }
-  async getCommentByPost(id: string,query: ParamsType){
+  async getCommentByPost(id: string, query: ParamsType) {
     const { term, pageSize, pageNumber, sortDirection, sortBy } = parseQueryPaginator(query);
     const postId = new Types.ObjectId(id);
     const post = await this.postsRepository.findPostById(postId);
@@ -120,9 +126,9 @@ export class PostsService {
     };
 
   }
-  async getPost(id: string): Promise<outputPostModelType>{
-    const PostId = new Types.ObjectId(id)
-    const post = await this.postsRepository.findPostById(PostId)
+  async getPost(id: string): Promise<outputPostModelType> {
+    const PostId = new Types.ObjectId(id);
+    const post = await this.postsRepository.findPostById(PostId);
     // const userStatus = await this.postsRepository.findLikesStatus(postId, userId);
     // if (post) {
     //
@@ -148,17 +154,17 @@ export class PostsService {
         myStatus: post.extendedLikesInfo.myStatus,
         newestLikes: post.extendedLikesInfo.newestLikes
       }
-    }
+    };
   }
   async updatePost(id: string, dto: PutPostInputModelType) {
     const postId = new Types.ObjectId(id);
     const post = await this.postsRepository.findPostById(postId);
     await post.updatePost(dto);
-    return await post.save()
+    return await post.save();
   }
   async deletePost(id: string) {
-    const postId = new Types.ObjectId(id)
-    return await this.postsRepository.delete(postId)
+    const postId = new Types.ObjectId(id);
+    return await this.postsRepository.delete(postId);
   }
   async deleteAllPost(): Promise<boolean> {
     return await this.postsRepository.deleteAllPosts();

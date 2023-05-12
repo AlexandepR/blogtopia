@@ -20,7 +20,7 @@ export type BlogType = {
   createdAt: string
   isMembership: boolean
 }
-export type getBlogsQueryType = {
+export type QueryType = {
   term: string,
   pageSize: number,
   pageNumber: number,

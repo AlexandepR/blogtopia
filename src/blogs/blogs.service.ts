@@ -5,8 +5,8 @@ import { PaginationType, ParamsType } from "../types/types";
 import { BlogDocument } from "./type/blogs.schema";
 import { pagesCounter, parseQueryPaginator, skipPage } from "../utils/helpers";
 import { Types } from "mongoose";
+import { outputPostModelType, PostsTypeFiltered } from "../posts/type/postsType";
 import { PostsRepository } from "../posts/posts.repository";
-import { PostsTypeFiltered } from "../posts/type/postsType";
 
 
 @Injectable()
@@ -42,8 +42,29 @@ export class BlogsService {
       isMembership: createBlog.isMembership
     };
   }
-  async createPostForBlog(dto:createPostForBlogInputModel) {
-
+  async createPostForBlog(postDto:createPostForBlogInputModel, id: string): Promise<outputPostModelType | null> {
+    // idParamsValidator(req.params.blogId, res);
+    const blogId = new Types.ObjectId(id);
+    const getBlog = await this.blogsRepository.findBlogById(blogId)
+    const createPost = await this.blogsRepository.createPost(postDto,getBlog);
+    return {
+      id: createPost._id.toString(),
+      title: createPost.title,
+      shortDescription: createPost.shortDescription,
+      content: createPost.content,
+      blogId: createPost.blogId,
+      blogName: createPost.blogName,
+      createdAt: createPost.createdAt,
+      extendedLikesInfo: {
+        likesCount: createPost.extendedLikesInfo.likesCount,
+        dislikesCount: createPost.extendedLikesInfo.dislikesCount,
+        myStatus: createPost.extendedLikesInfo.myStatus,
+        newestLikes: createPost.extendedLikesInfo.newestLikes
+      }
+    }
+    // const { title, shortDescription, content } = dto;
+    // const newPostForBlog = await this.blogsService.createPostForBlog(
+    //   blogId, title, shortDescription, content);
   }
   async getBlog(id: string) {
     const blogId = new Types.ObjectId(id)
@@ -117,11 +138,12 @@ export class BlogsService {
     }
     return null;
   }
+
   async updateBlog(id: string, dto: PutBlogDtoType) {
     const blogId = new Types.ObjectId(id);
     const blog = await this.blogsRepository.findBlogById(blogId);
     blog.updateBlog(dto)
-    return await blog.save()
+    return await this.blogsRepository.save(blog)
   }
   async deleteBlog(id: string) {
     const blogId = new Types.ObjectId(id)

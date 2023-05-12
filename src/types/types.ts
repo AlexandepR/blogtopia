@@ -18,6 +18,13 @@ export type PaginationType<T> = {
   totalCount: number
   items: T
 }
+export type ParamsType = {
+  term: string,
+  pageSize: number,
+  pageNumber: number,
+  sortDirection: "asc" | "desc",
+  sortBy: string
+}
 //
 // export type RefreshTokensMetaType = {
 //   issuedDateRefreshToken: string,

@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { HydratedDocument, Model, Types, ObjectId } from "mongoose";
-import { CreateBlogInputModelType, PutBlogDtoType } from "./blogsType";
+import { CreateBlogInputModelType, createPostForBlogInputModel, PutBlogDtoType } from "./blogsType";
+import { PostDocument, PostModelType } from "../../posts/type/posts.schema";
 // import ObjectId = module
 
 
@@ -21,7 +22,6 @@ import { CreateBlogInputModelType, PutBlogDtoType } from "./blogsType";
 // }
 //
 // export const PostSchema = SchemaFactory.createForClass(Posts);
-const { ObjectId } = mongoose.Types;
 
 @Schema()
 export class Blog {
@@ -31,18 +31,22 @@ export class Blog {
   _id: Types.ObjectId;
 
   @Prop({
-    required: true
+    required: true,
+    maxLength: 15
   })
   name: string;
 
   @Prop({
-    require: true
+    require: true,
+    maxLength: 500,
   })
   description: string;
 
   @Prop
   ({
-    require: true
+    require: true,
+    maxLength: 100,
+    match: /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/,
     // default: []
   })
   websiteUrl: string;
@@ -82,6 +86,30 @@ export class Blog {
     createNewBlog.createdAt = new Date().toISOString();
 
     return createNewBlog;
+  }
+  static createPost(
+    postDto: createPostForBlogInputModel,
+    getBlog: BlogDocument,
+    PostModel: PostModelType
+  ): PostDocument {
+    if (!postDto) throw new Error("Bad request");
+    const createNewPost = new PostModel();
+    createNewPost.title = postDto.title;
+    createNewPost.shortDescription = postDto.shortDescription;
+    createNewPost.content = postDto.content;
+    createNewPost.blogId = getBlog._id;
+    createNewPost.blogName = getBlog.name;
+    createNewPost.createdAt = new Date().toISOString();
+    createNewPost.extendedLikesInfo = {
+      // _id: new Types.ObjectId,
+      likesData: [],
+      dislikesData: [],
+      likesCount: 0,
+      dislikesCount: 0,
+      myStatus: "None",
+      newestLikes: []
+    };
+    return createNewPost;
   }
 }
 

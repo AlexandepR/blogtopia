@@ -1,15 +1,17 @@
 import { Injectable } from "@nestjs/common";
-import { Blog, BlogDocument, BlogModelStaticType, BlogModelType } from "./type/blogs.schema";
-import { Model } from "mongoose";
+import { Blog, BlogDocument, BlogModelType } from "./type/blogs.schema";
 import { InjectModel } from "@nestjs/mongoose";
-import { BlogDBType, CreateBlogInputModelType, FilterBlogType, PutBlogDtoType } from "./type/blogsType";
-import { Filter, ObjectId } from "mongodb";
+import { CreateBlogInputModelType, createPostForBlogInputModel } from "./type/blogsType";
+import { ObjectId } from "mongodb";
+import { Post, PostModelType } from "../posts/type/posts.schema";
 
 @Injectable()
 export class BlogsRepository {
   constructor(
-    @InjectModel(Blog.name)
-    private BlogModel: BlogModelType) {
+    // @InjectModel(Blog.name, Post.name)
+    @InjectModel(Blog.name) private BlogModel: BlogModelType,
+    @InjectModel(Post.name) private PostModel: PostModelType
+  ) {
   }
   async getBlogs(
     skip: number,
@@ -27,7 +29,12 @@ export class BlogsRepository {
           _id: 0,
           // "isMembership": 0,
           // "__v": 0,
-          id: "$_id"
+          id: "$_id",
+          "name": 1,
+          "description": 1,
+          "websiteUrl": 1,
+          "createdAt": 1,
+          "isMembership": 1
         }
       )
       .sort([[sortBy, sortDirection]])
@@ -40,6 +47,11 @@ export class BlogsRepository {
     // const newBlog = this.BlogModel.create(createDto, this.BlogModel);
     return newBlog.save();
   }
+  async createPost(postDto: createPostForBlogInputModel, getBlog: BlogDocument): Promise<Post> {
+    const postForBlog = Blog.createPost(postDto, getBlog, this.PostModel);
+    // const newBlog = this.BlogModel.create(createDto, this.BlogModel);
+    return postForBlog.save();
+  }
   async findBlogById(blogId: ObjectId): Promise<BlogDocument> {
     const blog = this.BlogModel
       .findOne({ _id: blogId });
@@ -47,7 +59,7 @@ export class BlogsRepository {
     return blog;
   }
   async save(blog: BlogDocument) {
-    await blog.save();
+    return await blog.save();
   }
   // async getTotalCountBlogs(filter: Filter<BlogDBType>): Promise<number> {
   async getTotalCountBlogs(filter: any): Promise<number> {

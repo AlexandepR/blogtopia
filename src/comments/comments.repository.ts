@@ -1,16 +1,15 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { PostModelType } from "../posts/type/posts.schema";
-import { CommentDocument, CommentModelType } from "./type/comments.schema";
+import { Post, PostModelType } from "../posts/type/posts.schema";
+import { Comment, CommentDocument, CommentModelType } from "./type/comments.schema";
 import { Blog, BlogModelType } from "../blogs/type/blogs.schema";
 
 @Injectable()
 export class CommentsRepository {
   constructor(
-    @InjectModel(Blog.name)
-    private BlogModel: BlogModelType,
-    private PostModel: PostModelType,
-    private CommentModel: CommentModelType,
+    @InjectModel(Blog.name) private BlogModel: BlogModelType,
+    @InjectModel(Post.name) private PostModel: PostModelType,
+    @InjectModel(Comment.name) private CommentModel: CommentModelType,
   ) {
   }
   async getComments(

@@ -2,27 +2,26 @@ import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Post, PostDocument, PostModelType } from "../posts/type/posts.schema";
 import { BlogDocument } from "../blogs/type/blogs.schema";
-import { CreatePostInputModelType } from "../posts/type/postsType";
+import { CreatePostInputModelType, PostsType } from "../posts/type/postsType";
 import { ObjectId } from "mongodb";
 
 @Injectable()
 export class PostsRepository {
   constructor(
-    @InjectModel(Post.name)
-    private PostModel: PostModelType) {
-  }
+    @InjectModel(Post.name) private PostModel: PostModelType) {}
   async getPosts(
     skip: number,
     pageSize: number,
     filter: any,
     sortBy: string,
     sortDirection: "asc" | "desc"
-  ): Promise<PostDocument[]> {
+  ): Promise<any> {
     const posts = await this.PostModel
-      .find(filter)
+      .find()
       .sort([[sortBy, sortDirection]])
       .skip(skip)
       .limit(pageSize)
+      .lean()
     return posts
   }
   async createPost(createDto: CreatePostInputModelType,blog: BlogDocument): Promise<Post> {
