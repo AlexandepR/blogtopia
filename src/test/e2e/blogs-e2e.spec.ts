@@ -272,58 +272,69 @@ describe("e2e test for Blog", () => {
         }))
   })
   it('should create 11 post and status 200', async () => {
+    post2.blogId = blogId1
+    post3.blogId = blogId1
+    post4.blogId = blogId1
+    post5.blogId = blogId1
+    post6.blogId = blogId1
+    post7.blogId = blogId1
+    post8.blogId = blogId1
+    post9.blogId = blogId1
+    post10.blogId = blogId1
+    post11.blogId = blogId1
+    post12.blogId = blogId1
     await request(httpServer)
-      .post(`/blogs/${blogId1}/posts`)
+      .post(`/posts`)
       // .set('Authorization', basicAuth)
       .send(post2)
       .expect(201);
     await request(httpServer)
-      .post(`/blogs/${blogId1}/posts`)
+      .post(`/posts`)
       // .set('Authorization', basicAuth)
       .send(post3)
       .expect(201);
     await request(httpServer)
-      .post(`/blogs/${blogId1}/posts`)
+      .post(`/posts`)
       // .set('Authorization', basicAuth)
       .send(post4)
       .expect(201);
     await request(httpServer)
-      .post(`/blogs/${blogId1}/posts`)
+      .post(`/posts`)
       // .set('Authorization', basicAuth)
       .send(post5)
       .expect(201);
     await request(httpServer)
-      .post(`/blogs/${blogId1}/posts`)
+      .post(`/posts`)
       // .set('Authorization', basicAuth)
       .send(post6)
       .expect(201);
     await request(httpServer)
-      .post(`/blogs/${blogId1}/posts`)
+      .post(`/posts`)
       // .set('Authorization', basicAuth)
       .send(post7)
       .expect(201);
     await request(httpServer)
-      .post(`/blogs/${blogId1}/posts`)
+      .post(`/posts`)
       // .set('Authorization', basicAuth)
       .send(post8)
       .expect(201);
     await request(httpServer)
-      .post(`/blogs/${blogId1}/posts`)
+      .post(`/posts`)
       // .set('Authorization', basicAuth)
       .send(post9)
       .expect(201);
     await request(httpServer)
-      .post(`/blogs/${blogId1}/posts`)
+      .post(`/posts`)
       // .set('Authorization', basicAuth)
       .send(post10)
       .expect(201);
     await request(httpServer)
-      .post(`/blogs/${blogId1}/posts`)
+      .post(`/posts`)
       // .set('Authorization', basicAuth)
       .send(post11)
       .expect(201);
     await request(httpServer)
-      .post(`/blogs/${blogId1}/posts`)
+      .post(`/posts`)
       // .set('Authorization', basicAuth)
       .send(post12)
       .expect(201);
