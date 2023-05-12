@@ -33,17 +33,31 @@ export const parseQueryPaginator = (query:QueryType): QueryType => {
 export const parseQueryUsersPaginator = (query: ParamsUsersType): QueryUsersPaginator => {
   let filter = {};
   if (query.searchLoginTerm) {
-    filter["login"] = { $regex: query.searchLoginTerm, $options: "i" };
+    filter = { 'login': { $regex: query.searchLoginTerm, $options: 'i' } };
   }
-
   if (query.searchEmailTerm) {
-    filter["email"] = { $regex: query.searchEmailTerm, $options: "i" };
+    filter = { 'email': { $regex: query.searchEmailTerm, $options: 'i' } };
   }
-
   if (query.searchLoginTerm && query.searchEmailTerm) {
-    filter["$or"] = [{ "login": { $regex: query.searchLoginTerm, $options: "i" } },
-      { "email": { $regex: query.searchEmailTerm, $options: "i" } }];
+    filter = {
+      $or: [
+        { 'login': { $regex: query.searchLoginTerm, $options: 'i' } },
+        { 'email': { $regex: query.searchEmailTerm, $options: 'i' } }
+      ]
+    };
   }
+  // if (query.searchLoginTerm) {
+  //   filter["login"] = { $regex: query.searchLoginTerm, $options: "i" };
+  // }
+  //
+  // if (query.searchEmailTerm) {
+  //   filter["email"] = { $regex: query.searchEmailTerm, $options: "i" };
+  // }
+  //
+  // if (query.searchLoginTerm && query.searchEmailTerm) {
+  //   filter["$or"] = [{ "login": { $regex: query.searchLoginTerm, $options: "i" } },
+  //     { "email": { $regex: query.searchEmailTerm, $options: "i" } }];
+  // }
   return {
     filter: filter,
     pageNumber: query.pageNumber ? +query.pageNumber : 1,
