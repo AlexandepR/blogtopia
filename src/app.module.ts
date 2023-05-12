@@ -35,7 +35,7 @@ import { settingsEnv } from "./settings/settings";
       serveRoot: process.env.NODE_ENV === "development" ? "/" : "/swagger"
     }),
     ConfigModule.forRoot(),
-    MongooseModule.forRoot(process.env.MONGO_URL, {
+    MongooseModule.forRoot(settingsEnv.MONGO_URL, {
     // MongooseModule.forRoot(settingsEnv.MONGO_URL, {
     // MongooseModule.forRoot('mongodb:127.0.0.1:27017', {
     //   dbName: 'blogtopia',

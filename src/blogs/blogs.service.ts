@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { BlogsRepository } from "./blogs.repository";
 import { BlogType, CreateBlogInputModelType, createPostForBlogInputModel, PutBlogDtoType } from "./type/blogsType";
 import { PaginationType, ParamsType } from "../types/types";
@@ -13,8 +13,9 @@ import { PostsRepository } from "../posts/posts.repository";
 export class BlogsService {
   constructor(
     protected blogsRepository: BlogsRepository,
-    protected postsRepository: PostsRepository,
-  ) {}
+    protected postsRepository: PostsRepository
+  ) {
+  }
 
   async findAll(query): Promise<PaginationType<BlogDocument[]>> {
     const { term, pageSize, pageNumber, sortDirection, sortBy } = parseQueryPaginator(query);
@@ -33,6 +34,7 @@ export class BlogsService {
   }
   async createBlog(dto: CreateBlogInputModelType): Promise<BlogType> {
     const createBlog = await this.blogsRepository.create(dto);
+    if(!createBlog) throw new HttpException('', HttpStatus.NOT_FOUND)
     return {
       id: createBlog._id.toString(),
       name: createBlog.name,
@@ -42,11 +44,12 @@ export class BlogsService {
       isMembership: createBlog.isMembership
     };
   }
-  async createPostForBlog(postDto:createPostForBlogInputModel, id: string): Promise<outputPostModelType | null> {
+  async createPostForBlog(postDto: createPostForBlogInputModel, id: string): Promise<outputPostModelType | null> {
     // idParamsValidator(req.params.blogId, res);
     const blogId = new Types.ObjectId(id);
-    const getBlog = await this.blogsRepository.findBlogById(blogId)
-    const createPost = await this.blogsRepository.createPost(postDto,getBlog);
+    const getBlog = await this.blogsRepository.findBlogById(blogId);
+    if (!getBlog) throw new HttpException("", HttpStatus.NOT_FOUND);
+    const createPost = await this.blogsRepository.createPost(postDto, getBlog);
     return {
       id: createPost._id.toString(),
       title: createPost.title,
@@ -61,30 +64,36 @@ export class BlogsService {
         myStatus: createPost.extendedLikesInfo.myStatus,
         newestLikes: createPost.extendedLikesInfo.newestLikes
       }
-    }
+    };
     // const { title, shortDescription, content } = dto;
     // const newPostForBlog = await this.blogsService.createPostForBlog(
     //   blogId, title, shortDescription, content);
   }
   async getBlog(id: string) {
-    const blogId = new Types.ObjectId(id)
-    const blog = await this.blogsRepository.findBlogById(blogId)
-    return {
-      id: blog._id,
-      name: blog.name,
-      description: blog.description,
-      websiteUrl: blog.websiteUrl,
-      createdAt: blog.createdAt,
-      isMembership: blog.isMembership
-    }
+    // if(!blog) throw new BadRequestException(HttpStatus.NOT_FOUND)
+      const blogId = new Types.ObjectId(id);
+      const blog = await this.blogsRepository.findBlogById(blogId);
+      if (!blog) throw new HttpException("", HttpStatus.NOT_FOUND);
+      return {
+        id: blog._id,
+        name: blog.name,
+        description: blog.description,
+        websiteUrl: blog.websiteUrl,
+        createdAt: blog.createdAt,
+        isMembership: blog.isMembership
+      };
   }
-  async getPosts(blogId: string, query: ParamsType): Promise<PaginationType<PostsTypeFiltered[]>> {
+  async getPosts(id: string, query: ParamsType): Promise<PaginationType<PostsTypeFiltered[]>> {
     const { term, pageSize, pageNumber, sortDirection, sortBy } = parseQueryPaginator(query);
     const filter = term ? { name: { $regex: term, $options: "i" } } : {};
     const totalCountPosts = await this.postsRepository.getTotalCountPosts(filter);
     const skip = skipPage(pageNumber, pageSize);
     const pagesCount = pagesCounter(totalCountPosts, pageSize);
+    const blogId = new Types.ObjectId(id);
+    const blog = await this.blogsRepository.findBlogById(blogId);
+    if(!blog) throw new HttpException('', HttpStatus.NOT_FOUND)
     const posts = await this.postsRepository.getPosts(skip, pageSize, filter, sortBy, sortDirection);
+    // if(!posts || posts.length <= 0) throw new HttpException('', HttpStatus.NOT_FOUND)
     if (posts) {
       const postsArray = posts.map(({
                                       _id,
@@ -106,7 +115,7 @@ export class BlogsService {
                                       ...rest
 
                                     }) => {
-        let userStatus: 'None' | 'Like' | 'Dislike' = 'None';
+        let userStatus: "None" | "Like" | "Dislike" = "None";
         // if (userId) {
         //   const userLike = extendedLikesInfo.likesData.find((like) => like.userId.toString() === userId.toString());
         //   const userDislike = extendedLikesInfo.dislikesData.find((dislike) => dislike.userId.toString() === userId.toString());
@@ -125,7 +134,7 @@ export class BlogsService {
             myStatus: userStatus,
             ...restExtendedLikesInfo,
             newestLikes
-          },
+          }
         };
       });
       return {
@@ -142,12 +151,12 @@ export class BlogsService {
   async updateBlog(id: string, dto: PutBlogDtoType) {
     const blogId = new Types.ObjectId(id);
     const blog = await this.blogsRepository.findBlogById(blogId);
-    blog.updateBlog(dto)
-    return await this.blogsRepository.save(blog)
+    blog.updateBlog(dto);
+    return await this.blogsRepository.save(blog);
   }
   async deleteBlog(id: string) {
-    const blogId = new Types.ObjectId(id)
-    return await this.blogsRepository.delete(blogId)
+    const blogId = new Types.ObjectId(id);
+    return await this.blogsRepository.delete(blogId);
   }
   async deleteAllBlog(): Promise<boolean> {
     return await this.blogsRepository.deleteAllBlogs();

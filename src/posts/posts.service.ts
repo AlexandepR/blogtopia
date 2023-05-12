@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { PaginationType, ParamsType } from "../types/types";
 import { pagesCounter, parseQueryPaginator, skipPage } from "../utils/helpers";
 import {
@@ -129,6 +129,7 @@ export class PostsService {
   async getPost(id: string): Promise<outputPostModelType> {
     const PostId = new Types.ObjectId(id);
     const post = await this.postsRepository.findPostById(PostId);
+    if(!post) throw new HttpException('', HttpStatus.NOT_FOUND)
     // const userStatus = await this.postsRepository.findLikesStatus(postId, userId);
     // if (post) {
     //
@@ -159,11 +160,13 @@ export class PostsService {
   async updatePost(id: string, dto: PutPostInputModelType) {
     const postId = new Types.ObjectId(id);
     const post = await this.postsRepository.findPostById(postId);
+    if(!post) throw new HttpException('', HttpStatus.NOT_FOUND)
     await post.updatePost(dto);
     return await post.save();
   }
   async deletePost(id: string) {
     const postId = new Types.ObjectId(id);
+    if(!postId) throw new HttpException('', HttpStatus.NOT_FOUND)
     return await this.postsRepository.delete(postId);
   }
   async deleteAllPost(): Promise<boolean> {

@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { PaginationType } from "../types/types";
 import { UsersRepository } from "./users.repository";
 import { Types } from "mongoose";
@@ -56,6 +56,12 @@ export class UsersService {
     }
     return null;
   }
+  async getUser(id:string) {
+    const userId = new Types.ObjectId(id)
+    const user = await this.usersRepository.findUserById(userId);
+    if (!user) throw new HttpException("", HttpStatus.NOT_FOUND);
+    return
+  }
   async createUser(dto: CreateUserInputModelType): Promise<UserType | null> {
     const createPost = await this.usersRepository.createUser(dto);
     return {
@@ -68,7 +74,9 @@ export class UsersService {
 
   async deleteUser(id: string) {
     const userId = new Types.ObjectId(id)
-    return await this.usersRepository.deleteUser(userId)
+    const user = await this.usersRepository.deleteUser(userId)
+    if (!user) throw new HttpException("", HttpStatus.NOT_FOUND);
+    return user
   }
   async deleteAllUser(): Promise<boolean> {
     return await this.usersRepository.deleteAllUser();

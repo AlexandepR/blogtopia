@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, 
 import { BlogsService } from "./blogs.service";
 import { CreateBlogInputModelType, createPostForBlogInputModel, PutBlogDtoType } from "./type/blogsType";
 import { ParamsType } from "../types/types";
+import { Types } from "mongoose";
 
 
 @Controller("blogs")
@@ -24,7 +25,7 @@ export class BlogsController {
   ) {
     return await this.blogsService.getBlog(id);
   }
-  @Get("/:id/posts")
+  @Get(":id/posts")
   async GetPostsByBlog(
     @Param("id")
       id: string,
@@ -38,7 +39,7 @@ export class BlogsController {
   ) {
     return await this.blogsService.createBlog(dto);
   }
-  @Post("/:id/posts")
+  @Post(":id/posts")
   async createPostForBlog(
     @Body() dto: createPostForBlogInputModel,
     @Param("id") id: string
@@ -52,7 +53,9 @@ export class BlogsController {
       id: string,
     @Body() dto: PutBlogDtoType
   ) {
-    return await this.blogsService.updateBlog(id, dto);
+    const purBlog = await this.blogsService.updateBlog(id, dto);
+    if(!purBlog) return (HttpStatus.NOT_FOUND)
+    return purBlog
   }
   @Delete(":id")
   @HttpCode(HttpStatus.NO_CONTENT)

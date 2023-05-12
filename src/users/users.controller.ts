@@ -13,7 +13,13 @@ export class UsersController {
   ) {
     return this.usersService.findAll(query);
   }
-
+  @Get(":id")
+  async getUser(
+    @Param("id")
+      id: string
+  ) {
+    return this.usersService.getUser(id);
+  }
   @Post()
   async createUser(@Body() dto: CreateUserInputModelType) {
     return await this.usersService.createUser(dto);

@@ -35,6 +35,10 @@ export class UsersRepository {
       .countDocuments(filter);
     return count;
   }
+  async findUserById(id: ObjectId) {
+    return this.UserModel
+      .findOne({_id: id})
+  }
   async createUser(userDto: CreateUserInputModelType): Promise<User> {
     const user = User.create(userDto, this.UserModel);
     // const newBlog = this.BlogModel.create(createDto, this.BlogModel);
