@@ -8,13 +8,22 @@
 //   websiteUrl: string,
 // }
 
+import { parseQueryUsersPaginator } from "../../utils/helpers";
+
 export type ParamsUsersType = {
   pageSize: number,
   pageNumber: number,
   sortDirection: "asc" | "desc",
-  sortBy: string
+  sortBy: string,
   searchLoginTerm: string,
   searchEmailTerm: string,
+}
+export type QueryUsersPaginator = {
+  filter: Record<string, any>,
+  pageSize: number,
+  pageNumber: number,
+  sortDirection: "asc" | "desc",
+  sortBy: string,
 }
 
 export type UserType = {

@@ -21,7 +21,16 @@ export type BlogType = {
   isMembership: boolean
 }
 export type QueryType = {
-  term: string,
+  searchNameTerm: string,
+  pageSize: number,
+  pageNumber: number,
+  sortDirection: "asc" | "desc",
+  sortBy: string
+}
+export type QueryUsersType = {
+  // filter?: Record<string, any>,
+  // searchLoginTerm?: string,
+  // searchEmailTerm?: string,
   pageSize: number,
   pageNumber: number,
   sortDirection: "asc" | "desc",

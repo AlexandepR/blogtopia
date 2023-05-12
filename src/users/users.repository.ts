@@ -23,12 +23,20 @@ export class UsersRepository {
     sortDirection: "asc" | "desc"
   ): Promise<User[]> {
     const users = await this.UserModel
-      .find(filter)
+      .find(filter, {
+          _id: 0,
+          id: "$_id",
+          "login": 1,
+          "email": 1,
+          "createdAt": 1
+          // 'password': 0,
+        }
+      )
       .sort([[sortBy, sortDirection]])
       .skip(skip)
-      .limit(pageSize)
-      .lean()
-    return users
+      .limit(pageSize);
+    // .lean()
+    return users;
   }
   async getTotalCountUsers(filter: any): Promise<number> {
     const count = await this.UserModel
@@ -37,7 +45,7 @@ export class UsersRepository {
   }
   async findUserById(id: ObjectId) {
     return this.UserModel
-      .findOne({_id: id})
+      .findOne({ _id: id });
   }
   async createUser(userDto: CreateUserInputModelType): Promise<User> {
     const user = User.create(userDto, this.UserModel);

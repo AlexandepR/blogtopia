@@ -22,8 +22,8 @@ export class PostsService {
 
   async findAll(query): Promise<PaginationType<PostsTypeFiltered[]>> {
     // async findAll(query): Promise<any> {
-    const { term, pageSize, pageNumber, sortDirection, sortBy } = parseQueryPaginator(query);
-    const filter = term ? { name: { $regex: term, $options: "i" } } : {};
+    const { searchNameTerm, pageSize, pageNumber, sortDirection, sortBy } = parseQueryPaginator(query);
+    const filter = searchNameTerm ? { name: { $regex: searchNameTerm, $options: "i" } } : {};
     const totalCountPosts = await this.postsRepository.getTotalCountPosts(filter);
     const skip = skipPage(pageNumber, pageSize);
     const pagesCount = pagesCounter(totalCountPosts, pageSize);
@@ -108,11 +108,11 @@ export class PostsService {
 
   }
   async getCommentByPost(id: string, query: ParamsType) {
-    const { term, pageSize, pageNumber, sortDirection, sortBy } = parseQueryPaginator(query);
+    const { searchNameTerm, pageSize, pageNumber, sortDirection, sortBy } = parseQueryPaginator(query);
     const postId = new Types.ObjectId(id);
     const post = await this.postsRepository.findPostById(postId);
     // const userStatus = await this.postsRepository.findLikesStatus(postId, userId);
-    const filter = term ? { name: { $regex: term, $options: "i" } } : {};
+    const filter = searchNameTerm ? { name: { $regex: searchNameTerm, $options: "i" } } : {};
     const getTotalCountBlogs = await this.blogsRepository.getTotalCountBlogs(filter);
     const skip = skipPage(pageNumber, pageSize);
     const pagesCount = pagesCounter(getTotalCountBlogs, pageSize);

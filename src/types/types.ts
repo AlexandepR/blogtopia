@@ -19,7 +19,7 @@ export type PaginationType<T> = {
   items: T
 }
 export type ParamsType = {
-  term: string,
+  searchNameTerm: string,
   pageSize: number,
   pageNumber: number,
   sortDirection: "asc" | "desc",

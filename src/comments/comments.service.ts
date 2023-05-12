@@ -14,8 +14,8 @@ export class CommentsService {
   ) {}
 
   async findAll(query): Promise<PaginationType<Omit<CommentType, 'postId' | 'likesInfo'>[]> | null> {
-    const { term, pageSize, pageNumber, sortDirection, sortBy } = parseQueryPaginator(query);
-    const filter = term ? { name: { $regex: term, $options: "i" } } : {};
+    const { searchNameTerm, pageSize, pageNumber, sortDirection, sortBy } = parseQueryPaginator(query);
+    const filter = searchNameTerm ? { name: { $regex: searchNameTerm, $options: "i" } } : {};
     const totalCountComments = await this.commentsRepository.getTotalCountComments(filter);
     const skip = skipPage(pageNumber, pageSize);
     const pagesCount = pagesCounter(totalCountComments, pageSize);

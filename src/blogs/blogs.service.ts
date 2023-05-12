@@ -18,8 +18,8 @@ export class BlogsService {
   }
 
   async findAll(query): Promise<PaginationType<BlogDocument[]>> {
-    const { term, pageSize, pageNumber, sortDirection, sortBy } = parseQueryPaginator(query);
-    const filter = term ? { name: { $regex: term, $options: "i" } } : {};
+    const { searchNameTerm, pageSize, pageNumber, sortDirection, sortBy } = parseQueryPaginator(query);
+    const filter = searchNameTerm ? { name: { $regex: searchNameTerm, $options: "i" } } : {};
     const getTotalCountBlogs = await this.blogsRepository.getTotalCountBlogs(filter);
     const skip = skipPage(pageNumber, pageSize);
     const pagesCount = pagesCounter(getTotalCountBlogs, pageSize);
@@ -84,8 +84,8 @@ export class BlogsService {
       };
   }
   async getPosts(id: string, query: ParamsType): Promise<PaginationType<PostsTypeFiltered[]>> {
-    const { term, pageSize, pageNumber, sortDirection, sortBy } = parseQueryPaginator(query);
-    const filter = term ? { name: { $regex: term, $options: "i" } } : {};
+    const { searchNameTerm, pageSize, pageNumber, sortDirection, sortBy } = parseQueryPaginator(query);
+    const filter = searchNameTerm ? { name: { $regex: searchNameTerm, $options: "i" } } : {};
     const totalCountPosts = await this.postsRepository.getTotalCountPosts(filter);
     const skip = skipPage(pageNumber, pageSize);
     const pagesCount = pagesCounter(totalCountPosts, pageSize);

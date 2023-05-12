@@ -39,7 +39,7 @@ export class BlogsRepository {
       )
       .sort([[sortBy, sortDirection]])
       .skip(skip)
-      .limit(pageSize);
+      .limit(pageSize)
     return blogs;
   }
   async create(createDto: CreateBlogInputModelType): Promise<Blog> {

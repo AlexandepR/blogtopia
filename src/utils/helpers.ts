@@ -18,21 +18,44 @@
 // }
 //
 import { PaginationQueryType } from "./helpers-type";
-import { QueryType } from "../blogs/type/blogsType";
+import { QueryType, QueryUsersType } from "../blogs/type/blogsType";
+import { ParamsUsersType, QueryUsersPaginator } from "../users/type/usersTypes";
 
 export const parseQueryPaginator = (query:QueryType): QueryType => {
   return {
     pageNumber: query.pageNumber ? +query.pageNumber : 1,
     pageSize: query.pageSize ? +query.pageSize : 10,
-    term: query.term?.toString() || null,
-    sortBy: (query.sortBy || 'createdAt') as string,
-    sortDirection: query.sortDirection === 'asc' ? 'asc' : 'desc',
+    searchNameTerm: query.searchNameTerm?.toString() || null,
+    sortBy: (query.sortBy || "createdAt") as string,
+    sortDirection: query.sortDirection === "asc" ? "asc" : "desc"
+  };
+};
+export const parseQueryUsersPaginator = (query: ParamsUsersType): QueryUsersPaginator => {
+  let filter = {};
+  if (query.searchLoginTerm) {
+    filter["login"] = { $regex: query.searchLoginTerm, $options: "i" };
   }
-}
 
-export const pagesCounter = (totalCount: number, pageSize: number) => Math.ceil(totalCount / pageSize)
+  if (query.searchEmailTerm) {
+    filter["email"] = { $regex: query.searchEmailTerm, $options: "i" };
+  }
 
-export const skipPage = (pageNumber: number, pageSize: number) => (pageNumber - 1) * pageSize
+  if (query.searchLoginTerm && query.searchEmailTerm) {
+    filter["$or"] = [{ "login": { $regex: query.searchLoginTerm, $options: "i" } },
+      { "email": { $regex: query.searchEmailTerm, $options: "i" } }];
+  }
+  return {
+    filter: filter,
+    pageNumber: query.pageNumber ? +query.pageNumber : 1,
+    pageSize: query.pageSize ? +query.pageSize : 10,
+    sortBy: (query.sortBy || "createdAt") as string,
+    sortDirection: query.sortDirection === "asc" ? "asc" : "desc"
+  };
+};
+
+export const pagesCounter = (totalCount: number, pageSize: number) => Math.ceil(totalCount / pageSize);
+
+export const skipPage = (pageNumber: number, pageSize: number) => (pageNumber - 1) * pageSize;
 
 // export const updatePostLikesInfo = (post: PostsDBType, likeStatus: string, newLikesData?: PostLikesType) => {
 //   if (newLikesData) {
