@@ -53,7 +53,7 @@ export class BlogsRepository {
     return postForBlog.save();
   }
   async findBlogById(blogId: ObjectId): Promise<BlogDocument> {
-    const blog = this.BlogModel
+    const blog = await this.BlogModel
       .findOne({ _id: blogId });
     // .lean()
     return blog;

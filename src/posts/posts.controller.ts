@@ -21,15 +21,15 @@ export class PostsController {
   ) {
     return await this.postsService.getPost(id);
   }
-  @Get("/:id/comments")
-  async getCommentByPost(
-    @Param("id")
-      id: string,
-    @Query()
-      query: ParamsType
-  ) {
-    return await this.postsService.getCommentByPost(id,query);
-  }
+  // @Get("/:id/comments")
+  // async getCommentByPost(
+  //   @Param("id")
+  //     id: string,
+  //   @Query()
+  //     query: ParamsType
+  // ) {
+  //   return await this.postsService.getCommentByPost(id,query);
+  // }
 
   @Post()
   async createPost(@Body() dto: CreatePostInputModelType) {
@@ -54,8 +54,8 @@ export class PostsController {
   async deletePost(
     @Param("id")
       id: string) {
-    await this.postsService.deletePost(id);
-    return `This blog #${id} removes`;
+    return await this.postsService.deletePost(id);
+    // return `This blog #${id} removes`;
   }
   @Delete()
   async deleteAllPost() {

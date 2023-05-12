@@ -29,7 +29,7 @@ export class PostsRepository {
     return newPost.save();
   }
   async findPostById(postId: ObjectId): Promise<PostDocument> {
-    const post = this.PostModel
+    const post = await this.PostModel
       .findOne({ _id: postId });
     return post;
   }

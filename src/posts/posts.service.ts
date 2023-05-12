@@ -168,7 +168,6 @@ export class PostsService {
     const postId = new Types.ObjectId(id);
     const post = await this.postsRepository.findPostById(postId);
     if(!post) throw new HttpException('', HttpStatus.NOT_FOUND)
-    if(!postId) throw new HttpException('', HttpStatus.NOT_FOUND)
     return await this.postsRepository.delete(postId);
   }
   async deleteAllPost(): Promise<boolean> {
