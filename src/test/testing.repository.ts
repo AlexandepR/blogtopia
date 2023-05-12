@@ -23,9 +23,9 @@ export class TestingRepository {
       .deleteMany({});
     const delPosts = await this.PostModel
       .deleteMany({});
-    const delComments = await this.PostModel
+    const delComments = await this.CommentModel
       .deleteMany({});
-    const delUsers = await this.PostModel
+    const delUsers = await this.UserModel
       .deleteMany({});
     return delBlogs.deletedCount >= 1 &&
       delPosts.deletedCount >= 1  &&
