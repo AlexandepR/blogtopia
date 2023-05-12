@@ -93,7 +93,6 @@ export class BlogsService {
     const blog = await this.blogsRepository.findBlogById(blogId);
     if(!blog) throw new HttpException('', HttpStatus.NOT_FOUND)
     const posts = await this.postsRepository.getPosts(skip, pageSize, filter, sortBy, sortDirection);
-    // if(!posts || posts.length <= 0) throw new HttpException('', HttpStatus.NOT_FOUND)
     if (posts) {
       const postsArray = posts.map(({
                                       _id,
@@ -151,11 +150,14 @@ export class BlogsService {
   async updateBlog(id: string, dto: PutBlogDtoType) {
     const blogId = new Types.ObjectId(id);
     const blog = await this.blogsRepository.findBlogById(blogId);
+    if(!blog) throw new HttpException('', HttpStatus.NOT_FOUND)
     blog.updateBlog(dto);
     return await this.blogsRepository.save(blog);
   }
   async deleteBlog(id: string) {
     const blogId = new Types.ObjectId(id);
+    const blog = await this.blogsRepository.findBlogById(blogId);
+    if(!blog) throw new HttpException('', HttpStatus.NOT_FOUND)
     return await this.blogsRepository.delete(blogId);
   }
   async deleteAllBlog(): Promise<boolean> {

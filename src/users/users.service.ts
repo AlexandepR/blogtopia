@@ -74,8 +74,9 @@ export class UsersService {
 
   async deleteUser(id: string) {
     const userId = new Types.ObjectId(id)
+    const findUser = await this.usersRepository.findUserById(userId);
+    if (!findUser) throw new HttpException("", HttpStatus.NOT_FOUND);
     const user = await this.usersRepository.deleteUser(userId)
-    if (!user) throw new HttpException("", HttpStatus.NOT_FOUND);
     return user
   }
   async deleteAllUser(): Promise<boolean> {

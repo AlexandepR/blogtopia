@@ -188,17 +188,53 @@ describe("e2e test for Blog", () => {
       })
     );
   });
-  it("should return for GET posts error if :id from uri param not found; status 404;",
+  it("should return error for GET posts error if :id from uri param not found; status 404;",
     async () => {
       await request(httpServer)
         .get(`/blogs/645e62ec11c8f44c852ec699/posts`)
         .expect(404);
     });
-  it("should return for POST posts error if :id from uri param not found; status 404;",
+  it("should return error for POST posts error if :id from uri param not found; status 404;",
     async () => {
       await request(httpServer)
         .post(`/blogs/645e62ec11c8f44c852ec699/posts`)
         .send(post2)
+        .expect(404);
+    });
+  it("should return error for GET Blogs if :id from uri param not found; status 404;",
+    async () => {
+      await request(httpServer)
+        .get(`/blogs/645e62ec11c8f44c852ec699`)
+        .expect(404);
+    });
+  it("should return error for PUT Blogs if :id from uri param not found; status 404;",
+    async () => {
+      await request(httpServer)
+        .put(`/blogs/645e62ec11c8f44c852ec699`)
+        .expect(404);
+    });
+  it("should return error for DELETE Blogs if :id from uri param not found; status 404;",
+    async () => {
+      await request(httpServer)
+        .delete(`/blogs/645e62ec11c8f44c852ec699`)
+        .expect(404);
+    });
+  it("should return error for GET Posts if :id from uri param not found; status 404;",
+    async () => {
+      await request(httpServer)
+        .get(`/posts/645e62ec11c8f44c852ec699`)
+        .expect(404);
+    });
+  it("should return error for PUT Posts if :id from uri param not found; status 404;",
+    async () => {
+      await request(httpServer)
+        .put(`/posts/645e62ec11c8f44c852ec699`)
+        .expect(404);
+    });
+  it("should return error for DELETE Posts if :id from uri param not found; status 404;",
+    async () => {
+      await request(httpServer)
+        .delete(`/posts/645e62ec11c8f44c852ec699`)
         .expect(404);
     });
   it("should get post content: posts for specific blog with pagination,return status 200;", async () => {
