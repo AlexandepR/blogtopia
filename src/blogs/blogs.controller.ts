@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query } from "@nestjs/common";
 import { BlogsService } from "./blogs.service";
 import { CreateBlogInputModelType, createPostForBlogInputModel, PutBlogDtoType } from "./type/blogsType";
 import { ParamsType } from "../types/types";
@@ -46,6 +46,7 @@ export class BlogsController {
     return await this.blogsService.createPostForBlog(dto,id);
   }
   @Put(":id")
+  @HttpCode(HttpStatus.NO_CONTENT)
   async updateBlog(
     @Param("id")
       id: string,
@@ -54,6 +55,7 @@ export class BlogsController {
     return await this.blogsService.updateBlog(id, dto);
   }
   @Delete(":id")
+  @HttpCode(HttpStatus.NO_CONTENT)
   async deleteBlog(
     @Param("id")
       id: string) {

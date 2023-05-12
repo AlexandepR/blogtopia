@@ -32,10 +32,11 @@ import { settingsEnv } from "./settings/settings";
     // MongooseModule.forRoot(settingsEnv.MONGO_URL),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, "..", "swagger-static"),
-      serveRoot: settingsEnv.NODE_ENV === "development" ? "/" : "/swagger"
+      serveRoot: process.env.NODE_ENV === "development" ? "/" : "/swagger"
     }),
     ConfigModule.forRoot(),
-    MongooseModule.forRoot(settingsEnv.MONGO_URL, {
+    MongooseModule.forRoot(process.env.MONGO_URL, {
+    // MongooseModule.forRoot(settingsEnv.MONGO_URL, {
     // MongooseModule.forRoot('mongodb:127.0.0.1:27017', {
     //   dbName: 'blogtopia',
     //   loggerLevel: 'debug',

@@ -2,6 +2,8 @@ import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Blog, BlogModelType } from "../blogs/type/blogs.schema";
 import { Post, PostModelType } from "../posts/type/posts.schema";
+import { CommentModelType } from "../comments/type/comments.schema";
+import { UserModelType } from "../users/type/users.schema";
 
 
 
@@ -9,7 +11,9 @@ import { Post, PostModelType } from "../posts/type/posts.schema";
 export class TestingRepository {
   constructor(
     @InjectModel(Blog.name) private BlogModel: BlogModelType,
-    @InjectModel(Post.name) private PostModel: PostModelType
+    @InjectModel(Post.name) private PostModel: PostModelType,
+    @InjectModel(Post.name) private CommentModel: CommentModelType,
+    @InjectModel(Post.name) private UserModel: UserModelType,
   ) {
   }
 
@@ -19,6 +23,13 @@ export class TestingRepository {
       .deleteMany({});
     const delPosts = await this.PostModel
       .deleteMany({});
-    return delBlogs.deletedCount >= 1 && delPosts.deletedCount >= 1;
+    const delComments = await this.PostModel
+      .deleteMany({});
+    const delUsers = await this.PostModel
+      .deleteMany({});
+    return delBlogs.deletedCount >= 1 &&
+      delPosts.deletedCount >= 1  &&
+      delComments.deletedCount >= 1  &&
+      delUsers.deletedCount >= 1;
   }
 }

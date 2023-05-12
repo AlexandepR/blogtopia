@@ -4,7 +4,7 @@
 export const settingsEnv = {
   // const mongoUri : process.env.mongoURI || "mongodb://0.0.0.0:27017";
   PORT: process.env.PORT,
-  MONGO_URL: process.env.MONGO_URL as string,
+  MONGO_URL: process.env.MONGO_URL,
   // mongoUri: process.env.mongoUri as string,
   DB_NAME: process.env.DB_NAME,
   EMAIL_LOG: process.env.EMAIL_LOG,

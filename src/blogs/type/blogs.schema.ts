@@ -82,7 +82,7 @@ export class Blog {
     createNewBlog.name = dto.name;
     createNewBlog.description = dto.description;
     createNewBlog.websiteUrl = dto.websiteUrl;
-    createNewBlog.isMembership = true;
+    createNewBlog.isMembership = false;
     createNewBlog.createdAt = new Date().toISOString();
 
     return createNewBlog;

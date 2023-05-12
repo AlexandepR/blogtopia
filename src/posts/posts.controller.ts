@@ -50,6 +50,7 @@ export class PostsController {
      return
   }
   @Delete(":id")
+  @HttpCode(HttpStatus.NO_CONTENT)
   async deletePost(
     @Param("id")
       id: string) {
