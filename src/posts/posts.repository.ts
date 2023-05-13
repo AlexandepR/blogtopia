@@ -17,7 +17,7 @@ export class PostsRepository {
     sortDirection: "asc" | "desc"
   ): Promise<any> {
     const posts = await this.PostModel
-      .find()
+      .find(filter)
       .sort([[sortBy, sortDirection]])
       .skip(skip)
       .limit(pageSize)

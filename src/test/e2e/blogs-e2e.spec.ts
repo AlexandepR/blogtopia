@@ -125,31 +125,30 @@ describe("e2e test for Blog", () => {
     await app.close();
   });
   it("All data is deleted", async () => {
-    // await startApp();
     await request(httpServer)
       .delete("/testing/all-data")
       .expect(204);
   });
-  it("Should return length equal zero", async () => {
+  it("Should return length equal zero for Blog", async () => {
     const getBlogs = await request(httpServer)
       .get("/blogs")
       .expect(200);
     let blogs = getBlogs.body;
     expect(blogs.items.length).toBe(0);
   });
+  it("Should return length equal zero for Post", async () => {
+    const getPosts = await request(httpServer)
+      .get("/posts")
+      .expect(200);
+    let posts = getPosts.body;
+    expect(posts.items.length).toBe(0);
+  });
   it("Should create new blog and return", async () => {
     const createBlog1 = await request(httpServer)
       .post("/blogs")
-      // .set('Authorization', basicAuth)
       .send(blog1)
       .expect(201);
-    // const createBlog2 = await request(app)
-    //   .post('/blogs')
-    //   .set('Authorization', basicAuth)
-    //   .send(blog2)
-    //   .expect(201);
     blogId1 = createBlog1.body.id;
-    // blogId2 = createBlog2.body.id;
     expect(createBlog1.body).toEqual({
       id: expect.any(String),
       name: "testBlog1",
@@ -168,7 +167,7 @@ describe("e2e test for Blog", () => {
         shortDescription: post1.shortDescription,
         content: post1.content
       })
-      .expect(201);
+      .expect(201);               //create post 1
     post1Id = newPost.body.id;
     expect(newPost.body).toStrictEqual(
       expect.objectContaining({
@@ -287,57 +286,57 @@ describe("e2e test for Blog", () => {
       .post(`/posts`)
       // .set('Authorization', basicAuth)
       .send(post2)
-      .expect(201);
+      .expect(201);           // create 2
     await request(httpServer)
       .post(`/posts`)
       // .set('Authorization', basicAuth)
       .send(post3)
-      .expect(201);
+      .expect(201);            // create 3
     await request(httpServer)
       .post(`/posts`)
       // .set('Authorization', basicAuth)
       .send(post4)
-      .expect(201);
+      .expect(201);           // create 4
     await request(httpServer)
       .post(`/posts`)
       // .set('Authorization', basicAuth)
       .send(post5)
-      .expect(201);
+      .expect(201);            // create 5
     await request(httpServer)
       .post(`/posts`)
       // .set('Authorization', basicAuth)
       .send(post6)
-      .expect(201);
+      .expect(201);           // create 6
     await request(httpServer)
       .post(`/posts`)
       // .set('Authorization', basicAuth)
       .send(post7)
-      .expect(201);
+      .expect(201);           // create 7
     await request(httpServer)
       .post(`/posts`)
       // .set('Authorization', basicAuth)
       .send(post8)
-      .expect(201);
+      .expect(201);           // create 8
     await request(httpServer)
       .post(`/posts`)
       // .set('Authorization', basicAuth)
       .send(post9)
-      .expect(201);
+      .expect(201);           // create 9
     await request(httpServer)
       .post(`/posts`)
       // .set('Authorization', basicAuth)
       .send(post10)
-      .expect(201);
+      .expect(201);           // create 10
     await request(httpServer)
       .post(`/posts`)
       // .set('Authorization', basicAuth)
       .send(post11)
-      .expect(201);
+      .expect(201);           // create 11
     await request(httpServer)
       .post(`/posts`)
       // .set('Authorization', basicAuth)
       .send(post12)
-      .expect(201);
+      .expect(201);            // create 12
   })
   it("should get 12 post ,return status 200;", async () => {
     const posts1 = await request(httpServer)
@@ -354,10 +353,39 @@ describe("e2e test for Blog", () => {
           "items": expect.any(Array)
         }))
   })
-  it('should delete blog', async () => {
+  it('should delete post', async () => {
     await request(httpServer)
-      .delete(`/blogs/${blogId1}`)
+      .delete(`/posts/${post1Id}`)
       .expect(204);
   })
-
+  it("should get 11 post ,return status 200;", async () => {
+    const posts1 = await request(httpServer)
+      .get(`/blogs/${blogId1}/posts`)
+      // .set('Authorization', basicAuth)
+      .expect(200);
+    expect(posts1.body).toStrictEqual(
+      expect.objectContaining(
+        {
+          "pagesCount": 2,
+          "page": 1,
+          "pageSize": 10,
+          "totalCount": 11,
+          "items": expect.any(Array)
+        }))
+  })
+  // it("should get 11 post ,return status 200;", async () => {
+  //   const posts1 = await request(httpServer)
+  //     .get(`/blogs/${blogId1}/posts`)
+  //     // .set('Authorization', basicAuth)
+  //     .expect(200);
+  //   expect(posts1.body).toStrictEqual(
+  //     expect.objectContaining(
+  //       {
+  //         "pagesCount": 2,
+  //         "page": 1,
+  //         "pageSize": 10,
+  //         "totalCount": 11,
+  //         "items": expect.any(Array)
+  //       }))
+  // })
 });

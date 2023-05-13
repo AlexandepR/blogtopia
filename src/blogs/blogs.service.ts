@@ -85,7 +85,8 @@ export class BlogsService {
   }
   async getPosts(id: string, query: ParamsType): Promise<PaginationType<PostsTypeFiltered[]>> {
     const { searchNameTerm, pageSize, pageNumber, sortDirection, sortBy } = parseQueryPaginator(query);
-    const filter = searchNameTerm ? { name: { $regex: searchNameTerm, $options: "i" } } : {};
+    // const filter = searchNameTerm ? { name: { $regex: searchNameTerm, $options: "i" } } : {};
+    const filter = {blogId: new Types.ObjectId(id)}
     const totalCountPosts = await this.postsRepository.getTotalCountPosts(filter);
     const skip = skipPage(pageNumber, pageSize);
     const pagesCount = pagesCounter(totalCountPosts, pageSize);
