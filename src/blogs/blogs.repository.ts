@@ -42,7 +42,7 @@ export class BlogsRepository {
       .limit(pageSize)
     return blogs;
   }
-  async create(createDto: CreateBlogInputModelType): Promise<Blog> {
+  async createBlog(createDto: CreateBlogInputModelType): Promise<Blog> {
     const newBlog = Blog.create(createDto, this.BlogModel);
     // const newBlog = this.BlogModel.create(createDto, this.BlogModel);
     return newBlog.save();

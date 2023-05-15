@@ -1,18 +1,15 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query } from "@nestjs/common";
-import { BlogsService } from "./blogs.service";
-import { CreateBlogInputModelType, createPostForBlogInputModel, PutBlogDtoType } from "./type/blogsType";
+import { BlogInputClassModel, BlogsService, createPostForBlogInputClassModel } from "./blogs.service";
+import { PutBlogDtoType } from "./type/blogsType";
 import { ParamsType } from "../types/types";
-import { Types } from "mongoose";
 
 
 @Controller("blogs")
 export class BlogsController {
-  // constructor(private blogsService: UsersService) {}
   constructor(protected blogsService: BlogsService) {
 
   }
   @Get()
-  // getBlogs(@Query("term") term: string) {
   async getBlogs(
     @Query() query: ParamsType
   ) {
@@ -35,13 +32,13 @@ export class BlogsController {
   }
   @Post()
   async createBlog(
-    @Body() dto: CreateBlogInputModelType
+    @Body() dto: BlogInputClassModel
   ) {
     return await this.blogsService.createBlog(dto);
   }
   @Post(":id/posts")
   async createPostForBlog(
-    @Body() dto: createPostForBlogInputModel,
+    @Body() dto: createPostForBlogInputClassModel,
     @Param("id") id: string
   ) {
     return await this.blogsService.createPostForBlog(dto,id);
@@ -51,7 +48,7 @@ export class BlogsController {
   async updateBlog(
     @Param("id")
       id: string,
-    @Body() dto: PutBlogDtoType
+    @Body() dto: BlogInputClassModel
   ) {
     const purBlog = await this.blogsService.updateBlog(id, dto);
     if(!purBlog) return (HttpStatus.NOT_FOUND)
