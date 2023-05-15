@@ -7,7 +7,26 @@ import { pagesCounter, parseQueryPaginator, skipPage } from "../utils/helpers";
 import { Types } from "mongoose";
 import { outputPostModelType, PostsTypeFiltered } from "../posts/type/postsType";
 import { PostsRepository } from "../posts/posts.repository";
+import { IsUrl, MaxLength, validateOrReject } from "class-validator";
+import { CreateUserInputClassModel } from "../users/users.service";
+import { validateOrRejectModel } from "../helpers/validation.helpers";
 
+export class BlogInputClassModel {
+  @MaxLength(15)
+  name: string
+  @MaxLength(500)
+  description: string
+  @IsUrl()
+  websiteUrl: string
+}
+export class createPostForBlogInputClassModel {
+  @MaxLength(30)
+  title: string
+  @MaxLength(100)
+  shortDescription: string
+  @MaxLength(1000)
+  content: string
+}
 
 @Injectable()
 export class BlogsService {
@@ -32,8 +51,9 @@ export class BlogsService {
       items: getBlogs
     };
   }
-  async createBlog(dto: CreateBlogInputModelType): Promise<BlogType> {
-    const createBlog = await this.blogsRepository.create(dto);
+  async createBlog(dto: BlogInputClassModel): Promise<BlogType> {
+    await validateOrRejectModel(dto, BlogInputClassModel)
+    const createBlog = await this.blogsRepository.createBlog(dto);
     if(!createBlog) throw new HttpException('', HttpStatus.NOT_FOUND)
     return {
       id: createBlog._id.toString(),
@@ -44,8 +64,8 @@ export class BlogsService {
       isMembership: createBlog.isMembership
     };
   }
-  async createPostForBlog(postDto: createPostForBlogInputModel, id: string): Promise<outputPostModelType | null> {
-    // idParamsValidator(req.params.blogId, res);
+  async createPostForBlog(postDto: createPostForBlogInputClassModel, id: string): Promise<outputPostModelType | null> {
+    await validateOrRejectModel(postDto, createPostForBlogInputClassModel)
     const blogId = new Types.ObjectId(id);
     const getBlog = await this.blogsRepository.findBlogById(blogId);
     if (!getBlog) throw new HttpException("", HttpStatus.NOT_FOUND);
@@ -86,13 +106,13 @@ export class BlogsService {
   async getPosts(id: string, query: ParamsType): Promise<PaginationType<PostsTypeFiltered[]>> {
     const { searchNameTerm, pageSize, pageNumber, sortDirection, sortBy } = parseQueryPaginator(query);
     // const filter = searchNameTerm ? { name: { $regex: searchNameTerm, $options: "i" } } : {};
+    const blogId = new Types.ObjectId(id);
+    const blog = await this.blogsRepository.findBlogById(blogId);
+    if(!blog) throw new HttpException('', HttpStatus.NOT_FOUND)
     const filter = {blogId: new Types.ObjectId(id)}
     const totalCountPosts = await this.postsRepository.getTotalCountPosts(filter);
     const skip = skipPage(pageNumber, pageSize);
     const pagesCount = pagesCounter(totalCountPosts, pageSize);
-    const blogId = new Types.ObjectId(id);
-    const blog = await this.blogsRepository.findBlogById(blogId);
-    if(!blog) throw new HttpException('', HttpStatus.NOT_FOUND)
     const posts = await this.postsRepository.getPosts(skip, pageSize, filter, sortBy, sortDirection);
     if (posts) {
       const postsArray = posts.map(({
@@ -148,7 +168,8 @@ export class BlogsService {
     return null;
   }
 
-  async updateBlog(id: string, dto: PutBlogDtoType) {
+  async updateBlog(id: string, dto: BlogInputClassModel):Promise<BlogDocument> {
+    await validateOrRejectModel(dto, BlogInputClassModel)
     const blogId = new Types.ObjectId(id);
     const blog = await this.blogsRepository.findBlogById(blogId);
     if(!blog) throw new HttpException('', HttpStatus.NOT_FOUND)
