@@ -1,6 +1,4 @@
 import { Module } from "@nestjs/common";
-import { AppController } from "./app.controller";
-import { AppService } from "./app.service";
 import { ConfigModule } from "@nestjs/config";
 import { MongooseModule } from "@nestjs/mongoose";
 import { ServeStaticModule } from "@nestjs/serve-static";
@@ -25,6 +23,10 @@ import { CommentsRepository } from "./comments/comments.repository";
 import { TestingService } from "./test/testing.service";
 import { TestingRepository } from "./test/testing.repository";
 import { settingsEnv } from "./settings/settings";
+import { AuthModule } from "./auth/auth.module";
+import { UsersModule } from "./auth/users.module";
+import { AuthController } from "./auth/auth.cotroller";
+import { AuthService } from "./auth/auth.service";
 
 
 @Module({
@@ -35,6 +37,8 @@ import { settingsEnv } from "./settings/settings";
       serveRoot: process.env.NODE_ENV === "development" ? "/" : "/swagger"
     }),
     ConfigModule.forRoot(),
+    AuthModule,
+    UsersModule,
     MongooseModule.forRoot(settingsEnv.MONGO_URL, {
     // MongooseModule.forRoot(settingsEnv.MONGO_URL, {
     // MongooseModule.forRoot('mongodb:127.0.0.1:27017', {
@@ -58,10 +62,10 @@ import { settingsEnv } from "./settings/settings";
         name: User.name,
         schema: UserSchema,
       },
-    ])
+    ]),
   ],
   controllers: [
-    AppController,
+    AuthController,
     UsersController,
     BlogsController,
     PostsController,
@@ -69,7 +73,7 @@ import { settingsEnv } from "./settings/settings";
     TestingController,
   ],
   providers: [
-    AppService,
+    AuthService,
     BlogsService,
     BlogsRepository,
     PostsService,
@@ -79,7 +83,7 @@ import { settingsEnv } from "./settings/settings";
     CommentsService,
     CommentsRepository,
     TestingService,
-    TestingRepository
+    TestingRepository,
   ]
 })
 export class AppModule {
