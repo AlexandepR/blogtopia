@@ -1,4 +1,5 @@
-import { validateOrReject } from "class-validator";
+import { IsMongoId, validateOrReject } from "class-validator";
+import { ExecutionContext, Injectable } from "@nestjs/common";
 
 export const validateOrRejectModel = async ( model: any, ctor: { new(): any}) => {
   if (!(model instanceof ctor)) {
@@ -9,4 +10,11 @@ export const validateOrRejectModel = async ( model: any, ctor: { new(): any}) =>
   } catch (error) {
     throw new Error(error)
   }
+}
+/*
+* **check id, is not ObjectId, return error
+* */
+export class checkObjectId {
+  @IsMongoId({message: 'Invalid Id format'})
+  id:string;
 }
