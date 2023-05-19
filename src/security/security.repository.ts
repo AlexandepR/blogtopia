@@ -28,5 +28,30 @@ export class SecurityRepository {
       .updateOne({ userId: userId }, { $set: { issuedDateRefreshToken: issuedDate } });
     return updateDateSession.matchedCount === 1;
   }
-
+  async findSessions(userId: Types.ObjectId): Promise<any> {
+    const userSessions = await this.SecurityModel
+      .find({ userId: userId })
+      .lean();
+    if (userSessions) {
+      return userSessions;
+    } else return null;
+  }
+  async findSessionByDeviceId(deviceId: string): Promise<any> {
+    const sessionByDeviceId = await this.SecurityModel
+      .findOne({ deviceId: deviceId })
+      .lean();
+    if (sessionByDeviceId) {
+      return sessionByDeviceId;
+    } else return null;
+  }
+  async terminateOtherSessions(userId: Types.ObjectId, deviceId: string): Promise<boolean> {
+    const terminateSessions = await this.SecurityModel
+      .deleteMany({ userId: userId, deviceId: { $ne: deviceId } });
+    return terminateSessions.deletedCount >= 1;
+  }
+  async terminateSessionByDeviceId(deviceId: string): Promise<boolean> {
+    const terminateSession = await this.SecurityModel
+      .deleteOne({ deviceId: deviceId });
+    return terminateSession.deletedCount === 1;
+  }
 }
