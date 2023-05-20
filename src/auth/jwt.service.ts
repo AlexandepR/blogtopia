@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { UsersRepository } from "../users/users.repository";
 import { settingsEnv } from "../settings/settings";
-import jwt from 'jsonwebtoken';
+import * as jwt from 'jsonwebtoken';
 import { UserDocument } from "../users/type/users.schema";
 import { Types } from "mongoose";
 import { Request } from "express";
@@ -13,6 +13,7 @@ export class JwtService {
   ) {
   }
   async сreateJWT(user: UserDocument) {
+    console.log(user._id, 'test-----------id');
     const token = jwt.sign(
       {userId: user._id},
       settingsEnv.JWT_SECRET,

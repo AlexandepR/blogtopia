@@ -1,16 +1,14 @@
-
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
-import { JwtService } from '@nestjs/jwt';
-import { Request } from 'express';
-import { jwtConstants } from './constants';
-import { BASIC_AUTH_KEY, IS_PUBLIC_KEY } from "./decorators/public.decorator";
-import { BasicAuthGuard } from "./guards/basic.auth.guard";
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
+import { Reflector } from "@nestjs/core";
+import { JwtService } from "@nestjs/jwt";
+import { Request } from "express";
+import * as jwt from "jsonwebtoken";
+import { jwtConstants } from "../constants";
+import { BASIC_AUTH_KEY, IS_PUBLIC_KEY, REFRESH_TOKEN_AUTH_KEY } from "../decorators/public.decorator";
+import { BasicAuthGuard } from "./basic.auth.guard";
+import { settingsEnv } from "../../settings/settings";
+import { Types } from "mongoose";
+import { UsersRepository } from "../../users/users.repository";
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -18,6 +16,7 @@ export class AuthGuard implements CanActivate {
     private jwtService: JwtService,
     private reflector: Reflector,
     private basicAuthGuard: BasicAuthGuard,
+    private usersRepository: UsersRepository
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -44,11 +43,23 @@ export class AuthGuard implements CanActivate {
       if (!basicAuthResult) {
         throw new UnauthorizedException();
       }
-      // доп логика,
-      // сохранить информацию о пользователе в запросе
+      // доп логика,сохранить информацию о пользователе в запросе
       return true;
     }
-
+    const isRefreshToken = this.reflector.getAllAndOverride<boolean>(
+      REFRESH_TOKEN_AUTH_KEY,
+      [
+        context.getHandler(),
+        context.getClass(),
+      ],
+    );
+    if (isRefreshToken) {
+        const user = await this.extractUserFromRefreshToken(request)
+      if (!user) {
+        throw new UnauthorizedException();
+      }
+      return true;
+    }
 
     const token = this.extractTokenFromHeader(request);
     if (!token) {
@@ -56,9 +67,12 @@ export class AuthGuard implements CanActivate {
     }
     try {
       const payload = await this.jwtService.verifyAsync(token, {
-        secret: jwtConstants.secret,
+        secret: settingsEnv.JWT_SECRET,
       });
-      request['user'] = payload;
+      const user = request.user || {};
+      user._id = payload.userId;
+      request.user = user;
+      request.user._id = payload.userId;
     } catch {
       throw new UnauthorizedException();
     }
@@ -79,5 +93,16 @@ export class AuthGuard implements CanActivate {
       return { username, password };
     }
     return { username: '', password: '' };
+  }
+  private async extractUserFromRefreshToken(request: Request): Promise<boolean> {
+    const refreshToken = request.cookies.refreshToken;
+    const getRefreshToken: any = jwt.verify(refreshToken, settingsEnv.JWT_REFRESH_TOKEN_SECRET)
+    const user = await this.usersRepository.findUserById(new Types.ObjectId(getRefreshToken.userId))
+    if (!refreshToken || !getRefreshToken || !user) return false
+    for (const token of user.authData.expirationRefreshToken) {
+      if (token === refreshToken) return false
+    }
+    request.user = user;
+    return true
   }
 }
