@@ -4,12 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import { UsersService } from "../users/users.service";
 import { CreateUserInputClassModel } from "../users/type/usersTypes";
 import { validateOrRejectModel } from "../helpers/validation.helpers";
-import {
-  checkEmailInputClassModel,
-  codeInputModel,
-  loginInputClassModel,
-  newPasswordInputModel
-} from "./types/auth.types";
+import { checkEmailInputClassModel, loginInputClassModel, newPasswordInputModel } from "./types/auth.types";
 import { Types } from "mongoose";
 import { EmailService } from "../managers/email.service";
 import { generateHash, isPasswordCorrect, updateConfirmInfo } from "../utils/helpers";
@@ -30,17 +25,6 @@ export class AuthService {
   ) {
   }
   async registration(dto: CreateUserInputClassModel, ip: string) {
-    // const login = dto.login;
-    // const email = dto.email;
-    // const recoveryCode = dto.recoveryCode
-    // if (email || login) {
-    //   const findUserEmail = await this.usersService.findUserByLoginOrEmail(email);
-    //   const findUserLogin = await this.usersService.findUserByLoginOrEmail(login);
-    //   if (findUserEmail || findUserLogin ||
-    //     findUserLogin.emailConfirmation.isConfirmed === true) {
-    //     throw new HttpException('', HttpStatus.FORBIDDEN);
-    //   }
-    // }
     await validateOrRejectModel(dto, CreateUserInputClassModel);
     const passwordHash = await generateHash(dto.password);
     const confirmEmail = false;
@@ -96,14 +80,12 @@ export class AuthService {
 
       const token = await this.jwtService.сreateJWT(user);
       const refreshToken = await this.jwtService.createRefreshToken(user, createSession.deviceId);
-      // const refreshTokenCookie = `refreshToken=${refreshToken}; HttpOnly; Secure`;
-      const refreshTokenCookie = `refreshToken=${refreshToken}`;
+      const refreshTokenCookie = `refreshToken=${refreshToken}; HttpOnly; Secure`;
+      // const refreshTokenCookie = `refreshToken=${refreshToken}`;
     return { refreshTokenCookie, token };
   }
   async passwordRecovery(emailDto: checkEmailInputClassModel) {
     await validateOrRejectModel(emailDto, checkEmailInputClassModel);
-    const emailDtoInput = new checkEmailInputClassModel()
-    // const email = emailDtoInput as unknown as string
     const newCode = uuidv4();
     const updatePassRecoveryCode = await this.usersRepository.updatePassRecoveryCode(emailDto.email, newCode);
     if (!updatePassRecoveryCode) throw new HttpException("", HttpStatus.BAD_REQUEST);
@@ -126,20 +108,13 @@ export class AuthService {
   async refreshToken(req: Request) {
     const refreshToken = req.cookies.refreshToken;
     const user = req.user
-    // const getRefreshToken: any = this.jwtService.getSessionInfoByRefreshToken(refreshToken);
-    // const user = await this.usersRepository.findUserById(new Types.ObjectId(getRefreshToken.userId));
-    // if (!getRefreshToken || !user) throw new HttpException("", HttpStatus.BAD_REQUEST);
-    // for (const token of user.authData.expirationRefreshToken) {
-    //   if (token === refreshToken) throw new HttpException("", HttpStatus.UNAUTHORIZED);}
-    // req.user = user;
     const updateRefreshToken = await this.jwtService.updateRefreshToken(refreshToken);
-    // const findUser = await this.jwtService.getUserByRefreshToken(refreshToken);
     if (user && updateRefreshToken) {
       await this.securityService.updateDateSession(user._id);
       await this.jwtService.refreshTokenToDeprecated(user, refreshToken);
       const token = await this.jwtService.сreateJWT(user);
-      // const refreshTokenCookie = `refreshToken=${updateRefreshToken}; HttpOnly; Secure`;
-      const refreshTokenCookie = `refreshToken=${updateRefreshToken}`;
+      const refreshTokenCookie = `refreshToken=${updateRefreshToken}; HttpOnly; Secure`;
+      // const refreshTokenCookie = `refreshToken=${updateRefreshToken}`;
       return { refreshTokenCookie, token };
     }
     throw new HttpException("", HttpStatus.BAD_REQUEST);
