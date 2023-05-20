@@ -1,7 +1,5 @@
 import { UsersService } from "../users/users.service";
 import { CanActivate, ExecutionContext, HttpException, HttpStatus, Injectable, NestMiddleware } from "@nestjs/common";
-import { NextFunction, Request, Response } from "express";
-import { AttemptRepository } from "../attempts/attempt.repository";
 import { UsersRepository } from "../users/users.repository";
 
 // @Injectable()

@@ -27,7 +27,6 @@ import { AuthModule } from "./auth/auth.module";
 import { UsersModule } from "./auth/users.module";
 import { AuthController } from "./auth/auth.cotroller";
 import { AuthService } from "./auth/auth.service";
-import { Attempt, AttemptSchema } from "./attempts/attempts.schema";
 import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 import { APP_GUARD } from "@nestjs/core";
 import { EmailModule } from "./managers/email.module";
@@ -74,10 +73,10 @@ import { MailerModule } from "@nestjs-modules/mailer";
         name: User.name,
         schema: UserSchema,
       },
-      {
-        name: Attempt.name,
-        schema: AttemptSchema
-      },
+      // {
+      //   name: Attempt.name,
+      //   schema: AttemptSchema
+      // },
       {
         name: Security.name,
         schema: SecuritySchema,

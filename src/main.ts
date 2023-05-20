@@ -4,7 +4,8 @@ import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { settingsEnv } from "./settings/settings";
 import { BadRequestException, INestApplication, ValidationPipe } from "@nestjs/common";
 import { HttpExceptionFilter } from "./helpers/exception.filter";
-import * as cookieParser from 'cookie-parser';
+import cookieParser from "cookie-parser";
+
 
 export const addSettingsApp = (app: INestApplication) => {
   app.enableCors();
