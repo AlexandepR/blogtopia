@@ -3,7 +3,6 @@ import { Reflector } from "@nestjs/core";
 import { JwtService } from "@nestjs/jwt";
 import { Request } from "express";
 import * as jwt from "jsonwebtoken";
-import { jwtConstants } from "../constants";
 import { BASIC_AUTH_KEY, IS_PUBLIC_KEY, REFRESH_TOKEN_AUTH_KEY } from "../decorators/public.decorator";
 import { BasicAuthGuard } from "./basic.auth.guard";
 import { settingsEnv } from "../../settings/settings";
