@@ -30,6 +30,7 @@
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/serve-static": "^3.0.1",
     "@nestjs/swagger": "^6.3.0",
+    "@nestjs/throttler": "^4.0.0",
     "@types/cookie-parser": "^1.4.3",
     "@types/nodemailer": "^6.4.8",
     "bcrypt": "^5.1.0",
