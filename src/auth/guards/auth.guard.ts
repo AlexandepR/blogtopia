@@ -87,8 +87,8 @@ export class AuthGuard implements CanActivate {
   private extractBasicAuthCredentials(request: Request): { username: string; password: string } {
     const authorizationHeader = request.headers.authorization;
     if (authorizationHeader && authorizationHeader.startsWith('Basic ')) {
-      const credentials = authorizationHeader.slice('Basic '.length);
-      // const credentials = Buffer.from(base64Credentials, 'base64').toString('utf-8');
+      const base64Credentials = authorizationHeader.slice('Basic '.length);
+      const credentials = Buffer.from(base64Credentials, 'base64').toString('utf-8');
       const [username, password] = credentials.split(':');
       return { username, password };
     }
