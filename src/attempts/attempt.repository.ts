@@ -23,5 +23,4 @@ export class AttemptRepository {
       .exec();
     return result.deletedCount >= 1;
   }
-
 }

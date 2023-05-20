@@ -27,18 +27,30 @@ import { AuthModule } from "./auth/auth.module";
 import { UsersModule } from "./auth/users.module";
 import { AuthController } from "./auth/auth.cotroller";
 import { AuthService } from "./auth/auth.service";
+import { Attempt, AttemptSchema } from "./attempts/attempts.schema";
+import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
+import { APP_GUARD } from "@nestjs/core";
+import { EmailModule } from "./managers/email.module";
+import { SecurityService } from "./security/security.service";
+import { SecurityRepository } from "./security/security.repository";
+import { Security, SecuritySchema } from "./security/type/security.schema";
+import { MailerModule } from "@nestjs-modules/mailer";
 
 
 @Module({
   imports: [
-    // MongooseModule.forRoot(settingsEnv.MONGO_URL),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, "..", "swagger-static"),
       serveRoot: process.env.NODE_ENV === "development" ? "/" : "/swagger"
     }),
+    ThrottlerModule.forRoot({
+      ttl: 1,
+      limit: 5000,
+    }),
     ConfigModule.forRoot(),
     AuthModule,
     UsersModule,
+    EmailModule,
     MongooseModule.forRoot(settingsEnv.MONGO_URL, {
     // MongooseModule.forRoot(settingsEnv.MONGO_URL, {
     // MongooseModule.forRoot('mongodb:127.0.0.1:27017', {
@@ -62,7 +74,27 @@ import { AuthService } from "./auth/auth.service";
         name: User.name,
         schema: UserSchema,
       },
+      {
+        name: Attempt.name,
+        schema: AttemptSchema
+      },
+      {
+        name: Security.name,
+        schema: SecuritySchema,
+      },
     ]),
+    MailerModule.forRoot({
+      transport: {
+        service: 'gmail', // if write 'gmail', settings below not need
+        auth: {
+          user: settingsEnv.EMAIL_LOG,
+          pass: settingsEnv.EMAIL_PASS,
+        },
+      },
+      defaults: {
+        from: `"Alex" <${settingsEnv.EMAIL_LOG}>`,
+      },
+    }),
   ],
   controllers: [
     AuthController,
@@ -84,7 +116,22 @@ import { AuthService } from "./auth/auth.service";
     CommentsRepository,
     TestingService,
     TestingRepository,
+    SecurityService,
+    SecurityRepository,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard
+    }
+
   ]
 })
 export class AppModule {
 }
+// export class AppModule implements NestModule {
+//   configure(consumer: MiddlewareConsumer) {
+//     consumer
+//       .apply(EmailConfirmMiddleware)
+//       // .forRoutes('auth/registration');
+//       .forRoutes('auth/*');
+//   }
+// }

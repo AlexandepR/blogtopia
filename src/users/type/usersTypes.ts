@@ -9,6 +9,21 @@
 // }
 
 import { parseQueryUsersPaginator } from "../../utils/helpers";
+import { IsEmail, IsString, Length } from "class-validator";
+
+export class CreateUserInputClassModel {
+  @IsString()
+  @Length(3, 10)
+    // @Matches(/^[a-zA-Z0-9_-]*$/)
+  login: string;
+  @IsEmail(
+    //   // {},
+    //   // { message: "--incorrect email" }
+  )
+  email: string;
+  @Length(6, 20)
+  password: string;
+}
 
 export type ParamsUsersType = {
   pageSize: number,

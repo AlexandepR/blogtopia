@@ -22,7 +22,7 @@ export type outputPostModelType = {
   }
 }
 export type PostsNewestLikesType = {
-  _id: Types.ObjectId
+  _id?: Types.ObjectId
   description: string
   addedAt: string
   // userId: string
@@ -30,9 +30,9 @@ export type PostsNewestLikesType = {
   login: string
 }
 export type PostLikesType = {
-  _id: ObjectId
+  _id: Types.ObjectId
   createdAt: string
-  userId: ObjectId
+  userId: Types.ObjectId
   userLogin: string
 }
 export type PostExtendedLikesInfoType = {
@@ -64,4 +64,7 @@ export type PutPostInputModelType = {
   shortDescription: string
   content: string
   blogId: string
+}
+export type likeStatusType = {
+  likeStatus: "None" | "Like" | "Dislike"
 }

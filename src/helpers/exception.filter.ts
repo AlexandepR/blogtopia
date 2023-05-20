@@ -24,7 +24,6 @@ import { Request, Response } from 'express';
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
-    debugger
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
@@ -39,7 +38,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
         errors: []
       }
       const responseBody: any = exception.getResponse();
-      responseBody.message.forEach((m) => errorResponse.errors.push(m))
+      if (responseBody.message && Array.isArray(responseBody.message)) {
+        responseBody.message.forEach((m) => errorResponse.errors.push(m));
+      }
+      // responseBody.message.forEach((m) => errorResponse.errors.push(m))
       response.status(status).json(errorResponse)
     } else {
       response

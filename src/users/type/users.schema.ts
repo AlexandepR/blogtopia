@@ -106,7 +106,8 @@ export class User {
     userDto: CreateUserInputModelType,
     UserModel: UserModelType,
     passwordHash: string,
-    ip: any
+    ip: any,
+    confirmEmail: boolean,
   ): UserDocument {
     const user = new UserModel();
     user.accountData = new UserAccount();
@@ -124,7 +125,7 @@ export class User {
       hours: 1,
       minutes: 3
     });
-    user.emailConfirmation.isConfirmed = true;
+    user.emailConfirmation.isConfirmed = confirmEmail;
     user.emailConfirmation.passwordRecoveryCode = '';
     user.registrationData.ip = [ip]
     user.registrationData.infoDateIp = [];
@@ -150,7 +151,8 @@ export type UserModelStaticType = {
     userDto: CreateUserInputModelType,
     UserModel: UserModelType,
     passwordHash: string,
-    ip: any
+    ip: any,
+    confirmEmail: boolean
   ) => UserDocument
 }
 export type UserDocument = HydratedDocument<User>

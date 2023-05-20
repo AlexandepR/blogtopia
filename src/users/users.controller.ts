@@ -4,16 +4,19 @@ import {
   Delete,
   Get,
   HttpCode,
-  HttpStatus, Ip,
+  HttpStatus,
+  Ip,
   Param,
   Post,
-  Query, Req,
+  Query, UseGuards,
+  UseInterceptors,
   ValidationPipe
 } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { CreateUserInputClassModel, ParamsUsersType } from "./type/usersTypes";
 import { BasicAuth } from "../auth/decorators/public.decorator";
 import { checkObjectId } from "../helpers/validation.helpers";
+import { CheckLoginOrEmailGuard } from "../middleware/middleware";
 
 
 @Controller("users")
@@ -27,16 +30,7 @@ export class UsersController {
   ) {
     return this.usersService.findAll(query);
   }
-  // @UseGuards(BasicAuthGuard)
-  // @Get(":id")
-  // async getUser(
-  //   @Param("id")
-  //     id: string
-  // ) {
-  //   return this.usersService.getUser(id);
-  // }
   @BasicAuth()
-  @Post()
   @Get(":id")
   async getUserById(
     @Param(ValidationPipe)
@@ -44,12 +38,12 @@ export class UsersController {
   ) {
     return await this.usersService.findUserById(params.id)
   }
+  @Post()
+  @UseGuards(CheckLoginOrEmailGuard)
   async createUser(
     @Ip() ip,
     @Body() dto: CreateUserInputClassModel
   ) {
-    // dto.email='';
-    // const ip = ''
     return await this.usersService.createUser(dto,ip);
   }
   @BasicAuth()

@@ -107,7 +107,7 @@ export class Post {
     blog: BlogDocument,
     PostModel: PostModelType
   ): PostDocument {
-    if (!dto) throw new Error("Bad request");
+    // if (!dto) throw new Error("Bad request");
     const createNewPost = new PostModel();
 
     createNewPost.title = dto.title;

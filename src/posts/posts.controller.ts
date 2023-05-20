@@ -1,8 +1,8 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query } from "@nestjs/common";
-import { CreatePostInputModelType, PutPostInputModelType } from "./type/postsType";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query, Req } from "@nestjs/common";
 import { ParamsType } from "../types/types";
-import { PostsService } from "./posts.service";
-
+import { CreateCommentInputClassModel, CreatePostInputClassModel, PostsService } from "./posts.service";
+import { Request } from 'express';
+import { likeStatusType } from "./type/postsType";
 
 @Controller("posts")
 export class PostsController {
@@ -21,34 +21,48 @@ export class PostsController {
   ) {
     return await this.postsService.getPost(id);
   }
-  // @Get("/:id/comments")
-  // async getCommentByPost(
-  //   @Param("id")
-  //     id: string,
-  //   @Query()
-  //     query: ParamsType
-  // ) {
-  //   return await this.postsService.getCommentByPost(id,query);
-  // }
-
+  @Get("/:id/comments")
+  async getCommentByPost(
+    @Param("id")
+      postId: string,
+    @Query()
+      query: ParamsType
+  ) {
+    return await this.postsService.getCommentByPost(postId,query);
+  }
+  @Post('/:postId/comments')
+  async createCommentForPost(
+    @Req() req: Request,
+    @Param('postId')
+    postId: string,
+    @Body() dto:CreateCommentInputClassModel
+  ){
+    return await this.postsService.createCommentForPost(postId,dto, req)
+  }
   @Post()
-  async createPost(@Body() dto: CreatePostInputModelType) {
+  async createPost(@Body() dto: CreatePostInputClassModel) {
     return await this.postsService.createPost(dto);
   }
-  // @Post()
-  // createPostForBlog(@Body() inputModel: PutBlogInputModelType ) {
-  //
-  // }
   @Put(":id")
   @HttpCode(HttpStatus.NO_CONTENT)
   async updatePost(
     @Param("id")
       id: string,
-    @Body() dto: PutPostInputModelType
+    @Body() dto: CreatePostInputClassModel
   ) {
      await this.postsService.updatePost(id, dto);
      return
   }
+  @Put("/:postId/like-status")
+  async updateLikesInfoByPostId(
+    @Req() req: Request,
+    @Param("postId")
+      postId: string,
+    @Body() dto: likeStatusType
+  ) {
+      return await this.postsService.updateLikesInfo(dto,postId,req)
+  }
+
   @Delete(":id")
   @HttpCode(HttpStatus.NO_CONTENT)
   async deletePost(
