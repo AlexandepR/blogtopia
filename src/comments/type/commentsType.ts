@@ -1,5 +1,6 @@
 import { Types } from "mongoose";
 
+
 export type LikesType = {
   _id: Types.ObjectId
   createdAt: string
