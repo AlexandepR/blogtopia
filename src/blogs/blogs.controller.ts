@@ -1,7 +1,9 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query } from "@nestjs/common";
 import { BlogInputClassModel, BlogsService, createPostForBlogInputClassModel } from "./blogs.service";
-import { PutBlogDtoType } from "./type/blogsType";
 import { ParamsType } from "../types/types";
+import { Public } from "../auth/decorators/public.decorator";
+
+// import { BasicAuthGuard } from "../auth/guards/basic.auth.guard";
 
 
 @Controller("blogs")
@@ -9,7 +11,12 @@ export class BlogsController {
   constructor(protected blogsService: BlogsService) {
 
   }
+  // @Public()
+  // @UseGuards(BasicAuthGuard)
+  // @BasicAuth()
+  // @Public()
   @Get()
+  // @BasicAuth()
   async getBlogs(
     @Query() query: ParamsType
   ) {
@@ -30,6 +37,7 @@ export class BlogsController {
   ) {
     return await this.blogsService.getPosts(id, query);
   }
+  @Public()
   @Post()
   async createBlog(
     @Body() dto: BlogInputClassModel

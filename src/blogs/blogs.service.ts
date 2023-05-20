@@ -1,14 +1,13 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { BlogsRepository } from "./blogs.repository";
-import { BlogType, CreateBlogInputModelType, createPostForBlogInputModel, PutBlogDtoType } from "./type/blogsType";
+import { BlogType } from "./type/blogsType";
 import { PaginationType, ParamsType } from "../types/types";
 import { BlogDocument } from "./type/blogs.schema";
 import { pagesCounter, parseQueryPaginator, skipPage } from "../utils/helpers";
 import { Types } from "mongoose";
 import { outputPostModelType, PostsTypeFiltered } from "../posts/type/postsType";
 import { PostsRepository } from "../posts/posts.repository";
-import { IsUrl, MaxLength, validateOrReject } from "class-validator";
-import { CreateUserInputClassModel } from "../users/users.service";
+import { IsUrl, MaxLength } from "class-validator";
 import { validateOrRejectModel } from "../helpers/validation.helpers";
 
 export class BlogInputClassModel {
