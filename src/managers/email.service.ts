@@ -37,7 +37,7 @@ export class EmailService {
   async sendEmailRecoveryPassCode(email: string, code: string) {
     const recoveryPasswordLink = `https://l1bloggers.vercel.app/password-recovery?recoveryCode=${code}`;
 
-    await this.emailAdapter.sendEmail(
+    const sendEmail = await this.emailAdapter.sendEmail(
       email,
       "Recovery password code",
       `
@@ -48,5 +48,10 @@ export class EmailService {
         </div>
       `
     );
+    if (sendEmail) {
+      return sendEmail;
+    } else {
+      return null;
+    }
   }
 }
