@@ -45,7 +45,6 @@
     "jsonwebtoken": "^9.0.0",
     "jwt": "^0.2.0",
     "mongoose": "^7.1.0",
-    "node-base64": "^0.0.1",
     "node-gyp": "^9.3.1",
     "nodemailer": "^6.9.2",
     "passport": "^0.6.0",
