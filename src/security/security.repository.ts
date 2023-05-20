@@ -17,21 +17,21 @@ export class SecurityRepository {
     ip: string,
     deviceName: string,
   ): Promise<SecurityDocument> {
-    const getSession = await Security.createSession(userId,ip,deviceName, this.SecurityModel)
-    getSession.save()
-    if (getSession) {
-      return getSession
+    const createSession = await Security.createSession(userId,ip,deviceName, this.SecurityModel)
+    const result = await createSession.save()
+    if (result) {
+      return result
     } else return null
   }
   async updateDateSession(issuedDate: string, userId:Types.ObjectId): Promise<boolean> {
     const updateDateSession = await this.SecurityModel
       .updateOne({ userId: userId }, { $set: { issuedDateRefreshToken: issuedDate } });
-    return updateDateSession.matchedCount === 1;
+    return updateDateSession.modifiedCount > 0;
   }
-  async findSessions(userId: Types.ObjectId): Promise<any> {
+  async findSessionsByUserId(userId: Types.ObjectId): Promise<SecurityDocument[]> {
     const userSessions = await this.SecurityModel
       .find({ userId: userId })
-      .lean();
+      // .lean();
     if (userSessions) {
       return userSessions;
     } else return null;
@@ -52,6 +52,6 @@ export class SecurityRepository {
   async terminateSessionByDeviceId(deviceId: string): Promise<boolean> {
     const terminateSession = await this.SecurityModel
       .deleteOne({ deviceId: deviceId });
-    return terminateSession.deletedCount === 1;
+    return terminateSession.deletedCount >= 1;
   }
 }
