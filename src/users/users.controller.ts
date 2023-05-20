@@ -38,6 +38,7 @@ export class UsersController {
   ) {
     return await this.usersService.findUserById(params.id)
   }
+  @BasicAuth()
   @Post()
   @UseGuards(CheckLoginOrEmailGuard)
   async createUser(
