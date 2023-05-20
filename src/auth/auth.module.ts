@@ -2,7 +2,6 @@ import { Module } from "@nestjs/common";
 import { APP_GUARD } from "@nestjs/core";
 import { JwtModule } from "@nestjs/jwt";
 import { AuthService } from "./auth.service";
-import { jwtConstants } from "./constants";
 import { UsersModule } from "./users.module";
 import { AuthController } from "./auth.cotroller";
 import { MongooseModule } from "@nestjs/mongoose";
