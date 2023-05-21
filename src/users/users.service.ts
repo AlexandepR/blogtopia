@@ -93,7 +93,7 @@ export class UsersService {
       createdAt: createPost.accountData.createdAt
     };
   }
-  async findUserById(id: string): Promise<User> {
+  async findUserById(id: string): Promise<UserDocument> {
     const userId = new Types.ObjectId(id);
     const user = await this.usersRepository.findUserById(userId);
     if (!user) throw new HttpException("", HttpStatus.NOT_FOUND);

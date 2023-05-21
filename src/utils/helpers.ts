@@ -1,7 +1,10 @@
-import { QueryType, QueryUsersType } from "../blogs/type/blogsType";
+import { QueryType } from "../blogs/type/blogsType";
 import { ParamsUsersType, QueryUsersPaginator } from "../users/type/usersTypes";
-import { UsersService } from "../users/users.service";
-import { HttpException, HttpStatus } from "@nestjs/common";
+import * as bcrypt from "bcrypt";
+import { User } from "../users/type/users.schema";
+import { PostLikesType } from "../posts/type/postsType";
+import { PostDocument } from "../posts/type/posts.schema";
+import { Types } from "mongoose";
 
 export const parseQueryPaginator = (query: QueryType): QueryType => {
   return {
@@ -41,11 +44,7 @@ export const pagesCounter = (totalCount: number, pageSize: number) => Math.ceil(
 
 export const skipPage = (pageNumber: number, pageSize: number) => (pageNumber - 1) * pageSize;
 
-import * as bcrypt from "bcrypt";
-import { User } from "../users/type/users.schema";
-import { PostLikesType } from "../posts/type/postsType";
-import { PostDocument } from "../posts/type/posts.schema";
-import { Types } from "mongoose";
+
 
 export const generateHash = async (password: string) => {
   const passwordSalt = await bcrypt.genSalt(10);

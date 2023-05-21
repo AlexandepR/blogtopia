@@ -3,7 +3,6 @@ import { BlogInputClassModel, BlogsService, createPostForBlogInputClassModel } f
 import { ParamsType } from "../types/types";
 import { Public } from "../auth/decorators/public.decorator";
 
-// import { BasicAuthGuard } from "../auth/guards/basic.auth.guard";
 
 
 @Controller("blogs")

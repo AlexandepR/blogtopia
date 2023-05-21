@@ -13,6 +13,7 @@ import { JwtService } from "./jwt.service";
 import { Request } from "express";
 import { settingsEnv } from "../settings/settings";
 import * as jwt from "jsonwebtoken";
+import { UserDocument } from "../users/type/users.schema";
 
 @Injectable()
 export class AuthService {
@@ -28,7 +29,7 @@ export class AuthService {
     await validateOrRejectModel(dto, CreateUserInputClassModel);
     const passwordHash = await generateHash(dto.password);
     const confirmEmail = false;
-    const user = await this.usersRepository.createUser(dto, passwordHash, ip, confirmEmail);
+    const user: UserDocument = await this.usersRepository.createUser(dto, passwordHash, ip, confirmEmail);
     try {
       this.emailService.sendEmailConfirmationMessage(user);
     } catch (error) {
@@ -107,7 +108,9 @@ export class AuthService {
   }
   async refreshToken(req: Request) {
     const refreshToken = req.cookies.refreshToken;
-    const user = req.user
+    // const user = req.user
+    const userId = await this.jwtService.findUserIdByAuthHeaders(req);
+    const user = await this.usersRepository.findUserById(userId)
     const updateRefreshToken = await this.jwtService.updateRefreshToken(refreshToken);
     if (user && updateRefreshToken) {
       await this.securityService.updateDateSession(user._id);
@@ -134,8 +137,9 @@ export class AuthService {
     }
   }
   async getOwnAccount(req: Request) {
-    const userId = req.user!._id.toString();
-    const findUser = await this.usersService.findUserById(userId);
+    // const userId = req.user!._id.toString();
+    const userId = await this.jwtService.findUserIdByAuthHeaders(req);
+    const findUser = await this.usersService.findUserById(userId.toString());
     if (findUser) {
         return{
           'email': findUser.accountData.email,

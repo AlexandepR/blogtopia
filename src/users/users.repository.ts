@@ -21,7 +21,7 @@ export class UsersRepository {
     filter: any,
     sortBy: string,
     sortDirection: "asc" | "desc"
-  ): Promise<User[]> {
+  ): Promise<UserDocument[]> {
     const sortedUsers = `accountData.${sortBy}`;
     const users = await this.UserModel
       .find(filter, {
@@ -36,7 +36,7 @@ export class UsersRepository {
       .sort([[sortedUsers, sortDirection]])
       .skip(skip)
       .limit(pageSize)
-      .lean();
+      // .lean();
     return users;
   }
   async getTotalCountUsers(filter: any): Promise<number> {
@@ -49,7 +49,7 @@ export class UsersRepository {
     passwordHash: string,
     ip: any,
     confirmEmail: boolean
-  ): Promise<User> {
+  ): Promise<UserDocument> {
     const user = User.create(userDto, this.UserModel, passwordHash, ip, confirmEmail);
     // const newBlog = this.BlogModel.create(createDto, this.BlogModel);
     return user.save();
@@ -92,13 +92,13 @@ export class UsersRepository {
       .lean();
     return !!checkCode;
   }
-  async updateConfirmCode(_id: ObjectId, newCode: string): Promise<User | null> {
+  async updateConfirmCode(_id: ObjectId, newCode: string): Promise<UserDocument | null> {
     const updateCodeUser = await this.UserModel
       .updateOne({ _id }, { $set: { 'emailConfirmation.confirmationCode': newCode } });
     if (updateCodeUser.modifiedCount <= 0) return null;
     const user = await this.UserModel
       .findOne({ _id })
-      .lean();
+      // .lean();
     if (user) {
       return user;
     } else {

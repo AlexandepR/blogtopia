@@ -1,5 +1,7 @@
+import { configModule } from "./configuration/config.module";
+// const configModule = getConfigModule;
+
 import { Module } from "@nestjs/common";
-import { ConfigModule } from "@nestjs/config";
 import { MongooseModule } from "@nestjs/mongoose";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { join } from "path";
@@ -34,6 +36,8 @@ import { SecurityService } from "./security/security.service";
 import { SecurityRepository } from "./security/security.repository";
 import { Security, SecuritySchema } from "./security/type/security.schema";
 import { MailerModule } from "@nestjs-modules/mailer";
+;
+
 
 
 @Module({
@@ -46,16 +50,18 @@ import { MailerModule } from "@nestjs-modules/mailer";
       ttl: 1,
       limit: 5000,
     }),
-    ConfigModule.forRoot(),
+    configModule,
     AuthModule,
     UsersModule,
     EmailModule,
-    MongooseModule.forRoot(settingsEnv.MONGO_URL, {
+    MongooseModule.forRoot(settingsEnv.MONGO_URL,
+      // {
     // MongooseModule.forRoot(settingsEnv.MONGO_URL, {
     // MongooseModule.forRoot('mongodb:127.0.0.1:27017', {
     //   dbName: 'blogtopia',
     //   loggerLevel: 'debug',
-    }),
+    // }
+    ),
     MongooseModule.forFeature([
       {
         name: Blog.name,

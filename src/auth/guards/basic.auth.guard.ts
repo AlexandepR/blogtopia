@@ -6,8 +6,6 @@ import { settingsEnv } from "../../settings/settings";
 @Injectable()
 export class BasicAuthGuard extends PassportStrategy(BasicStrategy, 'basic') {
   constructor(
-  //   private readonly authService: AuthService,
-  // private readonly configService: ConfigService,
   ) {
     super({
       // usernameField: 'username',
