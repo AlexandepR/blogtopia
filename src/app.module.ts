@@ -44,7 +44,7 @@ import { MailerModule } from "@nestjs-modules/mailer";
   imports: [
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, "..", "swagger-static"),
-      serveRoot: process.env.NODE_ENV === "development" ? "/" : "/swagger"
+      serveRoot: settingsEnv.NODE_ENV === "development" ? "/" : "/swagger"
     }),
     ThrottlerModule.forRoot({
       ttl: 1,
