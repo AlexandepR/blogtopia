@@ -18,7 +18,7 @@ export class EmailService {
   }
 
   sendEmailConfirmationMessage(user) {
-    const emailConfirmationLink = `https://l1bloggers.vercel.app/confirm-email?code=${user.emailConfirmation.confirmationCode}`;
+    // const emailConfirmationLink = `https://l1bloggers.vercel.app/confirm-email?code=${user.emailConfirmation.confirmationCode}`;
 
     const sendEmail = this.emailAdapter.sendEmail(
       user.accountData.email,
@@ -26,8 +26,9 @@ export class EmailService {
       `
         <div>
           <h1>Thank for your registration</h1>
-          <p>To finish registration please follow the link below:</p>
-          <a href="${emailConfirmationLink}">Complete registration</a>
+          <p>To finish registration please follow the link below:
+          <a href="https://l1bloggers.vercel.app/confirm-email?code=${user.emailConfirmation.confirmationCode}">Complete registration</a>
+        </p>
         </div>
       `
     );

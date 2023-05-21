@@ -18,16 +18,16 @@ export const parseQueryPaginator = (query: QueryType): QueryType => {
 export const parseQueryUsersPaginator = (query: ParamsUsersType): QueryUsersPaginator => {
   let filter = {};
   if (query.searchLoginTerm) {
-    filter = { "login": { $regex: query.searchLoginTerm, $options: "i" } };
+    filter = { "accountData.login": { $regex: query.searchLoginTerm, $options: "i" } };
   }
   if (query.searchEmailTerm) {
-    filter = { "email": { $regex: query.searchEmailTerm, $options: "i" } };
+    filter = { "accountData.email": { $regex: query.searchEmailTerm, $options: "i" } };
   }
   if (query.searchLoginTerm && query.searchEmailTerm) {
     filter = {
       $or: [
-        { "login": { $regex: query.searchLoginTerm, $options: "i" } },
-        { "email": { $regex: query.searchEmailTerm, $options: "i" } }
+        { "accountData.login": { $regex: query.searchLoginTerm, $options: "i" } },
+        { "accountData.email": { $regex: query.searchEmailTerm, $options: "i" } }
       ]
     };
   }
@@ -44,7 +44,15 @@ export const pagesCounter = (totalCount: number, pageSize: number) => Math.ceil(
 
 export const skipPage = (pageNumber: number, pageSize: number) => (pageNumber - 1) * pageSize;
 
-
+// export class UserHelper {
+//   static async checkIfUserExistsByEmail(email: string): Promise<boolean> {
+//     const findUserByEmail = await UserModel.findOne({
+//       'accountData.email': email,
+//     }).lean();
+//
+//     return !!findUserByEmail;
+//   }
+// }
 
 export const generateHash = async (password: string) => {
   const passwordSalt = await bcrypt.genSalt(10);

@@ -79,18 +79,17 @@ export class UsersService {
   // }
   async createUser(dto: CreateUserInputClassModel, ip): Promise<UserType | null> {
     await validateOrRejectModel(dto, CreateUserInputClassModel);
-    // const findUserByEmail = await this.usersRepository.findByLoginOrEmail(dto.email);
-    // if (findUserByEmail) throw new HttpException("", HttpStatus.FORBIDDEN);
-    // const findUserByLogin = await this.usersRepository.findByLoginOrEmail(dto.login);
-    // if (findUserByLogin) throw new HttpException("", HttpStatus.FORBIDDEN);
+    const findUserByEmail = await this.usersRepository.findByLoginOrEmail(dto.email);
+    const findUserByLogin = await this.usersRepository.findByLoginOrEmail(dto.login);
+    if (findUserByLogin || findUserByEmail) throw new HttpException('', HttpStatus.BAD_REQUEST);
     const passwordHash = await generateHash(dto.password);
     const confirmEmail = true;
-    const createPost = await this.usersRepository.createUser(dto, passwordHash, ip, confirmEmail);
+    const createUser = await this.usersRepository.createUser(dto, passwordHash, ip, confirmEmail);
     return {
-      id: createPost._id.toString(),
-      login: createPost.accountData.login,
-      email: createPost.accountData.email,
-      createdAt: createPost.accountData.createdAt
+      id: createUser._id.toString(),
+      login: createUser.accountData.login,
+      email: createUser.accountData.email,
+      createdAt: createUser.accountData.createdAt
     };
   }
   async findUserById(id: string): Promise<UserDocument> {
@@ -100,6 +99,7 @@ export class UsersService {
     return user;
   }
   async findUserByLoginOrEmail(loginOrEmail: string): Promise<UserDocument | null> {
+  // async findUserByLoginOrEmail(login?: string, email?: string): Promise<UserDocument | null> {
     const findUser = await this.usersRepository.findByLoginOrEmail(loginOrEmail);
     if (findUser) {
       return findUser;

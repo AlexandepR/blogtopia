@@ -29,12 +29,15 @@ export class AuthService {
     await validateOrRejectModel(dto, CreateUserInputClassModel);
     const passwordHash = await generateHash(dto.password);
     const confirmEmail = false;
+    const findUserByEmail = await this.usersRepository.findByLoginOrEmail(dto.email);
+    const findUserByLogin = await this.usersRepository.findByLoginOrEmail(dto.login);
+    if (findUserByLogin || findUserByEmail) throw new HttpException('', HttpStatus.BAD_REQUEST);
     const user: UserDocument = await this.usersRepository.createUser(dto, passwordHash, ip, confirmEmail);
     try {
       this.emailService.sendEmailConfirmationMessage(user);
     } catch (error) {
       await this.usersRepository.deleteUser(user._id);
-      return null;
+      throw new HttpException("", HttpStatus.BAD_REQUEST);
     }
     throw new HttpException("", HttpStatus.NO_CONTENT);
   }
@@ -43,10 +46,10 @@ export class AuthService {
     const newCode = uuidv4();
     await validateOrRejectModel(dto, checkEmailInputClassModel);
     const findEmail = await this.usersRepository.findByLoginOrEmail(email)
-    if (findEmail.emailConfirmation.isConfirmed === true || !findEmail) throw new HttpException("", HttpStatus.FORBIDDEN);
+    if (findEmail.emailConfirmation.isConfirmed === true || !findEmail) throw new HttpException("", HttpStatus.BAD_REQUEST);
     const userId = new Types.ObjectId(findEmail._id.toString());
     const userUpdateCode = await this.usersRepository.updateConfirmCode(userId, newCode);
-    if (!userUpdateCode) throw new HttpException("", HttpStatus.FORBIDDEN);
+    if (!userUpdateCode) throw new HttpException("", HttpStatus.BAD_REQUEST);
     const sendEmail = await this.emailService.sendEmailConfirmationMessage(userUpdateCode);
     if (sendEmail) {
       throw new HttpException("", HttpStatus.NO_CONTENT);
@@ -57,12 +60,12 @@ export class AuthService {
   }
   async confirmRegistration(code: string) {
     const user = await this.usersService.findByConfirmationCode(code);
-    if (!user || user.emailConfirmation.isConfirmed) throw new HttpException("", HttpStatus.FORBIDDEN);
+    if (!user || user.emailConfirmation.isConfirmed) throw new HttpException("", HttpStatus.BAD_REQUEST);
 
     const dateNow = new Date();
     if (user.emailConfirmation.expirationDate.getTime() - dateNow.getTime() <= 0) {
       await this.usersRepository.deleteUser(user._id);
-      throw new HttpException("", HttpStatus.FORBIDDEN);
+      throw new HttpException("", HttpStatus.BAD_REQUEST);
     }
     if(updateConfirmInfo(user,code)) {
       user.emailConfirmation.isConfirmed = true;
@@ -74,16 +77,19 @@ export class AuthService {
   async login(signInDto: loginInputClassModel,deviceName: string, ip:string) {
     await validateOrRejectModel(signInDto, loginInputClassModel);
     const user = await this.usersService.findUserByLoginOrEmail(signInDto.loginOrEmail);
-    const isHash = isPasswordCorrect(signInDto.password, user.accountData.passwordHash);
-    if (!user || !user.emailConfirmation.isConfirmed || !isHash) throw new HttpException("", HttpStatus.FORBIDDEN);
-    const createSession = await this.securityService.createSession(user._id, ip, deviceName);
-    if (!createSession) throw new HttpException("", HttpStatus.FORBIDDEN);
+    if (user) {
+      const isHash = isPasswordCorrect(signInDto.password, user.accountData.passwordHash);
+      if (!user || !user.emailConfirmation.isConfirmed || !isHash) throw new HttpException("", HttpStatus.UNAUTHORIZED);
+      const createSession = await this.securityService.createSession(user._id, ip, deviceName);
+      if (!createSession) throw new HttpException("", HttpStatus.UNAUTHORIZED);
 
       const token = await this.jwtService.сreateJWT(user);
       const refreshToken = await this.jwtService.createRefreshToken(user, createSession.deviceId);
       const refreshTokenCookie = `refreshToken=${refreshToken}; HttpOnly; Secure`;
       // const refreshTokenCookie = `refreshToken=${refreshToken}`;
-    return { refreshTokenCookie, token };
+      return { refreshTokenCookie, token };
+    }
+    throw new HttpException("", HttpStatus.UNAUTHORIZED);
   }
   async passwordRecovery(emailDto: checkEmailInputClassModel) {
     await validateOrRejectModel(emailDto, checkEmailInputClassModel);
@@ -91,7 +97,7 @@ export class AuthService {
     const updatePassRecoveryCode = await this.usersRepository.updatePassRecoveryCode(emailDto.email, newCode);
     if (!updatePassRecoveryCode) throw new HttpException("", HttpStatus.BAD_REQUEST);
     const sendCode = await this.emailService.sendEmailRecoveryPassCode(emailDto.email, newCode);
-    if (!sendCode) throw new HttpException("", HttpStatus.FORBIDDEN);
+    if (!sendCode) throw new HttpException("", HttpStatus.BAD_REQUEST);
     else throw new HttpException('', HttpStatus.NO_CONTENT)
   }
   async newPassword(dto: newPasswordInputModel) {
