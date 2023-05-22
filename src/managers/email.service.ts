@@ -17,10 +17,10 @@ export class EmailService {
     );
   }
 
-  sendEmailConfirmationMessage(user) {
+  async sendEmailConfirmationMessage(user) {
     // const emailConfirmationLink = `https://l1bloggers.vercel.app/confirm-email?code=${user.emailConfirmation.confirmationCode}`;
 
-    const sendEmail = this.emailAdapter.sendEmail(
+    const sendEmail = await this.emailAdapter.sendEmail(
       user.accountData.email,
       "Confirmation code",
       `

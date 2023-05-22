@@ -43,7 +43,7 @@ export const addSettingsApp = (app: INestApplication) => {
         constraintsKeys.forEach((ckey) => {
           errorsForResponse.push({
             message: e.constraints[ckey],
-            filed: e.property
+            field: e.property
           });
         });
       });

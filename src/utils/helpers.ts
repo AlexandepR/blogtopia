@@ -60,8 +60,8 @@ export const generateHash = async (password: string) => {
   return hash;
 };
 
-export const isPasswordCorrect = (password: string, hash: string) => {
-  const isEqual = bcrypt.compare(password, hash);
+export const isPasswordCorrect = async (password: string, hash: string) => {
+  const isEqual = await bcrypt.compare(password, hash);
   return isEqual;
 };
 

@@ -34,7 +34,7 @@ export class AuthService {
     if (findUserByLogin || findUserByEmail) throw new HttpException('', HttpStatus.BAD_REQUEST);
     const user: UserDocument = await this.usersRepository.createUser(dto, passwordHash, ip, confirmEmail);
     try {
-      this.emailService.sendEmailConfirmationMessage(user);
+      await this.emailService.sendEmailConfirmationMessage(user);
     } catch (error) {
       await this.usersRepository.deleteUser(user._id);
       throw new HttpException("", HttpStatus.BAD_REQUEST);
@@ -46,7 +46,7 @@ export class AuthService {
     const newCode = uuidv4();
     await validateOrRejectModel(dto, checkEmailInputClassModel);
     const findEmail = await this.usersRepository.findByLoginOrEmail(email)
-    if (findEmail.emailConfirmation.isConfirmed === true || !findEmail) throw new HttpException("", HttpStatus.BAD_REQUEST);
+    if (findEmail.emailConfirmation.isConfirmed === true || !findEmail) throw new Error();
     const userId = new Types.ObjectId(findEmail._id.toString());
     const userUpdateCode = await this.usersRepository.updateConfirmCode(userId, newCode);
     if (!userUpdateCode) throw new HttpException("", HttpStatus.BAD_REQUEST);
@@ -60,7 +60,7 @@ export class AuthService {
   }
   async confirmRegistration(code: string) {
     const user = await this.usersService.findByConfirmationCode(code);
-    if (!user || user.emailConfirmation.isConfirmed) throw new HttpException("", HttpStatus.BAD_REQUEST);
+    if (!user || user.emailConfirmation.isConfirmed === true) throw new Error()
 
     const dateNow = new Date();
     if (user.emailConfirmation.expirationDate.getTime() - dateNow.getTime() <= 0) {
@@ -78,7 +78,7 @@ export class AuthService {
     await validateOrRejectModel(signInDto, loginInputClassModel);
     const user = await this.usersService.findUserByLoginOrEmail(signInDto.loginOrEmail);
     if (user) {
-      const isHash = isPasswordCorrect(signInDto.password, user.accountData.passwordHash);
+      const isHash = await isPasswordCorrect(signInDto.password, user.accountData.passwordHash);
       if (!user || !user.emailConfirmation.isConfirmed || !isHash) throw new HttpException("", HttpStatus.UNAUTHORIZED);
       const createSession = await this.securityService.createSession(user._id, ip, deviceName);
       if (!createSession) throw new HttpException("", HttpStatus.UNAUTHORIZED);
@@ -87,6 +87,7 @@ export class AuthService {
       const refreshToken = await this.jwtService.createRefreshToken(user, createSession.deviceId);
       const refreshTokenCookie = `refreshToken=${refreshToken}; HttpOnly; Secure`;
       // const refreshTokenCookie = `refreshToken=${refreshToken}`;
+      if (!token || !refreshToken || !refreshTokenCookie) throw new HttpException("", HttpStatus.UNAUTHORIZED);
       return { refreshTokenCookie, token };
     }
     throw new HttpException("", HttpStatus.UNAUTHORIZED);

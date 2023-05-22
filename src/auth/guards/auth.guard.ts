@@ -85,7 +85,7 @@ export class AuthGuard implements CanActivate {
     return type === 'Bearer' ? token : undefined;
   }
 
-  private extractBasicAuthCredentials(request: Request): { username: string; password: string } {
+  private extractBasicAuthCredentials(request: Request): { username: string; password: string } | null {
     const authorizationHeader = request.headers.authorization;
     if (authorizationHeader && authorizationHeader.startsWith('Basic ')) {
       const credentials = authorizationHeader.slice('Basic '.length);
@@ -94,7 +94,7 @@ export class AuthGuard implements CanActivate {
       // const [username, password] = credentials.split(':');
       return { username, password };
     }
-    return { username: '', password: '' };
+    return null
   }
   private async extractUserFromRefreshToken(request: Request): Promise<boolean> {
     const refreshToken = request.cookies.refreshToken;
