@@ -13,7 +13,6 @@ export class JwtService {
   ) {
   }
   async сreateJWT(user: UserDocument) {
-    console.log(user._id, 'test-----------id');
     const token = jwt.sign(
       {userId: user._id},
       settingsEnv.JWT_SECRET,

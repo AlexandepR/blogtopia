@@ -36,6 +36,7 @@ import { SecurityService } from "./security/security.service";
 import { SecurityRepository } from "./security/security.repository";
 import { Security, SecuritySchema } from "./security/type/security.schema";
 import { MailerModule } from "@nestjs-modules/mailer";
+import { IsLoginOrEmailAlreadyExistsPipe } from "./pipes/validation/validate-user-login.pipe";
 ;
 
 
@@ -126,8 +127,8 @@ import { MailerModule } from "@nestjs-modules/mailer";
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard
-    }
-
+    },
+    IsLoginOrEmailAlreadyExistsPipe
   ]
 })
 export class AppModule {

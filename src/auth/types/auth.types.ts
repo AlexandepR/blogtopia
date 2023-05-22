@@ -24,7 +24,7 @@ export class loginInputClassModel {
   // @Type()
   @IsNotEmpty()
   loginOrEmail: string
-  @Type()
+  // @Type()
   @IsNotEmpty()
   password: string
 }

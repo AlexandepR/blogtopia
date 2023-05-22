@@ -3,11 +3,13 @@ import { AppModule } from "./app.module";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { settingsEnv } from "./settings/settings";
 import { BadRequestException, INestApplication, ValidationPipe } from "@nestjs/common";
-import { HttpExceptionFilter } from "./helpers/exception.filter";
+import { HttpExceptionFilter } from "./exception.filter";
 import cookieParser from "cookie-parser";
+import { useContainer } from "class-validator";
 
 
 export const addSettingsApp = (app: INestApplication) => {
+  useContainer(app.select(AppModule), {fallbackOnErrors: true})
   app.enableCors();
   app.use(cookieParser());
   app.useGlobalPipes(new ValidationPipe({

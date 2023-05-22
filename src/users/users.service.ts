@@ -79,9 +79,9 @@ export class UsersService {
   // }
   async createUser(dto: CreateUserInputClassModel, ip): Promise<UserType | null> {
     await validateOrRejectModel(dto, CreateUserInputClassModel);
-    const findUserByEmail = await this.usersRepository.findByLoginOrEmail(dto.email);
-    const findUserByLogin = await this.usersRepository.findByLoginOrEmail(dto.login);
-    if (findUserByLogin || findUserByEmail) throw new HttpException('', HttpStatus.BAD_REQUEST);
+    // const findUserByEmail = await this.usersRepository.findByLoginOrEmail(dto.email);
+    // const findUserByLogin = await this.usersRepository.findByLoginOrEmail(dto.login);
+    // if (findUserByLogin || findUserByEmail) throw new HttpException('', HttpStatus.BAD_REQUEST);
     const passwordHash = await generateHash(dto.password);
     const confirmEmail = true;
     const createUser = await this.usersRepository.createUser(dto, passwordHash, ip, confirmEmail);
@@ -119,7 +119,7 @@ export class UsersService {
     const findUser = await this.usersRepository.findUserById(userId);
     if (!findUser) throw new HttpException("", HttpStatus.NOT_FOUND);
     const user = await this.usersRepository.deleteUser(userId);
-    return user;
+    throw new HttpException("", HttpStatus.NO_CONTENT);
   }
   async deleteAllUser(): Promise<boolean> {
     return await this.usersRepository.deleteAllUser();

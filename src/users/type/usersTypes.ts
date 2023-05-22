@@ -8,19 +8,26 @@
 //   websiteUrl: string,
 // }
 
-import { parseQueryUsersPaginator } from "../../utils/helpers";
-import { IsEmail, IsString, Length } from "class-validator";
+import { IsEmail, IsString, Length, registerDecorator, Validate, ValidationOptions } from "class-validator";
+import {
+  IsLoginOrEmailAlreadyExists,
+  IsLoginOrEmailAlreadyExistsPipe
+} from "../../pipes/validation/validate-user-login.pipe";
+
+
 
 export class CreateUserInputClassModel {
-  // @IsString()
+  @IsLoginOrEmailAlreadyExists()
   @Length(3, 10)
-    // @Matches(/^[a-zA-Z0-9_-]*$/)
+  @IsString()
   login: string;
-  @IsEmail(
-    //   // {},
-    //   // { message: "--incorrect email" }
-  )
+
+  @IsLoginOrEmailAlreadyExists()
+  @IsEmail()
+  @IsString()
   email: string;
+
+  @IsString()
   @Length(6, 20)
   password: string;
 }

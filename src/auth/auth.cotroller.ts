@@ -1,4 +1,16 @@
-import { Body, Controller, Get, Ip, Post, Req, Res, UseGuards, UseInterceptors } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Ip,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+  UseInterceptors
+} from "@nestjs/common";
 import { UsersService } from "../users/users.service";
 import { AuthService } from "./auth.service";
 import { Request } from "express";
@@ -29,11 +41,11 @@ export class AuthController {
   @Public()
   @Throttle(5, 10)
   @Post("/registration")
-  @UseGuards(
-    EmailConfirmGuard,
-    CheckLoginOrEmailGuard
+  // @UseGuards(
+    // EmailConfirmGuard,
+    // CheckLoginOrEmailGuard
     // recoveryCodeGuard
-  )
+  // )
   async registration(
     @Ip() ip,
     @Body() dto: CreateUserInputClassModel
@@ -61,7 +73,7 @@ export class AuthController {
 
   @Public()
   @Throttle(5, 10)
-  // @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.OK)
   @Post("/login")
   async login(
     @Ip() ip,

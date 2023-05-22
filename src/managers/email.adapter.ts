@@ -7,10 +7,6 @@ import { settingsEnv } from "../settings/settings";
 export class EmailAdapter {
 
   constructor() {
-    console.log({
-      user: settingsEnv.EMAIL_LOG,
-      pass: settingsEnv.EMAIL_PASS,
-    },);
   }
   async sendEmail(email: string, subject: string, message: string): Promise<boolean> {
     const transport = nodemailer.createTransport({

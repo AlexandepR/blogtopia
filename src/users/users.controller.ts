@@ -1,11 +1,12 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
   HttpCode,
   HttpStatus,
-  Ip,
+  Ip, NotFoundException,
   Param,
   Post,
   Query, UseGuards,
@@ -49,12 +50,15 @@ export class UsersController {
   }
   @BasicAuth()
   @Delete(":id")
-  @HttpCode(HttpStatus.NO_CONTENT)
+  // @HttpCode(HttpStatus.NO_CONTENT)
   async deleteUser(
-    @Param(ValidationPipe)
+    @Param(
+      ValidationPipe
+    )
       params: checkObjectId) {
-    await this.usersService.deleteUser(params.id);
-    return `This user #${params.id} removes`;
+    console.log(params, 'params------------');
+    if(!params.id) {throw new NotFoundException('Invalid ID')}
+    return await this.usersService.deleteUser(params.id);
   }
   @BasicAuth()
   @Delete()
