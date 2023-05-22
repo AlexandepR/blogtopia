@@ -95,6 +95,7 @@ export class UsersRepository {
   async updateConfirmCode(_id: ObjectId, newCode: string): Promise<UserDocument | null> {
     const updateCodeUser = await this.UserModel
       .updateOne({ _id }, { $set: { 'emailConfirmation.confirmationCode': newCode } });
+
     if (updateCodeUser.modifiedCount <= 0) return null;
     const user = await this.UserModel
       .findOne({ _id })
@@ -157,8 +158,8 @@ export class UsersRepository {
     return !!deleteUser;
   }
   async deleteAllUser(): Promise<boolean> {
-    const delusers = await this.UserModel
+    const delUsers = await this.UserModel
       .deleteMany({});
-    return delusers.deletedCount >= 1;
+    return delUsers.deletedCount >= 1;
   }
 }

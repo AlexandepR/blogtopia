@@ -13,7 +13,7 @@ export type checkEmailInputModel = {
   email: string
 }
 export class newPasswordInputModel {
-  @Type()
+  // @Type()
   @IsNotEmpty()
   recoveryCode: string
   @Length(6,20)
@@ -21,7 +21,7 @@ export class newPasswordInputModel {
 }
 
 export class loginInputClassModel {
-  @Type()
+  // @Type()
   @IsNotEmpty()
   loginOrEmail: string
   @Type()

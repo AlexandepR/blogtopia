@@ -1,19 +1,20 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Blog, BlogModelType } from "../blogs/type/blogs.schema";
+import { Blog, BlogDocument, BlogModelType } from "../blogs/type/blogs.schema";
 import { Post, PostModelType } from "../posts/type/posts.schema";
 import { Comment, CommentModelType } from "../comments/type/comments.schema";
 import { User, UserModelType } from "../users/type/users.schema";
+import { Model } from "mongoose";
 
 
 
 @Injectable()
 export class TestingRepository {
   constructor(
-    @InjectModel(Blog.name) private BlogModel: BlogModelType,
-    @InjectModel(Post.name) private PostModel: PostModelType,
-    @InjectModel(Comment.name) private CommentModel: CommentModelType,
-    @InjectModel(User.name) private UserModel: UserModelType,
+    @InjectModel(Blog.name) private BlogModel: Model<Blog>,
+    @InjectModel(Post.name) private PostModel: Model<Post>,
+    @InjectModel(Comment.name) private CommentModel: Model<Comment>,
+    @InjectModel(User.name) private UserModel: Model<User>,
   ) {
   }
 

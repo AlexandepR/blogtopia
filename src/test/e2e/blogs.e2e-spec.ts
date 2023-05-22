@@ -1,8 +1,9 @@
 import { INestApplication } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
 import { AppModule } from "../../app.module";
-import * as request from "supertest";
-
+// import * as request from "supertest";
+import request from "supertest";
+import { settingsEnv } from "../../settings/settings";
 const blog1 = {
   name: "testBlog1",
   description: "testBlogDescription1",
@@ -132,6 +133,7 @@ describe("e2e test for Blog", () => {
   it("Should return length equal zero for Blog", async () => {
     const getBlogs = await request(httpServer)
       .get("/blogs")
+      .auth(`${settingsEnv.BASIC_LOGIN}`, `${settingsEnv.BASIC_PASS}`, { type: 'basic' })
       .expect(200);
     let blogs = getBlogs.body;
     expect(blogs.items.length).toBe(0);
@@ -139,6 +141,7 @@ describe("e2e test for Blog", () => {
   it("Should return length equal zero for Post", async () => {
     const getPosts = await request(httpServer)
       .get("/posts")
+      .auth(`${settingsEnv.BASIC_LOGIN}`, `${settingsEnv.BASIC_PASS}`, { type: 'basic' })
       .expect(200);
     let posts = getPosts.body;
     expect(posts.items.length).toBe(0);
