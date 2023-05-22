@@ -50,19 +50,15 @@ export class UsersController {
   }
   @BasicAuth()
   @Delete(":id")
-  // @HttpCode(HttpStatus.NO_CONTENT)
+  @HttpCode(HttpStatus.NO_CONTENT)
   async deleteUser(
-    @Param(
-      ValidationPipe
-    )
+    @Param(ValidationPipe)
       params: checkObjectId) {
-    console.log(params, 'params------------');
-    if(!params.id) {throw new NotFoundException('Invalid ID')}
     return await this.usersService.deleteUser(params.id);
   }
   @BasicAuth()
   @Delete()
   async deleteAllUser() {
-    await this.usersService.deleteAllUser();
+    return await this.usersService.deleteAllUser();
   }
 }

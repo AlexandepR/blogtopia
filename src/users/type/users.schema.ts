@@ -22,7 +22,10 @@ import { add } from "date-fns";
 //   @Prop()
 //   sendDate: Date[] | string []
 // }
-@Schema()
+@Schema({
+  _id: false,
+  versionKey: false
+})
 class UserAccount {
   @Prop()
   login: string;

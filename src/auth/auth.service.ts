@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable, NotFoundException } from "@nestjs/common";
 import { UsersRepository } from "../users/users.repository";
 import { v4 as uuidv4 } from "uuid";
 import { UsersService } from "../users/users.service";
@@ -45,9 +45,9 @@ export class AuthService {
     const email = dto.email
     const newCode = uuidv4();
     await validateOrRejectModel(dto, checkEmailInputClassModel);
-    const findEmail = await this.usersRepository.findByLoginOrEmail(email)
-    if (findEmail.emailConfirmation.isConfirmed === true || !findEmail) throw new Error();
-    const userId = new Types.ObjectId(findEmail._id.toString());
+    const findUser = await this.usersRepository.findByLoginOrEmail(email)
+    if (findUser.emailConfirmation.isConfirmed === true || !findUser) throw new NotFoundException();
+    const userId = new Types.ObjectId(findUser._id.toString());
     const userUpdateCode = await this.usersRepository.updateConfirmCode(userId, newCode);
     if (!userUpdateCode) throw new HttpException("", HttpStatus.BAD_REQUEST);
     const sendEmail = await this.emailService.sendEmailConfirmationMessage(userUpdateCode);
@@ -60,7 +60,7 @@ export class AuthService {
   }
   async confirmRegistration(code: string) {
     const user = await this.usersService.findByConfirmationCode(code);
-    if (!user || user.emailConfirmation.isConfirmed === true) throw new Error()
+    if (!user || user.emailConfirmation.isConfirmed === true) throw new NotFoundException()
 
     const dateNow = new Date();
     if (user.emailConfirmation.expirationDate.getTime() - dateNow.getTime() <= 0) {
