@@ -90,11 +90,9 @@ export class AuthGuard implements CanActivate {
     if (authorizationHeader && authorizationHeader.startsWith('Basic ')) {
       const credentials = authorizationHeader.slice('Basic '.length);
       const [username, password] = Buffer.from(credentials, 'base64').toString().split(':');
-      // const credentials = Buffer.from(base64Credentials, 'base64').toString('utf-8');
-      // const [username, password] = credentials.split(':');
       return { username, password };
     }
-    return null
+    throw new UnauthorizedException();
   }
   private async extractUserFromRefreshToken(request: Request): Promise<boolean> {
     const refreshToken = request.cookies.refreshToken;

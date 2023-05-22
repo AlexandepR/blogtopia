@@ -1,12 +1,19 @@
-import { IsEmail, IsNotEmpty, Length } from "class-validator";
+import { IsEmail, IsNotEmpty, IsString, Length } from "class-validator";
 import { Type } from "class-transformer";
+import { IsLoginOrEmailAlreadyExists, IsLoginOrEmailNotExists } from "../../pipes/validation/validate-user-login.pipe";
 
 
 export class checkEmailInputClassModel {
+  @IsLoginOrEmailNotExists()
   @IsEmail()
   email: string
 }
 export type codeInputModel = {
+  code: string
+}
+export class codeInputClassModel {
+  @IsNotEmpty()
+  @IsString()
   code: string
 }
 export type checkEmailInputModel = {

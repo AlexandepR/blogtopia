@@ -22,7 +22,7 @@ import {
 } from "../middleware/middleware";
 import { Throttle } from "@nestjs/throttler";
 import {
-  checkEmailInputClassModel,
+  checkEmailInputClassModel, codeInputClassModel,
   codeInputModel,
   loginInputClassModel,
   newPasswordInputModel
@@ -61,14 +61,15 @@ export class AuthController {
     return await this.authService.emailResend(dto);
   }
   @Public()
+  // @UseGuards(recoveryCodeGuard)
   @Throttle(5, 10)
   @Post("/registration-confirmation")
   async confirmRegistration(
     //   @Param('postId')
     //     postId: string,
-    @Body() dto:codeInputModel
+    @Body() dto:codeInputClassModel
   ) {
-    return await this.authService.confirmRegistration(dto.code);
+    return await this.authService.confirmRegistration(dto);
   }
 
   @Public()

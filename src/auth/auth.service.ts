@@ -1,10 +1,15 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException } from "@nestjs/common";
 import { UsersRepository } from "../users/users.repository";
 import { v4 as uuidv4 } from "uuid";
 import { UsersService } from "../users/users.service";
 import { CreateUserInputClassModel } from "../users/type/usersTypes";
 import { validateOrRejectModel } from "../helpers/validation.helpers";
-import { checkEmailInputClassModel, loginInputClassModel, newPasswordInputModel } from "./types/auth.types";
+import {
+  checkEmailInputClassModel, codeInputClassModel,
+  codeInputModel,
+  loginInputClassModel,
+  newPasswordInputModel
+} from "./types/auth.types";
 import { Types } from "mongoose";
 import { EmailService } from "../managers/email.service";
 import { generateHash, isPasswordCorrect, updateConfirmInfo } from "../utils/helpers";
@@ -42,11 +47,11 @@ export class AuthService {
     throw new HttpException("", HttpStatus.NO_CONTENT);
   }
   async emailResend(dto: checkEmailInputClassModel) {
+    await validateOrRejectModel(dto, checkEmailInputClassModel);
     const email = dto.email
     const newCode = uuidv4();
-    await validateOrRejectModel(dto, checkEmailInputClassModel);
     const findUser = await this.usersRepository.findByLoginOrEmail(email)
-    if (findUser.emailConfirmation.isConfirmed === true || !findUser) throw new NotFoundException();
+    // if (!findUser || findUser.emailConfirmation.isConfirmed === true) throw new BadRequestException()
     const userId = new Types.ObjectId(findUser._id.toString());
     const userUpdateCode = await this.usersRepository.updateConfirmCode(userId, newCode);
     if (!userUpdateCode) throw new HttpException("", HttpStatus.BAD_REQUEST);
@@ -58,16 +63,17 @@ export class AuthService {
       return null;
     }
   }
-  async confirmRegistration(code: string) {
-    const user = await this.usersService.findByConfirmationCode(code);
-    if (!user || user.emailConfirmation.isConfirmed === true) throw new NotFoundException()
+  async confirmRegistration(dto: codeInputClassModel) {
+    await validateOrRejectModel(dto, codeInputClassModel);
+    const user = await this.usersService.findByConfirmationCode(dto.code);
+    if (!user || user.emailConfirmation.isConfirmed === true) throw new BadRequestException()
 
     const dateNow = new Date();
     if (user.emailConfirmation.expirationDate.getTime() - dateNow.getTime() <= 0) {
       await this.usersRepository.deleteUser(user._id);
       throw new HttpException("", HttpStatus.BAD_REQUEST);
     }
-    if(updateConfirmInfo(user,code)) {
+    if(updateConfirmInfo(user,dto.code)) {
       user.emailConfirmation.isConfirmed = true;
       const createUser = await this.usersRepository.save(user)
       if (createUser) throw new HttpException("", HttpStatus.NO_CONTENT);
