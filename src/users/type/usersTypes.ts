@@ -8,21 +8,17 @@
 //   websiteUrl: string,
 // }
 
-import { IsEmail, IsString, Length, registerDecorator, Validate, ValidationOptions } from "class-validator";
-import {
-  IsLoginOrEmailAlreadyExists,
-  IsLoginOrEmailAlreadyExistsPipe
-} from "../../pipes/validation/validate-user-login.pipe";
-
+import { IsEmail, IsString, Length } from "class-validator";
+import { CheckConfirmData } from "../../pipes/validation/validate-user-login.pipe";
 
 
 export class CreateUserInputClassModel {
-  @IsLoginOrEmailAlreadyExists()
+  @CheckConfirmData()
   @Length(3, 10)
   @IsString()
   login: string;
 
-  @IsLoginOrEmailAlreadyExists()
+  @CheckConfirmData()
   @IsEmail()
   @IsString()
   email: string;
