@@ -46,6 +46,7 @@ export class JwtService {
     }
   }
   async findUserIdByAuthHeaders(req: Request): Promise<Types.ObjectId | null> {
+    if (!req.headers['authorization']) return null
     const token = req.headers['authorization'].split(' ')[1]
     if (token) {
       const userId = this.getUserIdByToken(token);

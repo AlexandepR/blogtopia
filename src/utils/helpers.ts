@@ -114,3 +114,12 @@ export const idParamsValidator = (id: string) => {
     return null
   }
 }
+export const sortNewestLikesForPost = (post) => {
+  return post.extendedLikesInfo.likesData.sort((a, b) => {
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  }).slice(0, 3).map(({ _id, createdAt, userId, userLogin }) => ({
+    addedAt: createdAt,
+    userId: userId.toString(),
+    login: userLogin
+  }))
+}

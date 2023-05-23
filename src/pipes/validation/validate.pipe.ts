@@ -41,7 +41,6 @@ import { NotFoundException } from "@nestjs/common";
 //   };
 // }
 
-
 @ValidatorConstraint({ name: "IsLoginOrEmailNotExistsPipe", async: true })
 export class IsLoginOrEmailNotExistsPipe implements ValidatorConstraintInterface {
   constructor(protected usersRepository: UsersRepository) {
@@ -64,7 +63,7 @@ export class IsLoginOrEmailNotExistsPipe implements ValidatorConstraintInterface
 export function IsLoginOrEmailNotExists(validationOptions?: ValidationOptions) {
   return function (object: Object, propertyName: string) {
     registerDecorator({
-      name: 'IsLoginOrEmailNotExistsPipe',
+      name: 'IsLoginOrEmailNotExists',
       target: object.constructor,
       propertyName: propertyName,
       options: validationOptions,
@@ -115,11 +114,39 @@ export class CheckConfirmDataPipe implements ValidatorConstraintInterface {
 export function CheckConfirmData(validationOptions?: ValidationOptions) {
   return function (object: Object, propertyName: string) {
     registerDecorator({
-      name: 'CheckConfirmDataPipe',
+      name: 'CheckConfirmData',
       target: object.constructor,
       propertyName: propertyName,
       options: validationOptions,
       validator: CheckConfirmDataPipe,
+    });
+  };
+}
+
+
+@ValidatorConstraint({ name: "validateInputBlogPipe", async: true })
+export class validateInputBlogPipe implements ValidatorConstraintInterface {
+  constructor() {}
+  async validate(dto: string, args: ValidationArguments) {
+    const {value} = args
+    if (!value || value.trim().length <= 0) return false
+    if( typeof value !== 'string') return false
+    return true
+  }
+  defaultMessage(args: ValidationArguments) {
+    const {property} = args
+    // here you can provide default error message if validation failed
+    return `${property} is empty`;
+  }
+}
+export function ValidateInputBlog(validationOptions?: ValidationOptions) {
+  return function (object: Object, propertyName: string) {
+    registerDecorator({
+      name: 'validateInputBlog',
+      target: object.constructor,
+      propertyName: propertyName,
+      options: validationOptions,
+      validator: validateInputBlogPipe,
     });
   };
 }

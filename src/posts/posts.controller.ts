@@ -1,9 +1,23 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query, Req } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  Put,
+  Query,
+  Req,
+  ValidationPipe
+} from "@nestjs/common";
 import { ParamsType } from "../types/types";
 import { CreateCommentInputClassModel, CreatePostInputClassModel, PostsService } from "./posts.service";
 import { Request } from 'express';
-import { likeStatusType } from "./type/postsType";
+import { likeStatusClass, likeStatusType } from "./type/postsType";
 import { BasicAuth, Public } from "../auth/decorators/public.decorator";
+import { checkObjectId } from "../helpers/validation.helpers";
 
 @Controller("posts")
 export class PostsController {
@@ -19,10 +33,11 @@ export class PostsController {
   @Public()
   @Get(":id")
   async getPost(
+    @Req() req: Request,
     @Param("id")
       id: string
   ) {
-    return await this.postsService.getPost(id);
+    return await this.postsService.getPost(id,req);
   }
   @Public()
   @Get("/:id/comments")
@@ -34,7 +49,6 @@ export class PostsController {
   ) {
     return await this.postsService.getCommentByPost(postId,query);
   }
-  @BasicAuth()
   @Post('/:postId/comments')
   async createCommentForPost(
     @Req() req: Request,
@@ -60,15 +74,15 @@ export class PostsController {
      await this.postsService.updatePost(id, dto);
      return
   }
-  @BasicAuth()
-  @Put("/:postId/like-status")
+  @Put("/:id/like-status")
+  @HttpCode(HttpStatus.NO_CONTENT)
   async updateLikesInfoByPostId(
     @Req() req: Request,
-    @Param("postId")
-      postId: string,
-    @Body() dto: likeStatusType
+    @Param(ValidationPipe)
+      params: checkObjectId,
+    @Body() dto: likeStatusClass
   ) {
-      return await this.postsService.updateLikesInfo(dto,postId,req)
+      return await this.postsService.updateLikesInfo(dto,params.id,req)
   }
   @BasicAuth()
   @Delete(":id")

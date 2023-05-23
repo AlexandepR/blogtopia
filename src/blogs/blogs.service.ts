@@ -9,22 +9,27 @@ import { outputPostModelType, PostsTypeFiltered } from "../posts/type/postsType"
 import { PostsRepository } from "../posts/posts.repository";
 import { IsUrl, MaxLength } from "class-validator";
 import { validateOrRejectModel } from "../helpers/validation.helpers";
+import { ValidateInputBlog } from "../pipes/validation/validate.pipe";
 
 export class BlogInputClassModel {
   @MaxLength(15)
-  name: string
+  @ValidateInputBlog()
+  name: string;
   @MaxLength(500)
-  description: string
+  @ValidateInputBlog()
+  description: string;
   @IsUrl()
-  websiteUrl: string
+  @ValidateInputBlog()
+  websiteUrl: string;
 }
+
 export class createPostForBlogInputClassModel {
   @MaxLength(30)
-  title: string
+  title: string;
   @MaxLength(100)
-  shortDescription: string
+  shortDescription: string;
   @MaxLength(1000)
-  content: string
+  content: string;
 }
 
 @Injectable()
@@ -51,9 +56,9 @@ export class BlogsService {
     };
   }
   async createBlog(dto: BlogInputClassModel): Promise<BlogType> {
-    await validateOrRejectModel(dto, BlogInputClassModel)
+    await validateOrRejectModel(dto, BlogInputClassModel);
     const createBlog = await this.blogsRepository.createBlog(dto);
-    if(!createBlog) throw new HttpException('', HttpStatus.NOT_FOUND)
+    if (!createBlog) throw new HttpException("", HttpStatus.NOT_FOUND);
     return {
       id: createBlog._id.toString(),
       name: createBlog.name,
@@ -64,7 +69,7 @@ export class BlogsService {
     };
   }
   async createPostForBlog(postDto: createPostForBlogInputClassModel, id: string): Promise<outputPostModelType | null> {
-    await validateOrRejectModel(postDto, createPostForBlogInputClassModel)
+    await validateOrRejectModel(postDto, createPostForBlogInputClassModel);
     const blogId = new Types.ObjectId(id);
     const getBlog = await this.blogsRepository.findBlogById(blogId);
     if (!getBlog) throw new HttpException("", HttpStatus.NOT_FOUND);
@@ -90,25 +95,25 @@ export class BlogsService {
   }
   async getBlog(id: string) {
     // if(!blog) throw new BadRequestException(HttpStatus.NOT_FOUND)
-      const blogId = new Types.ObjectId(id);
-      const blog = await this.blogsRepository.findBlogById(blogId);
-      if (!blog) throw new HttpException("", HttpStatus.NOT_FOUND);
-      return {
-        id: blog._id,
-        name: blog.name,
-        description: blog.description,
-        websiteUrl: blog.websiteUrl,
-        createdAt: blog.createdAt,
-        isMembership: blog.isMembership
-      };
+    const blogId = new Types.ObjectId(id);
+    const blog = await this.blogsRepository.findBlogById(blogId);
+    if (!blog) throw new HttpException("", HttpStatus.NOT_FOUND);
+    return {
+      id: blog._id,
+      name: blog.name,
+      description: blog.description,
+      websiteUrl: blog.websiteUrl,
+      createdAt: blog.createdAt,
+      isMembership: blog.isMembership
+    };
   }
   async getPosts(id: string, query: ParamsType): Promise<PaginationType<PostsTypeFiltered[]>> {
     const { searchNameTerm, pageSize, pageNumber, sortDirection, sortBy } = parseQueryPaginator(query);
     // const filter = searchNameTerm ? { name: { $regex: searchNameTerm, $options: "i" } } : {};
     const blogId = new Types.ObjectId(id);
     const blog = await this.blogsRepository.findBlogById(blogId);
-    if(!blog) throw new HttpException('', HttpStatus.NOT_FOUND)
-    const filter = {blogId: new Types.ObjectId(id)}
+    if (!blog) throw new HttpException("", HttpStatus.NOT_FOUND);
+    const filter = { blogId: new Types.ObjectId(id) };
     const totalCountPosts = await this.postsRepository.getTotalCountPosts(filter);
     const skip = skipPage(pageNumber, pageSize);
     const pagesCount = pagesCounter(totalCountPosts, pageSize);
@@ -167,18 +172,18 @@ export class BlogsService {
     return null;
   }
 
-  async updateBlog(id: string, dto: BlogInputClassModel):Promise<BlogDocument> {
-    await validateOrRejectModel(dto, BlogInputClassModel)
+  async updateBlog(id: string, dto: BlogInputClassModel): Promise<BlogDocument> {
+    await validateOrRejectModel(dto, BlogInputClassModel);
     const blogId = new Types.ObjectId(id);
     const blog = await this.blogsRepository.findBlogById(blogId);
-    if(!blog) throw new HttpException('', HttpStatus.NOT_FOUND)
+    if (!blog) throw new HttpException("", HttpStatus.NOT_FOUND);
     blog.updateBlog(dto);
     return await this.blogsRepository.save(blog);
   }
   async deleteBlog(id: string) {
     const blogId = new Types.ObjectId(id);
     const blog = await this.blogsRepository.findBlogById(blogId);
-    if(!blog) throw new HttpException('', HttpStatus.NOT_FOUND)
+    if (!blog) throw new HttpException("", HttpStatus.NOT_FOUND);
     return await this.blogsRepository.delete(blogId);
   }
   async deleteAllBlog(): Promise<boolean> {

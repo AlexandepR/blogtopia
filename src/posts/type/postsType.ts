@@ -1,4 +1,5 @@
 import { ObjectId, Types } from "mongoose";
+import { IsIn, IsString } from "class-validator";
 
 export type PostsTypeFiltered = Omit<PostsType, 'extendedLikesInfo'> &
   { extendedLikesInfo: Omit<PostExtendedLikesInfoType, 'likesData' | 'dislikesData'> };
@@ -66,5 +67,11 @@ export type PutPostInputModelType = {
   blogId: string
 }
 export type likeStatusType = {
+  likeStatus: "None" | "Like" | "Dislike"
+}
+
+export class likeStatusClass {
+  @IsString()
+  @IsIn(['None', 'Like', 'Dislike'])
   likeStatus: "None" | "Like" | "Dislike"
 }

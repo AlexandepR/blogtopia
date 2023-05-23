@@ -48,8 +48,9 @@ export class BlogsController {
   @BasicAuth()
   @Post(":id/posts")
   async createPostForBlog(
+    @Param("id")
+      id: string,
     @Body() dto: createPostForBlogInputClassModel,
-    @Param("id") id: string
   ) {
     return await this.blogsService.createPostForBlog(dto,id);
   }
@@ -59,7 +60,7 @@ export class BlogsController {
   async updateBlog(
     @Param("id")
       id: string,
-    @Body() dto: BlogInputClassModel
+    @Body() dto: BlogInputClassModel,
   ) {
     const purBlog = await this.blogsService.updateBlog(id, dto);
     if(!purBlog) return (HttpStatus.NOT_FOUND)

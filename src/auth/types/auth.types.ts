@@ -1,5 +1,5 @@
 import { IsEmail, IsNotEmpty, IsString, Length } from "class-validator";
-import { CheckConfirmData, IsLoginOrEmailNotExists } from "../../pipes/validation/validate-user-login.pipe";
+import { CheckConfirmData, IsLoginOrEmailNotExists } from "../../pipes/validation/validate.pipe";
 
 
 export class checkEmailInputClassModel {

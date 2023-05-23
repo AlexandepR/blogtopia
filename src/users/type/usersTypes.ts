@@ -9,7 +9,7 @@
 // }
 
 import { IsEmail, IsString, Length } from "class-validator";
-import { CheckConfirmData } from "../../pipes/validation/validate-user-login.pipe";
+import { CheckConfirmData } from "../../pipes/validation/validate.pipe";
 
 
 export class CreateUserInputClassModel {

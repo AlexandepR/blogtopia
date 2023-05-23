@@ -1,7 +1,15 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable, NotFoundException } from "@nestjs/common";
 import { PaginationType, ParamsType } from "../types/types";
-import { commentResData, pagesCounter, parseQueryPaginator, skipPage, updatePostLikesInfo } from "../utils/helpers";
 import {
+  commentResData,
+  pagesCounter,
+  parseQueryPaginator,
+  skipPage,
+  sortNewestLikesForPost,
+  updatePostLikesInfo
+} from "../utils/helpers";
+import {
+  likeStatusClass,
   likeStatusType,
   outputPostModelType,
   PostLikesType, PostsNewestLikesType,
@@ -168,36 +176,31 @@ export class PostsService {
       items: commentList
     };
   }
-  async getPost(id: string): Promise<outputPostModelType> {
-    const PostId = new Types.ObjectId(id);
-    const post = await this.postsRepository.findPostById(PostId);
+  async getPost(id: string, req: Request): Promise<outputPostModelType> {
+    const postId = new Types.ObjectId(id);
+    const post = await this.postsRepository.findPostById(postId);
     if (!post) throw new HttpException("", HttpStatus.NOT_FOUND);
-    // const userStatus = await this.postsRepository.findLikesStatus(postId, userId);
-    // if (post) {
-    //
-    //   const sortNewestLikes = post.extendedLikesInfo.likesData.sort((a, b) => {
-    //     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    //   }).slice(0, 3).map(({ _id, createdAt, userId, userLogin }) => ({
-    //     addedAt: createdAt,
-    //     userId: userId.toString(),
-    //     login: userLogin
-    //   }));
-    // return post
-    return {
-      id: post._id.toString(),
-      title: post.title,
-      shortDescription: post.shortDescription,
-      content: post.content,
-      blogId: post.blogId,
-      blogName: post.blogName,
-      createdAt: post.createdAt,
-      extendedLikesInfo: {
-        likesCount: post.extendedLikesInfo.likesCount,
-        dislikesCount: post.extendedLikesInfo.dislikesCount,
-        myStatus: post.extendedLikesInfo.myStatus,
-        newestLikes: post.extendedLikesInfo.newestLikes
-      }
-    };
+    if (post) {
+      const userId = await this.jwtService.findUserIdByAuthHeaders(req);
+      const userStatus = await this.postsRepository.findLikesStatus(postId, userId);
+      const sortNewestLikes = sortNewestLikesForPost(post)
+      return {
+        id: post._id.toString(),
+        title: post.title,
+        shortDescription: post.shortDescription,
+        content: post.content,
+        blogId: post.blogId,
+        blogName: post.blogName,
+        createdAt: post.createdAt,
+        extendedLikesInfo: {
+          likesCount: post.extendedLikesInfo.likesCount,
+          dislikesCount: post.extendedLikesInfo.dislikesCount,
+          myStatus: userStatus,
+          newestLikes: sortNewestLikes
+        }
+      };
+    }
+    throw new NotFoundException()
   }
   async updatePost(id: string, dto: PutPostInputModelType) {
     await validateOrRejectModel(dto, CreatePostInputClassModel);
@@ -207,7 +210,8 @@ export class PostsService {
     await post.updatePost(dto);
     return await post.save();
   }
-  async updateLikesInfo(dto: likeStatusType,id: string, req: Request) {
+  async updateLikesInfo(dto: likeStatusClass,id: string, req: Request) {
+    await validateOrRejectModel(dto, likeStatusClass);
     const userId = await this.jwtService.findUserIdByAuthHeaders(req);
     const postId = new Types.ObjectId(id)
     const likeStatus = dto.likeStatus
@@ -215,7 +219,6 @@ export class PostsService {
     if (!userId || !post) if (!post) throw new HttpException("", HttpStatus.BAD_REQUEST);
     const user =  await this.usersRepository.findUserById(userId)
     const {accountData: { login: userLogin }} = user!
-
 
     const newDate = new Date().toISOString();
     const newLikesData: PostLikesType = {
