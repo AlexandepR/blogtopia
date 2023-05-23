@@ -4,15 +4,16 @@ import { AppModule } from "../../app.module";
 // import * as request from "supertest";
 import request from "supertest";
 import { settingsEnv } from "../../settings/settings";
+import { addSettingsApp } from "../../main";
 const blog1 = {
   name: "testBlog1",
   description: "testBlogDescription1",
-  websiteUrl: "https://testBlogWebSite.com1"
+  websiteUrl: "https://testBlogWebSite1.com"
 };
 const blog2 = {
   name: "testBlog2",
   description: "testBlogDescription2",
-  websiteUrl: "https://testBlogWebSite.com2"
+  websiteUrl: "https://testBlogWebSite2.com"
 };
 const post1 = {
   title: "post1",
@@ -93,36 +94,18 @@ let post2Id = "";
 
 describe("e2e test for Blog", () => {
   let app: INestApplication;
-  let connection;
   let httpServer;
-  // const managementToken = {
-  //   key: 'management-auth-token',
-  //   value: ''
-  // }
-  beforeAll(async () => {
 
+  beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule]
     }).compile();
-
-    // connection = moduleFixture.get<QuizService>(QuizService).getMongoConnection();
     app = moduleFixture.createNestApplication();
-    // app.useGlobalPipes(new ValidationBodyPipe());
-
+    addSettingsApp(app);
     await app.init();
-
     httpServer = app.getHttpServer();
-    // await request(httpServer)
-    //   .delete('testing/all-data');
   });
-
   afterAll(async () => {
-    //clear collection
-    // const collections = connection.collection;
-    // for (const key in collections) {
-    //   const collection = collections[key];
-    //   await collection.deleteMany({})
-    // }
     await app.close();
   });
   it("All data is deleted", async () => {
@@ -133,7 +116,6 @@ describe("e2e test for Blog", () => {
   it("Should return length equal zero for Blog", async () => {
     const getBlogs = await request(httpServer)
       .get("/blogs")
-      .auth(`${settingsEnv.BASIC_LOGIN}`, `${settingsEnv.BASIC_PASS}`, { type: 'basic' })
       .expect(200);
     let blogs = getBlogs.body;
     expect(blogs.items.length).toBe(0);
@@ -141,7 +123,6 @@ describe("e2e test for Blog", () => {
   it("Should return length equal zero for Post", async () => {
     const getPosts = await request(httpServer)
       .get("/posts")
-      .auth(`${settingsEnv.BASIC_LOGIN}`, `${settingsEnv.BASIC_PASS}`, { type: 'basic' })
       .expect(200);
     let posts = getPosts.body;
     expect(posts.items.length).toBe(0);
@@ -149,6 +130,7 @@ describe("e2e test for Blog", () => {
   it("Should create new blog and return", async () => {
     const createBlog1 = await request(httpServer)
       .post("/blogs")
+      .auth(`${settingsEnv.BASIC_LOGIN}`, `${settingsEnv.BASIC_PASS}`, { type: 'basic' })
       .send(blog1)
       .expect(201);
     blogId1 = createBlog1.body.id;
@@ -156,7 +138,7 @@ describe("e2e test for Blog", () => {
       id: expect.any(String),
       name: "testBlog1",
       description: "testBlogDescription1",
-      websiteUrl: "https://testBlogWebSite.com1",
+      websiteUrl: "https://testBlogWebSite1.com",
       createdAt: expect.any(String),
       isMembership: false
     });
@@ -164,7 +146,7 @@ describe("e2e test for Blog", () => {
   it("should create new post1 for blog1", async () => {
     const newPost = await request(httpServer)
       .post(`/blogs/${blogId1}/posts`)
-      // .set('Authorization', basicAuth)
+      .auth(`${settingsEnv.BASIC_LOGIN}`, `${settingsEnv.BASIC_PASS}`, { type: 'basic' })
       .send({
         title: post1.title,
         shortDescription: post1.shortDescription,
@@ -200,6 +182,7 @@ describe("e2e test for Blog", () => {
     async () => {
       await request(httpServer)
         .post(`/blogs/645e62ec11c8f44c852ec699/posts`)
+        .auth(`${settingsEnv.BASIC_LOGIN}`, `${settingsEnv.BASIC_PASS}`, { type: 'basic' })
         .send(post2)
         .expect(404);
     });
@@ -213,12 +196,14 @@ describe("e2e test for Blog", () => {
     async () => {
       await request(httpServer)
         .put(`/blogs/645e62ec11c8f44c852ec699`)
+        .auth(`${settingsEnv.BASIC_LOGIN}`, `${settingsEnv.BASIC_PASS}`, { type: 'basic' })
         .expect(404);
     });
   it("should return error for DELETE Blogs if :id from uri param not found; status 404;",
     async () => {
       await request(httpServer)
         .delete(`/blogs/645e62ec11c8f44c852ec699`)
+        .auth(`${settingsEnv.BASIC_LOGIN}`, `${settingsEnv.BASIC_PASS}`, { type: 'basic' })
         .expect(404);
     });
   it("should return error for GET Posts if :id from uri param not found; status 404;",
@@ -231,12 +216,14 @@ describe("e2e test for Blog", () => {
     async () => {
       await request(httpServer)
         .put(`/posts/645e62ec11c8f44c852ec699`)
+        .auth(`${settingsEnv.BASIC_LOGIN}`, `${settingsEnv.BASIC_PASS}`, { type: 'basic' })
         .expect(404);
     });
   it("should return error for DELETE Posts if :id from uri param not found; status 404;",
     async () => {
       await request(httpServer)
         .delete(`/posts/645e62ec11c8f44c852ec699`)
+        .auth(`${settingsEnv.BASIC_LOGIN}`, `${settingsEnv.BASIC_PASS}`, { type: 'basic' })
         .expect(404);
     });
   it("should get post content: posts for specific blog with pagination,return status 200;", async () => {
@@ -287,64 +274,63 @@ describe("e2e test for Blog", () => {
     post12.blogId = blogId1
     await request(httpServer)
       .post(`/posts`)
-      // .set('Authorization', basicAuth)
+      .auth(`${settingsEnv.BASIC_LOGIN}`, `${settingsEnv.BASIC_PASS}`, { type: 'basic' })
       .send(post2)
       .expect(201);           // create 2
     await request(httpServer)
       .post(`/posts`)
-      // .set('Authorization', basicAuth)
+      .auth(`${settingsEnv.BASIC_LOGIN}`, `${settingsEnv.BASIC_PASS}`, { type: 'basic' })
       .send(post3)
       .expect(201);            // create 3
     await request(httpServer)
       .post(`/posts`)
-      // .set('Authorization', basicAuth)
+      .auth(`${settingsEnv.BASIC_LOGIN}`, `${settingsEnv.BASIC_PASS}`, { type: 'basic' })
       .send(post4)
       .expect(201);           // create 4
     await request(httpServer)
       .post(`/posts`)
-      // .set('Authorization', basicAuth)
+      .auth(`${settingsEnv.BASIC_LOGIN}`, `${settingsEnv.BASIC_PASS}`, { type: 'basic' })
       .send(post5)
       .expect(201);            // create 5
     await request(httpServer)
       .post(`/posts`)
-      // .set('Authorization', basicAuth)
+      .auth(`${settingsEnv.BASIC_LOGIN}`, `${settingsEnv.BASIC_PASS}`, { type: 'basic' })
       .send(post6)
       .expect(201);           // create 6
     await request(httpServer)
       .post(`/posts`)
-      // .set('Authorization', basicAuth)
+      .auth(`${settingsEnv.BASIC_LOGIN}`, `${settingsEnv.BASIC_PASS}`, { type: 'basic' })
       .send(post7)
       .expect(201);           // create 7
     await request(httpServer)
       .post(`/posts`)
-      // .set('Authorization', basicAuth)
+      .auth(`${settingsEnv.BASIC_LOGIN}`, `${settingsEnv.BASIC_PASS}`, { type: 'basic' })
       .send(post8)
       .expect(201);           // create 8
     await request(httpServer)
       .post(`/posts`)
-      // .set('Authorization', basicAuth)
+      .auth(`${settingsEnv.BASIC_LOGIN}`, `${settingsEnv.BASIC_PASS}`, { type: 'basic' })
       .send(post9)
       .expect(201);           // create 9
     await request(httpServer)
       .post(`/posts`)
-      // .set('Authorization', basicAuth)
+      .auth(`${settingsEnv.BASIC_LOGIN}`, `${settingsEnv.BASIC_PASS}`, { type: 'basic' })
       .send(post10)
       .expect(201);           // create 10
     await request(httpServer)
       .post(`/posts`)
-      // .set('Authorization', basicAuth)
+      .auth(`${settingsEnv.BASIC_LOGIN}`, `${settingsEnv.BASIC_PASS}`, { type: 'basic' })
       .send(post11)
       .expect(201);           // create 11
     await request(httpServer)
       .post(`/posts`)
-      // .set('Authorization', basicAuth)
+      .auth(`${settingsEnv.BASIC_LOGIN}`, `${settingsEnv.BASIC_PASS}`, { type: 'basic' })
       .send(post12)
       .expect(201);            // create 12
   })
   it("should get 12 post ,return status 200;", async () => {
     const posts1 = await request(httpServer)
       .get(`/blogs/${blogId1}/posts`)
-      // .set('Authorization', basicAuth)
       .expect(200);
     expect(posts1.body).toStrictEqual(
       expect.objectContaining(
@@ -359,12 +345,12 @@ describe("e2e test for Blog", () => {
   it('should delete post', async () => {
     await request(httpServer)
       .delete(`/posts/${post1Id}`)
+      .auth(`${settingsEnv.BASIC_LOGIN}`, `${settingsEnv.BASIC_PASS}`, { type: 'basic' })
       .expect(204);
   })
   it("should get 11 post ,return status 200;", async () => {
     const posts1 = await request(httpServer)
       .get(`/blogs/${blogId1}/posts`)
-      // .set('Authorization', basicAuth)
       .expect(200);
     expect(posts1.body).toStrictEqual(
       expect.objectContaining(

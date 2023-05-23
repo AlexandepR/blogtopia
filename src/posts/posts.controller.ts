@@ -3,17 +3,20 @@ import { ParamsType } from "../types/types";
 import { CreateCommentInputClassModel, CreatePostInputClassModel, PostsService } from "./posts.service";
 import { Request } from 'express';
 import { likeStatusType } from "./type/postsType";
+import { BasicAuth, Public } from "../auth/decorators/public.decorator";
 
 @Controller("posts")
 export class PostsController {
   constructor(protected postsService: PostsService) {
   }
+  @Public()
   @Get()
   async getPosts(
     @Query() query: ParamsType
   ) {
     return this.postsService.findAll(query);
   }
+  @Public()
   @Get(":id")
   async getPost(
     @Param("id")
@@ -21,6 +24,7 @@ export class PostsController {
   ) {
     return await this.postsService.getPost(id);
   }
+  @Public()
   @Get("/:id/comments")
   async getCommentByPost(
     @Param("id")
@@ -30,6 +34,7 @@ export class PostsController {
   ) {
     return await this.postsService.getCommentByPost(postId,query);
   }
+  @BasicAuth()
   @Post('/:postId/comments')
   async createCommentForPost(
     @Req() req: Request,
@@ -39,10 +44,12 @@ export class PostsController {
   ){
     return await this.postsService.createCommentForPost(postId,dto, req)
   }
+  @BasicAuth()
   @Post()
   async createPost(@Body() dto: CreatePostInputClassModel) {
     return await this.postsService.createPost(dto);
   }
+  @BasicAuth()
   @Put(":id")
   @HttpCode(HttpStatus.NO_CONTENT)
   async updatePost(
@@ -53,6 +60,7 @@ export class PostsController {
      await this.postsService.updatePost(id, dto);
      return
   }
+  @BasicAuth()
   @Put("/:postId/like-status")
   async updateLikesInfoByPostId(
     @Req() req: Request,
@@ -62,7 +70,7 @@ export class PostsController {
   ) {
       return await this.postsService.updateLikesInfo(dto,postId,req)
   }
-
+  @BasicAuth()
   @Delete(":id")
   @HttpCode(HttpStatus.NO_CONTENT)
   async deletePost(
@@ -71,6 +79,7 @@ export class PostsController {
     return await this.postsService.deletePost(id);
     // return `This blog #${id} removes`;
   }
+  @BasicAuth()
   @Delete()
   async deleteAllPost() {
     await this.postsService.deleteAllPost();

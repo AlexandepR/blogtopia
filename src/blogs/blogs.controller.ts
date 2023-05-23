@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query } from "@nestjs/common";
 import { BlogInputClassModel, BlogsService, createPostForBlogInputClassModel } from "./blogs.service";
 import { ParamsType } from "../types/types";
-import { Public } from "../auth/decorators/public.decorator";
+import { BasicAuth, Public } from "../auth/decorators/public.decorator";
 
 
 
@@ -13,7 +13,7 @@ export class BlogsController {
   // @Public()
   // @UseGuards(BasicAuthGuard)
   // @BasicAuth()
-  // @Public()
+  @Public()
   @Get()
   // @BasicAuth()
   async getBlogs(
@@ -21,6 +21,7 @@ export class BlogsController {
   ) {
     return this.blogsService.findAll(query);
   }
+  @Public()
   @Get(":id")
   async getBlog(
     @Param("id")
@@ -28,6 +29,7 @@ export class BlogsController {
   ) {
     return await this.blogsService.getBlog(id);
   }
+  @Public()
   @Get(":id/posts")
   async GetPostsByBlog(
     @Param("id")
@@ -36,13 +38,14 @@ export class BlogsController {
   ) {
     return await this.blogsService.getPosts(id, query);
   }
-  @Public()
+  @BasicAuth()
   @Post()
   async createBlog(
     @Body() dto: BlogInputClassModel
   ) {
     return await this.blogsService.createBlog(dto);
   }
+  @BasicAuth()
   @Post(":id/posts")
   async createPostForBlog(
     @Body() dto: createPostForBlogInputClassModel,
@@ -50,6 +53,7 @@ export class BlogsController {
   ) {
     return await this.blogsService.createPostForBlog(dto,id);
   }
+  @BasicAuth()
   @Put(":id")
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateBlog(
@@ -61,6 +65,7 @@ export class BlogsController {
     if(!purBlog) return (HttpStatus.NOT_FOUND)
     return purBlog
   }
+  @BasicAuth()
   @Delete(":id")
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteBlog(
@@ -69,6 +74,7 @@ export class BlogsController {
     await this.blogsService.deleteBlog(id);
     return `This blog #${id} removes`;
   }
+  @BasicAuth()
   @Delete()
   async deleteAllBlog() {
     await this.blogsService.deleteAllBlog();
