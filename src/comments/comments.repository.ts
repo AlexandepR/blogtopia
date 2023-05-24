@@ -86,6 +86,31 @@ export class CommentsRepository {
       return false;
     }
   }
+  async updateCommentLikesInfo(comment: CommentDocument, commentId: Types.ObjectId): Promise<boolean> {
+    const updateComment = await this.CommentModel
+      .updateOne({ _id: commentId }, {
+        $set:
+          {
+            'likesInfo.likesData': comment.likesInfo.likesData,
+            'likesInfo.dislikesData': comment.likesInfo.dislikesData,
+            'likesInfo.likesCount': comment!.likesInfo.likesData.length,
+            'likesInfo.dislikesCount': comment!.likesInfo.dislikesData.length,
+          }
+      });
+    if (updateComment) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  // async checkNewestLikes(commentId: Types.ObjectId, userId: Types.ObjectId): Promise<boolean> {
+  //   const checkNewestLikes = await this.CommentModel
+  //     .updateMany(
+  //       { _id: commentId },
+  //       { $pull: { 'likesInfo.newestLikes': { userId: userId } } }
+  //     );
+  //   return checkNewestLikes.modifiedCount > 0;
+  // }
   async checkLikes(commentId: Types.ObjectId, userId: Types.ObjectId, updateField:string): Promise<boolean> {
     const field = `likesInfo.${updateField}`
     const result = await this.CommentModel

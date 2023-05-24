@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException } from "@nestjs/common";
 import { PaginationType, ParamsType } from "../types/types";
 import {
-  commentResData,
+  commentResData, idParamsValidator,
   pagesCounter,
   parseQueryPaginator,
   skipPage,
@@ -70,8 +70,11 @@ export class PostsService {
                                            likesData,
                                            dislikesData,
                                            myStatus,
-                                           newestLikes,
-                                           ...restExtendedLikesInfo
+                                           newestLikes: [{
+                                             description,
+                                             ...restNewest
+                                           }],
+                                           // ...restExtendedLikesInfo
                                          },
                                          // __v,
                                          ...rest
@@ -94,8 +97,10 @@ export class PostsService {
               likesCount,
               dislikesCount,
               myStatus: userStatus,
-              ...restExtendedLikesInfo,
-              newestLikes
+              // ...restExtendedLikesInfo,
+              newestLikes: [{
+                ...restNewest
+              }]
             }
           };
         }
@@ -136,8 +141,11 @@ export class PostsService {
   }
   async createCommentForPost(id: string, dto: CreateCommentInputClassModel,user: UserDocument): Promise<any> {
     await validateOrRejectModel(dto, CreateCommentInputClassModel);
-    const postId = new Types.ObjectId(id);
+    const postId = idParamsValidator(id);
+    if(!postId) throw new HttpException('', HttpStatus.NOT_FOUND)
+    const findPost = this.postsRepository.findPostById(postId)
     const createComment = await this.postsRepository.createComment(dto.content, postId, user);
+    if(!createComment) throw new HttpException('', HttpStatus.NOT_FOUND)
       if (createComment) {
         return {
           id: createComment._id.toString(),

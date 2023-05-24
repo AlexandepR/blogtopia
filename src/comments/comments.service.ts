@@ -1,7 +1,13 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { CommentsRepository } from "./comments.repository";
 import { PaginationType } from "../types/types";
-import { idParamsValidator, pagesCounter, parseQueryPaginator, skipPage } from "../utils/helpers";
+import {
+  idParamsValidator,
+  pagesCounter,
+  parseQueryPaginator,
+  skipPage,
+  updateCommentLikesInfo
+} from "../utils/helpers";
 import { UsersRepository } from "../users/users.repository";
 import { commentContentInputClassModel, CommentType, LikesType } from "./type/commentsType";
 import { JwtService } from "../auth/jwt.service";
@@ -46,12 +52,17 @@ export class CommentsService {
   }
   async updateComment (id: string, dto: commentContentInputClassModel, user: UserDocument) {
     await validateOrRejectModel(dto, commentContentInputClassModel);
-    // const commentId = idParamsValidator(id);
+    const commentId = idParamsValidator(id);
+    const comment = await this.commentsRepository.getCommentsById(commentId);
+    if (!comment) throw new HttpException('', HttpStatus.NOT_FOUND)
     // const userId = await this.jwtService.findUserIdByAuthHeaders(req);
     // const user = await this.commentsRepository.getCommentsById(new Types.ObjectId(commentId));
     // if (!user) throw new HttpException('', HttpStatus.NOT_FOUND);
     // if (userId.toString() !== user?.commentatorInfo.userId) throw new HttpException('', HttpStatus.FORBIDDEN);
     const commentIsUpdate = await this.commentsRepository.updateCommentId(new Types.ObjectId(id), dto.content);
+    if (user._id.toString() !== comment?.commentatorInfo.userId) {
+      throw new HttpException('', HttpStatus.FORBIDDEN)
+    }
     if (commentIsUpdate) {
       throw new HttpException('', HttpStatus.NO_CONTENT)
     } else {
@@ -76,51 +87,71 @@ export class CommentsService {
       const checkDislikes = await this.commentsRepository.checkLikes(commentId, userId, 'dislikesData');
       if (checkDislikes) {
         const comment = await this.commentsRepository.getCommentsById(commentId);
-        comment!.likesInfo.likesData.push(newLikesData);
-        comment!.likesInfo.likesCount = comment!.likesInfo.likesData.length;
-        comment!.likesInfo.dislikesCount = comment!.likesInfo.dislikesData.length;
-        const updateLike = await this.commentsRepository.updateLikeComment(comment!, commentId);
-        if (updateLike) throw new HttpException('', HttpStatus.NO_CONTENT)
-      }
-      const comment = await this.commentsRepository.getCommentsById(commentId);
-      if (comment!.commentatorInfo.userId === userId.toString()) {
-        comment!.likesInfo.myStatus = likeStatus;
+        const updateCommentLikesCount = updateCommentLikesInfo(comment!, likeStatus, newLikesData);
+        const updateLike = await this.commentsRepository.updateCommentLikesInfo(updateCommentLikesCount!, commentId);
+        return updateLike;
+        // comment!.likesInfo.likesData.push(newLikesData);
+        // comment!.likesInfo.likesCount = comment!.likesInfo.likesData.length;
+        // comment!.likesInfo.dislikesCount = comment!.likesInfo.dislikesData.length;
+        // const updateLike = await this.commentsRepository.updateLikeComment(comment!, commentId);
+        // if (updateLike) throw new HttpException('', HttpStatus.NO_CONTENT)
       }
       await this.commentsRepository.checkLikes(commentId, userId, 'likesData');
-      comment!.likesInfo.likesData.push(newLikesData);
-      comment!.likesInfo.dislikesCount = comment!.likesInfo.dislikesData.length;
-      comment!.likesInfo.likesCount = comment!.likesInfo.likesData.length;
-      const updateLike = await this.commentsRepository.updateLikeComment(comment!, commentId);
-      if (updateLike) throw new HttpException('', HttpStatus.NO_CONTENT)
+      // await this.commentsRepository.checkNewestLikes(commentId, userId);
+      // const updateNewestLikes = await this.commentsRepository.updateNewestLikes(postId, newesetLike);
+      const comment = await this.commentsRepository.getCommentsById(commentId);
+      const updateCommentLikesCount = updateCommentLikesInfo(comment!, likeStatus, newLikesData);
+      const updateLike = await this.commentsRepository.updateCommentLikesInfo(updateCommentLikesCount!, commentId);
+      return updateLike;
+      // const comment = await this.commentsRepository.getCommentsById(commentId);
+      // if (comment!.commentatorInfo.userId === userId.toString()) {
+      //   comment!.likesInfo.myStatus = likeStatus;
+      // }
+      // await this.commentsRepository.checkLikes(commentId, userId, 'likesData');
+      // comment!.likesInfo.likesData.push(newLikesData);
+      // comment!.likesInfo.dislikesCount = comment!.likesInfo.dislikesData.length;
+      // comment!.likesInfo.likesCount = comment!.likesInfo.likesData.length;
+      // const updateLike = await this.commentsRepository.updateLikeComment(comment!, commentId);
+      // if (updateLike) throw new HttpException('', HttpStatus.NO_CONTENT)
     }
     if (likeStatus === 'Dislike') {
       const checkLikes = await this.commentsRepository.checkLikes(commentId, userId, 'likesData');
       if (checkLikes) {
         const comment = await this.commentsRepository.getCommentsById(commentId);
-        comment!.likesInfo.dislikesData.push(newLikesData);
-        comment!.likesInfo.dislikesCount = comment!.likesInfo.dislikesData.length;
-        comment!.likesInfo.likesCount = comment!.likesInfo.likesData.length;
-        const updateLike = await this.commentsRepository.updateLikeComment(comment!, commentId);
-        if (updateLike) throw new HttpException('', HttpStatus.NO_CONTENT)
-      }
-      const comment = await this.commentsRepository.getCommentsById(commentId);
-      if (comment!.commentatorInfo.userId === userId.toString()) {
-        comment!.likesInfo.myStatus = likeStatus;
+        const updateCommentLikesCount = updateCommentLikesInfo(comment!, likeStatus, newLikesData);
+        const updateLike = await this.commentsRepository.updateCommentLikesInfo(updateCommentLikesCount!, commentId);
+        return updateLike;
+        // comment!.likesInfo.dislikesData.push(newLikesData);
+        // comment!.likesInfo.dislikesCount = comment!.likesInfo.dislikesData.length;
+        // comment!.likesInfo.likesCount = comment!.likesInfo.likesData.length;
+        // const updateLike = await this.commentsRepository.updateLikeComment(comment!, commentId);
+        // if (updateLike) throw new HttpException('', HttpStatus.NO_CONTENT)
       }
       await this.commentsRepository.checkLikes(commentId, userId, 'dislikesData');
-      comment!.likesInfo.dislikesData.push(newLikesData);
-      comment!.likesInfo.dislikesCount = comment!.likesInfo.dislikesData.length;
-      comment!.likesInfo.likesCount = comment!.likesInfo.likesData.length;
-      const updateLike = await this.commentsRepository.updateLikeComment(comment!, commentId);
-      if (updateLike) throw new HttpException('', HttpStatus.NO_CONTENT)
+      // await this.commentsRepository.checkNewestLikes(commentId, userId);
+      // const updateNewestLikes = await this.commentsRepository.updateNewestLikes(postId, newesetLike);
+      const comment = await this.commentsRepository.getCommentsById(commentId);
+      const updateCommentLikesCount = updateCommentLikesInfo(comment!, likeStatus, newLikesData);
+      const updateLike = await this.commentsRepository.updateCommentLikesInfo(updateCommentLikesCount!, commentId);
+      return updateLike;
+      // const comment = await this.commentsRepository.getCommentsById(commentId);
+      // if (comment!.commentatorInfo.userId === userId.toString()) {
+      //   comment!.likesInfo.myStatus = likeStatus;
+      // }
+      // await this.commentsRepository.checkLikes(commentId, userId, 'dislikesData');
+      // comment!.likesInfo.dislikesData.push(newLikesData);
+      // comment!.likesInfo.dislikesCount = comment!.likesInfo.dislikesData.length;
+      // comment!.likesInfo.likesCount = comment!.likesInfo.likesData.length;
+      // const updateLike = await this.commentsRepository.updateLikeComment(comment!, commentId);
+      // if (updateLike) throw new HttpException('', HttpStatus.NO_CONTENT)
     }
     if (likeStatus === 'None') {
       await this.commentsRepository.checkLikes(commentId, userId, 'dislikesData');
       await this.commentsRepository.checkLikes(commentId, userId, 'likesData');
       const comment = await this.commentsRepository.getCommentsById(commentId);
-      if (comment!.commentatorInfo.userId === userId.toString()) {
-        comment!.likesInfo.myStatus = likeStatus;
-      }
+      // if (comment!.commentatorInfo.userId === userId.toString()) {
+      //   comment!.likesInfo.myStatus = likeStatus;
+      // }
       comment!.likesInfo.dislikesCount = comment!.likesInfo.dislikesData.length;
       comment!.likesInfo.likesCount = comment!.likesInfo.likesData.length;
       const updateLike = await this.commentsRepository.updateLikeComment(comment!, commentId);

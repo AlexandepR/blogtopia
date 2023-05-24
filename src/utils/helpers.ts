@@ -5,6 +5,8 @@ import { User } from "../users/type/users.schema";
 import { PostLikesType } from "../posts/type/postsType";
 import { PostDocument } from "../posts/type/posts.schema";
 import { ObjectId, Types } from "mongoose";
+import { CommentDocument } from "../comments/type/comments.schema";
+import { LikesType } from "../comments/type/commentsType";
 
 export const parseQueryPaginator = (query: QueryType): QueryType => {
   return {
@@ -107,7 +109,7 @@ export const updatePostLikesInfo = (post: PostDocument, likeStatus: string, newL
   post!.extendedLikesInfo.dislikesCount = post!.extendedLikesInfo.dislikesData.length;
   return post
 }
-export const idParamsValidator = (id: string): Types.ObjectId => {
+export const idParamsValidator = (id: string): Types.ObjectId | null => {
   try {
     return new Types.ObjectId(id);
   } catch (err) {
@@ -122,4 +124,19 @@ export const sortNewestLikesForPost = (post) => {
     userId: userId.toString(),
     login: userLogin
   }))
+}
+
+
+export const updateCommentLikesInfo = (comment: CommentDocument, likeStatus: string, newLikesData?: LikesType) => {
+  if (newLikesData) {
+    if (likeStatus === 'Like'){
+      comment!.likesInfo.likesData.push(newLikesData)
+    }
+    if(likeStatus === 'Dislike') {
+      comment!.likesInfo.dislikesData.push(newLikesData)
+    }
+  };
+  comment!.likesInfo.likesCount = comment!.likesInfo.likesData.length;
+  comment!.likesInfo.dislikesCount = comment!.likesInfo.dislikesData.length;
+  return comment
 }

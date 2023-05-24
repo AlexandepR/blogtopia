@@ -114,8 +114,11 @@ export class BlogsService {
                                         likesData,
                                         dislikesData,
                                         myStatus,
-                                        newestLikes,
-                                        ...restExtendedLikesInfo
+                                        newestLikes: [{
+                                          description,
+                                          ...restNewest
+                                        }]
+                                        // ...restExtendedLikesInfo
                                       },
                                       __v,
                                       ...rest
@@ -138,8 +141,10 @@ export class BlogsService {
             likesCount,
             dislikesCount,
             myStatus: userStatus,
-            ...restExtendedLikesInfo,
-            newestLikes
+            // ...restExtendedLikesInfo,
+            newestLikes: [{
+              ...restNewest
+            }]
           }
         };
       });

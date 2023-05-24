@@ -3,7 +3,7 @@ import { CommentsService } from "./comments.service";
 import { ParamsType } from "../types/types";
 import { Request } from 'express';
 import { likeStatusInputClassModel } from "../posts/type/postsType";
-import { Public, UserFromRequestDecorator } from "../utils/public.decorator";
+import { BasicAuth, Public, UserFromRequestDecorator } from "../utils/public.decorator";
 import { UserDocument } from "../users/type/users.schema";
 import { commentContentInputClassModel } from "./type/commentsType";
 import { Types } from "mongoose";
@@ -48,7 +48,8 @@ export class CommentsController {
     await this.commentsService.deleteCommentById(id, req);
     return `This blog #${id} removes`;
   }
-  @Delete('')
+  @BasicAuth()
+  @Delete('all')
   async deleteAllBlog() {
    return await this.commentsService.deleteAllComment();
   }

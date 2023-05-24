@@ -39,7 +39,7 @@ export class PostsRepository {
     const newComment = Comment.createComment( content, postId, this.CommentModel, user);
     return newComment.save();
   }
-  async findPostById(postId: ObjectId): Promise<PostDocument> {
+  async findPostById(postId: Types.ObjectId): Promise<PostDocument> {
     const post = await this.PostModel
       .findOne({ _id: postId });
     return post;
