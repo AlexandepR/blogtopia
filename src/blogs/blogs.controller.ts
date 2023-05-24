@@ -1,8 +1,8 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query, Req } from "@nestjs/common";
 import { BlogInputClassModel, BlogsService, createPostForBlogInputClassModel } from "./blogs.service";
 import { ParamsType } from "../types/types";
 import { BasicAuth, Public } from "../auth/decorators/public.decorator";
-
+import { Request } from "express";
 
 
 @Controller("blogs")
@@ -32,11 +32,12 @@ export class BlogsController {
   @Public()
   @Get(":id/posts")
   async GetPostsByBlog(
+    @Req() req:Request,
     @Param("id")
       id: string,
     @Query() query: ParamsType
   ) {
-    return await this.blogsService.getPosts(id, query);
+    return await this.blogsService.getPosts(id, query, req);
   }
   @BasicAuth()
   @Post()

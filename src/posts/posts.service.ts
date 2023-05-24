@@ -19,7 +19,7 @@ import {
 import { BlogsRepository } from "../blogs/blogs.repository";
 import { Types } from "mongoose";
 import { PostsRepository } from "./posts.repository";
-import { IsString, Length, MaxLength } from "class-validator";
+import { IsMongoId, IsString, Length, MaxLength } from "class-validator";
 import { validateOrRejectModel } from "../helpers/validation.helpers";
 import { Request } from "express";
 import { UsersRepository } from "../users/users.repository";
@@ -34,6 +34,7 @@ export class CreatePostInputClassModel {
   @MaxLength(1000)
   content: string;
   @IsString()
+  @IsMongoId()
   blogId: string;
 }
 
@@ -54,8 +55,9 @@ export class PostsService {
   ) {
   }
 
-  async findAll(query): Promise<PaginationType<PostsTypeFiltered[]>> {
+  async findAll(query, req: Request): Promise<PaginationType<PostsTypeFiltered[]>> {
     // async findAll(query): Promise<any> {
+    const userId = this.jwtService.findUserIdByAuthHeaders(req);
     const { searchNameTerm, pageSize, pageNumber, sortDirection, sortBy } = parseQueryPaginator(query);
     const filter = searchNameTerm ? { name: { $regex: searchNameTerm, $options: "i" } } : {};
     const totalCountPosts = await this.postsRepository.getTotalCountPosts(filter);
@@ -70,7 +72,7 @@ export class PostsService {
                                          content,
                                          blogId,
                                          blogName,
-                                         // extendedLikesInfo,
+                                         extendedLikesInfo,
                                          extendedLikesInfo: {
                                            likesCount,
                                            dislikesCount,
@@ -84,11 +86,11 @@ export class PostsService {
                                          ...rest
                                        }) => {
           let userStatus: "None" | "Like" | "Dislike" = "None";
-          // if (userId) {
-          //   const userLike = extendedLikesInfo.likesData.find((like) => like.userId.toString() === userId.toString());
-          //   const userDislike = extendedLikesInfo.dislikesData.find((dislike) => dislike.userId.toString() === userId.toString());
-          //   userStatus = userLike ? 'Like' : userDislike ? 'Dislike' : 'None';
-          // }
+          if (userId) {
+            const userLike = extendedLikesInfo.likesData.find((like) => like.userId.toString() === userId.toString());
+            const userDislike = extendedLikesInfo.dislikesData.find((dislike) => dislike.userId.toString() === userId.toString());
+            userStatus = userLike ? 'Like' : userDislike ? 'Dislike' : 'None';
+          }
           return {
             id: _id.toString(),
             title,
@@ -216,7 +218,7 @@ export class PostsService {
     const postId = new Types.ObjectId(id)
     const likeStatus = dto.likeStatus
     const post = await this.postsRepository.findPostById(postId);
-    if (!userId || !post) if (!post) throw new HttpException("", HttpStatus.BAD_REQUEST);
+    if (!userId || !post) if (!post) throw new HttpException("", HttpStatus.NOT_FOUND);
     const user =  await this.usersRepository.findUserById(userId)
     const {accountData: { login: userLogin }} = user!
 

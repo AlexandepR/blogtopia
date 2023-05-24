@@ -48,10 +48,10 @@ export class IsLoginOrEmailNotExistsPipe implements ValidatorConstraintInterface
   async validate(email: string, args: ValidationArguments) {
     try {
       const user = await this.usersRepository.findByLoginOrEmail(email);
-      if (!user || user.emailConfirmation.isConfirmed === true) return false
+      if (!user || user.emailConfirmation.isConfirmed === true) return false;
       return true;
     } catch (e) {
-      return false
+      return false;
     }
 
   }
@@ -60,18 +60,18 @@ export class IsLoginOrEmailNotExistsPipe implements ValidatorConstraintInterface
     return "User with this email doesnt exists oe already confirmed";
   }
 }
+
 export function IsLoginOrEmailNotExists(validationOptions?: ValidationOptions) {
-  return function (object: Object, propertyName: string) {
+  return function(object: Object, propertyName: string) {
     registerDecorator({
-      name: 'IsLoginOrEmailNotExists',
+      name: "IsLoginOrEmailNotExists",
       target: object.constructor,
       propertyName: propertyName,
       options: validationOptions,
-      validator: IsLoginOrEmailNotExistsPipe,
+      validator: IsLoginOrEmailNotExistsPipe
     });
   };
 }
-
 
 
 @ValidatorConstraint({ name: "CheckConfirmDataPipe", async: true })
@@ -79,24 +79,24 @@ export class CheckConfirmDataPipe implements ValidatorConstraintInterface {
   constructor(protected usersRepository: UsersRepository) {
   }
   async validate(data: string, args: ValidationArguments) {
-    const { property } = args
-    if (property === 'email' || property === 'login') {
+    const { property } = args;
+    if (property === "email" || property === "login") {
       try {
         const user = await this.usersRepository.findByLoginOrEmail(data);
         if (user) return false;
-        return true
+        return true;
       } catch (e) {
-        return false
+        return false;
       }
     }
-    if (property === 'code') {
+    if (property === "code") {
       try {
         const user = await this.usersRepository.findByConfirmationCode(data);
         if (!user) return false;
-        if (user.emailConfirmation.isConfirmed === true) return false
-        return true
+        if (user.emailConfirmation.isConfirmed === true) return false;
+        return true;
       } catch (e) {
-        return false
+        return false;
       }
     }
   }
@@ -108,17 +108,18 @@ export class CheckConfirmDataPipe implements ValidatorConstraintInterface {
     return "Invalid data";
   }
 }
+
 /*
 * *Check email, login and confirm Code
 * */
 export function CheckConfirmData(validationOptions?: ValidationOptions) {
-  return function (object: Object, propertyName: string) {
+  return function(object: Object, propertyName: string) {
     registerDecorator({
-      name: 'CheckConfirmData',
+      name: "CheckConfirmData",
       target: object.constructor,
       propertyName: propertyName,
       options: validationOptions,
-      validator: CheckConfirmDataPipe,
+      validator: CheckConfirmDataPipe
     });
   };
 }
@@ -126,27 +127,42 @@ export function CheckConfirmData(validationOptions?: ValidationOptions) {
 
 @ValidatorConstraint({ name: "validateInputBlogPipe", async: true })
 export class validateInputBlogPipe implements ValidatorConstraintInterface {
-  constructor() {}
+  constructor() {
+  }
   async validate(dto: string, args: ValidationArguments) {
-    const {value} = args
-    if (!value || value.trim().length <= 0) return false
-    if( typeof value !== 'string') return false
-    return true
+    const { value, property } = args;
+    if (!value || value.trim().length <= 0) return false;
+    if (typeof value !== "string") return false;
+    if (property === "name") {
+      if(value.trim().length > 15) return false
+      return true
+    }
+    if (property === "description" && value.trim().length > 500) {
+      if(value.trim().length > 500) return false
+      return true
+    }
+    // if (property === "websiteUrl") {
+    //
+    // }
+
+
+    return false;
   }
   defaultMessage(args: ValidationArguments) {
-    const {property} = args
+    const { property } = args;
     // here you can provide default error message if validation failed
     return `${property} is empty`;
   }
 }
+
 export function ValidateInputBlog(validationOptions?: ValidationOptions) {
-  return function (object: Object, propertyName: string) {
+  return function(object: Object, propertyName: string) {
     registerDecorator({
-      name: 'validateInputBlog',
+      name: "validateInputBlog",
       target: object.constructor,
       propertyName: propertyName,
       options: validationOptions,
-      validator: validateInputBlogPipe,
+      validator: validateInputBlogPipe
     });
   };
 }

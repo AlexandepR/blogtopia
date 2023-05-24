@@ -26,9 +26,10 @@ export class PostsController {
   @Public()
   @Get()
   async getPosts(
+    @Req() req: Request,
     @Query() query: ParamsType
   ) {
-    return this.postsService.findAll(query);
+    return this.postsService.findAll(query, req);
   }
   @Public()
   @Get(":id")

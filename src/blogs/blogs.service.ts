@@ -7,20 +7,26 @@ import { pagesCounter, parseQueryPaginator, skipPage } from "../utils/helpers";
 import { Types } from "mongoose";
 import { outputPostModelType, PostsTypeFiltered } from "../posts/type/postsType";
 import { PostsRepository } from "../posts/posts.repository";
-import { IsUrl, MaxLength } from "class-validator";
+import { Allow, IsOptional, IsString, IsUrl, MaxLength } from "class-validator";
 import { validateOrRejectModel } from "../helpers/validation.helpers";
 import { ValidateInputBlog } from "../pipes/validation/validate.pipe";
+import { JwtService } from "../auth/jwt.service";
+import { Request } from "express";
 
 export class BlogInputClassModel {
-  @MaxLength(15)
+  // @MaxLength(15)
+  // @IsString()
   @ValidateInputBlog()
   name: string;
   @MaxLength(500)
+  // @IsString()
   @ValidateInputBlog()
   description: string;
   @IsUrl()
-  @ValidateInputBlog()
+  // @IsString()
+  // @ValidateInputBlog()
   websiteUrl: string;
+
 }
 
 export class createPostForBlogInputClassModel {
@@ -36,7 +42,8 @@ export class createPostForBlogInputClassModel {
 export class BlogsService {
   constructor(
     protected blogsRepository: BlogsRepository,
-    protected postsRepository: PostsRepository
+    protected postsRepository: PostsRepository,
+    protected jwtService: JwtService,
   ) {
   }
 
@@ -107,10 +114,11 @@ export class BlogsService {
       isMembership: blog.isMembership
     };
   }
-  async getPosts(id: string, query: ParamsType): Promise<PaginationType<PostsTypeFiltered[]>> {
+  async getPosts(id: string, query: ParamsType,req:Request): Promise<PaginationType<PostsTypeFiltered[]>> {
     const { searchNameTerm, pageSize, pageNumber, sortDirection, sortBy } = parseQueryPaginator(query);
     // const filter = searchNameTerm ? { name: { $regex: searchNameTerm, $options: "i" } } : {};
     const blogId = new Types.ObjectId(id);
+    const userId = this.jwtService.findUserIdByAuthHeaders(req);
     const blog = await this.blogsRepository.findBlogById(blogId);
     if (!blog) throw new HttpException("", HttpStatus.NOT_FOUND);
     const filter = { blogId: new Types.ObjectId(id) };
@@ -140,11 +148,11 @@ export class BlogsService {
 
                                     }) => {
         let userStatus: "None" | "Like" | "Dislike" = "None";
-        // if (userId) {
-        //   const userLike = extendedLikesInfo.likesData.find((like) => like.userId.toString() === userId.toString());
-        //   const userDislike = extendedLikesInfo.dislikesData.find((dislike) => dislike.userId.toString() === userId.toString());
-        //   userStatus = userLike ? 'Like' : userDislike ? 'Dislike' : 'None';
-        // }
+        if (userId) {
+          const userLike = extendedLikesInfo.likesData.find((like) => like.userId.toString() === userId.toString());
+          const userDislike = extendedLikesInfo.dislikesData.find((dislike) => dislike.userId.toString() === userId.toString());
+          userStatus = userLike ? 'Like' : userDislike ? 'Dislike' : 'None';
+        }
         return {
           id: _id.toString(),
           title,
