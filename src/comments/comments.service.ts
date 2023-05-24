@@ -20,14 +20,13 @@ export class CommentsService {
     protected jwtService: JwtService
   ) {
   }
-  async getComment(id: string, req: Request) {
+  async getComment(id: Types.ObjectId, req: Request) {
     const userId = await this.jwtService.findUserIdByAuthHeaders(req);
     const commentId = new Types.ObjectId(id)
     const comment = await this.commentsRepository.getCommentsById(commentId);
-    console.log(comment, '++++++++++++++++++++comment');
+    if(!comment) throw new HttpException('', HttpStatus.NOT_FOUND)
     if (comment) {
       const getMyStatusLikeInfo = await this.commentsRepository.getMyStatusLikeInfo(commentId, userId);
-      console.log(getMyStatusLikeInfo, '================================GetMy');
       return {
         id: comment._id.toString(),
         content: comment.content,

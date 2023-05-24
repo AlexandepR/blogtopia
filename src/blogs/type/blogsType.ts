@@ -1,20 +1,23 @@
 import { ObjectId } from "mongoose";
-import { IsString, IsUrl, MaxLength } from "class-validator";
+import { IsNotEmpty, IsString, IsUrl, MaxLength } from "class-validator";
 import { Transform } from "class-transformer";
 
 
 export class BlogInputClassModel {
   @MaxLength(15)
   @IsString()
+  @IsNotEmpty()
   @Transform(({ value }) => value.trim())
     // @ValidateInputBlog()
   name: string;
   @MaxLength(500)
   @IsString()
+  @IsNotEmpty()
   @Transform(({ value }) => value.trim())
     // @ValidateInputBlog()
   description: string;
   @IsUrl()
+  @IsNotEmpty()
   @Transform(({ value }) => value.trim())
   @IsString()
     // @ValidateInputBlog()
@@ -23,10 +26,19 @@ export class BlogInputClassModel {
 
 export class createPostForBlogInputClassModel {
   @MaxLength(30)
+  @IsString()
+  @Transform(({ value }) => value.trim())
+  @IsNotEmpty()
   title: string;
   @MaxLength(100)
+  @IsString()
+  @IsNotEmpty()
+  @Transform(({ value }) => value.trim())
   shortDescription: string;
   @MaxLength(1000)
+  @IsString()
+  @IsNotEmpty()
+  @Transform(({ value }) => value.trim())
   content: string;
 }
 

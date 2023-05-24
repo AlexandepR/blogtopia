@@ -4,7 +4,7 @@ import * as bcrypt from "bcrypt";
 import { User } from "../users/type/users.schema";
 import { PostLikesType } from "../posts/type/postsType";
 import { PostDocument } from "../posts/type/posts.schema";
-import { Types } from "mongoose";
+import { ObjectId, Types } from "mongoose";
 
 export const parseQueryPaginator = (query: QueryType): QueryType => {
   return {
@@ -107,9 +107,9 @@ export const updatePostLikesInfo = (post: PostDocument, likeStatus: string, newL
   post!.extendedLikesInfo.dislikesCount = post!.extendedLikesInfo.dislikesData.length;
   return post
 }
-export const idParamsValidator = (id: string) => {
+export const idParamsValidator = (id: string): Types.ObjectId => {
   try {
-    new Types.ObjectId(id);
+    return new Types.ObjectId(id);
   } catch (err) {
     return null
   }

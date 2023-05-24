@@ -6,6 +6,7 @@ import { likeStatusInputClassModel } from "../posts/type/postsType";
 import { Public, UserFromRequestDecorator } from "../utils/public.decorator";
 import { UserDocument } from "../users/type/users.schema";
 import { commentContentInputClassModel } from "./type/commentsType";
+import { Types } from "mongoose";
 
 @Controller("comments")
 export class CommentsController {
@@ -19,7 +20,7 @@ export class CommentsController {
     @Param("id")
       id: string
   ) {
-    return await this.commentsService.getComment(id, req);
+    return await this.commentsService.getComment( new Types.ObjectId(id), req);
   }
   @Put(":id")
   async updateComment(

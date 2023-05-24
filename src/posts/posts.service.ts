@@ -48,7 +48,7 @@ export class PostsService {
 
   async findAll(query, req: Request): Promise<PaginationType<PostsTypeFiltered[]>> {
     // async findAll(query): Promise<any> {
-    const userId = this.jwtService.findUserIdByAuthHeaders(req);
+    const userId = await this.jwtService.findUserIdByAuthHeaders(req);
     const { searchNameTerm, pageSize, pageNumber, sortDirection, sortBy } = parseQueryPaginator(query);
     const filter = searchNameTerm ? { name: { $regex: searchNameTerm, $options: "i" } } : {};
     const totalCountPosts = await this.postsRepository.getTotalCountPosts(filter);

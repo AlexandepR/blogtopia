@@ -10,21 +10,25 @@
 
 import { IsEmail, IsString, Length } from "class-validator";
 import { CheckConfirmData } from "../../pipes/validation/validate.pipe";
+import { Transform } from "class-transformer";
 
 
 export class CreateUserInputClassModel {
   @CheckConfirmData()
   @Length(3, 10)
   @IsString()
+  @Transform(({ value }) => value.trim())
   login: string;
 
   @CheckConfirmData()
   @IsEmail()
   @IsString()
+  @Transform(({ value }) => value.trim())
   email: string;
 
   @IsString()
   @Length(6, 20)
+  @Transform(({ value }) => value.trim())
   password: string;
 }
 

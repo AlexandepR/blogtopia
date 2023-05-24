@@ -92,7 +92,7 @@ export class BlogsService {
     const { searchNameTerm, pageSize, pageNumber, sortDirection, sortBy } = parseQueryPaginator(query);
     // const filter = searchNameTerm ? { name: { $regex: searchNameTerm, $options: "i" } } : {};
     const blogId = new Types.ObjectId(id);
-    const userId = this.jwtService.findUserIdByAuthHeaders(req);
+    const userId = await this.jwtService.findUserIdByAuthHeaders(req);
     const blog = await this.blogsRepository.findBlogById(blogId);
     if (!blog) throw new HttpException("", HttpStatus.NOT_FOUND);
     const filter = { blogId: new Types.ObjectId(id) };
