@@ -27,7 +27,7 @@ import {
   loginInputClassModel,
   newPasswordInputModel
 } from "./types/auth.types";
-import { Public, RefreshTokenAuthGuard } from "./decorators/public.decorator";
+import { Public, RefreshTokenAuthGuard } from "../utils/public.decorator";
 import { Response } from "express";
 
 

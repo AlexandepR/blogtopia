@@ -1,4 +1,4 @@
-import { UserDocument } from "./users.schema";
+import { UserDocument } from "./type/users.schema";
 
 
 declare global {

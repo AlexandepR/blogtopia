@@ -3,7 +3,7 @@ import { Reflector } from "@nestjs/core";
 import { JwtService } from "@nestjs/jwt";
 import { Request } from "express";
 import * as jwt from "jsonwebtoken";
-import { BASIC_AUTH_KEY, IS_PUBLIC_KEY, REFRESH_TOKEN_AUTH_KEY } from "../decorators/public.decorator";
+import { BASIC_AUTH_KEY, IS_PUBLIC_KEY, REFRESH_TOKEN_AUTH_KEY } from "../../utils/public.decorator";
 import { BasicAuthGuard } from "./basic.auth.guard";
 import { settingsEnv } from "../../settings/settings";
 import { Types } from "mongoose";
@@ -23,7 +23,9 @@ export class AuthGuard implements CanActivate {
       context.getHandler(),
       context.getClass(),
     ]);
+
     if (isPublic) {
+
       return true;
     }
 
@@ -70,8 +72,6 @@ export class AuthGuard implements CanActivate {
       });
       // request.user = user;
       const user = await this.usersRepository.findUserById(new Types.ObjectId(payload.userId))
-      // const user = request.user || {};
-      // user._id = payload.userId;
       request.user = user;
       // request.user._id = payload.userId;
     } catch {

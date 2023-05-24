@@ -13,11 +13,12 @@ import {
   ValidationPipe
 } from "@nestjs/common";
 import { ParamsType } from "../types/types";
-import { CreateCommentInputClassModel, CreatePostInputClassModel, PostsService } from "./posts.service";
+import { CreateCommentInputClassModel, PostsService } from "./posts.service";
 import { Request } from 'express';
-import { likeStatusClass, likeStatusType } from "./type/postsType";
-import { BasicAuth, Public } from "../auth/decorators/public.decorator";
+import { CreatePostInputClassModel, likeStatusInputClassModel } from "./type/postsType";
+import { BasicAuth, Public, UserFromRequestDecorator } from "../utils/public.decorator";
 import { checkObjectId } from "../helpers/validation.helpers";
+import { UserDocument } from "../users/type/users.schema";
 
 @Controller("posts")
 export class PostsController {
@@ -53,11 +54,12 @@ export class PostsController {
   @Post('/:postId/comments')
   async createCommentForPost(
     @Req() req: Request,
+    @UserFromRequestDecorator() user: UserDocument,
     @Param('postId')
     postId: string,
     @Body() dto:CreateCommentInputClassModel
   ){
-    return await this.postsService.createCommentForPost(postId,dto, req)
+    return await this.postsService.createCommentForPost(postId,dto, user)
   }
   @BasicAuth()
   @Post()
@@ -81,7 +83,7 @@ export class PostsController {
     @Req() req: Request,
     @Param(ValidationPipe)
       params: checkObjectId,
-    @Body() dto: likeStatusClass
+    @Body() dto: likeStatusInputClassModel
   ) {
       return await this.postsService.updateLikesInfo(dto,params.id,req)
   }

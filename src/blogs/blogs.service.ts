@@ -1,42 +1,16 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { BlogsRepository } from "./blogs.repository";
-import { BlogType } from "./type/blogsType";
+import { BlogInputClassModel, BlogType, createPostForBlogInputClassModel } from "./type/blogsType";
 import { PaginationType, ParamsType } from "../types/types";
 import { BlogDocument } from "./type/blogs.schema";
 import { pagesCounter, parseQueryPaginator, skipPage } from "../utils/helpers";
 import { Types } from "mongoose";
 import { outputPostModelType, PostsTypeFiltered } from "../posts/type/postsType";
 import { PostsRepository } from "../posts/posts.repository";
-import { Allow, IsOptional, IsString, IsUrl, MaxLength } from "class-validator";
 import { validateOrRejectModel } from "../helpers/validation.helpers";
-import { ValidateInputBlog } from "../pipes/validation/validate.pipe";
 import { JwtService } from "../auth/jwt.service";
 import { Request } from "express";
 
-export class BlogInputClassModel {
-  // @MaxLength(15)
-  // @IsString()
-  @ValidateInputBlog()
-  name: string;
-  // @MaxLength(500)
-  // @IsString()
-  @ValidateInputBlog()
-  description: string;
-  @IsUrl()
-  // @IsString()
-  @ValidateInputBlog()
-  websiteUrl: string;
-
-}
-
-export class createPostForBlogInputClassModel {
-  @MaxLength(30)
-  title: string;
-  @MaxLength(100)
-  shortDescription: string;
-  @MaxLength(1000)
-  content: string;
-}
 
 @Injectable()
 export class BlogsService {

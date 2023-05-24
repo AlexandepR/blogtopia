@@ -2,13 +2,17 @@ import { Body, Controller, Delete, Get, Param, Put, Query, Req } from "@nestjs/c
 import { CommentsService } from "./comments.service";
 import { ParamsType } from "../types/types";
 import { Request } from 'express';
-import { likeStatusType } from "../posts/type/postsType";
+import { likeStatusInputClassModel } from "../posts/type/postsType";
+import { Public, UserFromRequestDecorator } from "../utils/public.decorator";
+import { UserDocument } from "../users/type/users.schema";
+import { commentContentInputClassModel } from "./type/commentsType";
 
 @Controller("comments")
 export class CommentsController {
   constructor(protected commentsService: CommentsService) {
 
   }
+  @Public()
   @Get(":id")
   async getComment(
     @Req() req: Request,
@@ -18,17 +22,17 @@ export class CommentsController {
     return await this.commentsService.getComment(id, req);
   }
   @Put(":id")
-  async GetPostsByBlog(
+  async updateComment(
     @Param("id")
       id: string,
-    @Req() req: Request,
-    @Body() content: string
+    @UserFromRequestDecorator() user: UserDocument,
+    @Body() dto: commentContentInputClassModel
   ) {
-    return await this.commentsService.updateComment(id, content,req);
+    return await this.commentsService.updateComment(id, dto, user);
   }
   @Put(':id/like-status')
-  async createBlog(
-    @Body() dto: likeStatusType,
+  async updateLikeByCommentId(
+    @Body() dto: likeStatusInputClassModel,
     @Req() req:Request,
     @Param('id') id: string,
   ) {

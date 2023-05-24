@@ -15,3 +15,8 @@ export const BasicAuth = () => SetMetadata(BASIC_AUTH_KEY, true);
 
 export const REFRESH_TOKEN_AUTH_KEY = 'refreshTokenAuth';
 export const RefreshTokenAuthGuard = () => SetMetadata(REFRESH_TOKEN_AUTH_KEY, true);
+
+export const UserFromRequestDecorator = createParamDecorator((data: unknown, context: ExecutionContext) => {
+  const request = context.switchToHttp().getRequest();
+  return request.user
+})

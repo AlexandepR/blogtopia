@@ -1,4 +1,35 @@
 import { ObjectId } from "mongoose";
+import { IsString, IsUrl, MaxLength } from "class-validator";
+import { Transform } from "class-transformer";
+
+
+export class BlogInputClassModel {
+  @MaxLength(15)
+  @IsString()
+  @Transform(({ value }) => value.trim())
+    // @ValidateInputBlog()
+  name: string;
+  @MaxLength(500)
+  @IsString()
+  @Transform(({ value }) => value.trim())
+    // @ValidateInputBlog()
+  description: string;
+  @IsUrl()
+  @Transform(({ value }) => value.trim())
+  @IsString()
+    // @ValidateInputBlog()
+  websiteUrl: string;
+}
+
+export class createPostForBlogInputClassModel {
+  @MaxLength(30)
+  title: string;
+  @MaxLength(100)
+  shortDescription: string;
+  @MaxLength(1000)
+  content: string;
+}
+
 
 export class BlogDBType {
   constructor(

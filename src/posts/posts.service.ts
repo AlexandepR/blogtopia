@@ -9,8 +9,8 @@ import {
   updatePostLikesInfo
 } from "../utils/helpers";
 import {
-  likeStatusClass,
-  likeStatusType,
+  CreatePostInputClassModel,
+  likeStatusInputClassModel,
   outputPostModelType,
   PostLikesType, PostsNewestLikesType,
   PostsTypeFiltered,
@@ -25,18 +25,9 @@ import { Request } from "express";
 import { UsersRepository } from "../users/users.repository";
 import { CommentsRepository } from "../comments/comments.repository";
 import { JwtService } from "../auth/jwt.service";
+import { UserDocument } from "../users/type/users.schema";
 
-export class CreatePostInputClassModel {
-  @MaxLength(30)
-  title: string;
-  @MaxLength(100)
-  shortDescription: string;
-  @MaxLength(1000)
-  content: string;
-  @IsString()
-  @IsMongoId()
-  blogId: string;
-}
+
 
 export class CreateCommentInputClassModel {
   @Length(20, 300)
@@ -143,15 +134,27 @@ export class PostsService {
     };
 
   }
-  async createCommentForPost(id: string, dto: CreateCommentInputClassModel,req: Request): Promise<any> {
+  async createCommentForPost(id: string, dto: CreateCommentInputClassModel,user: UserDocument): Promise<any> {
     await validateOrRejectModel(dto, CreateCommentInputClassModel);
-    // const userId = req.user!._id;
-    const userId = await this.jwtService.findUserIdByAuthHeaders(req);
     const postId = new Types.ObjectId(id);
-    const user = await this.usersRepository.findUserById(userId);
     const createComment = await this.postsRepository.createComment(dto.content, postId, user);
-    if (createComment) throw new HttpException('', HttpStatus.NO_CONTENT)
-    else {throw new HttpException('', HttpStatus.BAD_REQUEST)}
+      if (createComment) {
+        return {
+          id: createComment._id.toString(),
+          content: createComment.content,
+          commentatorInfo: {
+            userId: createComment.commentatorInfo.userId.toString(),
+            userLogin: createComment.commentatorInfo.userLogin
+          },
+          createdAt: createComment.createdAt,
+          likesInfo: {
+            likesCount: createComment.likesInfo.likesCount,
+            dislikesCount: createComment.likesInfo.dislikesCount,
+            myStatus: createComment.likesInfo.myStatus,
+          }
+        };
+      }
+  else {throw new HttpException('', HttpStatus.BAD_REQUEST)}
   }
   async getCommentByPost(id: string, query: ParamsType) {
     const { searchNameTerm, pageSize, pageNumber, sortDirection, sortBy } = parseQueryPaginator(query);
@@ -212,8 +215,8 @@ export class PostsService {
     await post.updatePost(dto);
     return await post.save();
   }
-  async updateLikesInfo(dto: likeStatusClass,id: string, req: Request) {
-    await validateOrRejectModel(dto, likeStatusClass);
+  async updateLikesInfo(dto: likeStatusInputClassModel,id: string, req: Request) {
+    await validateOrRejectModel(dto, likeStatusInputClassModel);
     const userId = await this.jwtService.findUserIdByAuthHeaders(req);
     const postId = new Types.ObjectId(id)
     const likeStatus = dto.likeStatus

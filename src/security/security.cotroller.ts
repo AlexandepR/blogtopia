@@ -1,7 +1,7 @@
 import { Request } from "express";
 import { SecurityService } from "./security.service";
 import { Controller, Delete, Get, Param, Req } from "@nestjs/common";
-import { RefreshTokenAuthGuard } from "../auth/decorators/public.decorator";
+import { RefreshTokenAuthGuard } from "../utils/public.decorator";
 
 @Controller("security")
 export class AuthController {

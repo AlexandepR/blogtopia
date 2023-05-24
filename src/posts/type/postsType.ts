@@ -1,5 +1,41 @@
-import { ObjectId, Types } from "mongoose";
-import { IsIn, IsString } from "class-validator";
+import { Types } from "mongoose";
+import { IsIn, IsMongoId, IsNotEmpty, isNotEmpty, IsString, MaxLength } from "class-validator";
+import { Transform } from "class-transformer";
+import { existingBlog } from "../../pipes/validation/validate.pipe";
+
+// export class likeStatusClass {
+//   @IsIn(['None', 'Like', 'Dislike'])
+//   likeStatus: "None" | "Like" | "Dislike"
+// }
+
+export class CreatePostInputClassModel {
+  @MaxLength(30)
+  @IsString()
+  @Transform(({ value }) => value.trim())
+  @IsNotEmpty()
+  title: string;
+  @MaxLength(100)
+  @IsString()
+  @IsNotEmpty()
+  @Transform(({ value }) => value.trim())
+  shortDescription: string;
+  @MaxLength(1000)
+  @IsString()
+  @IsNotEmpty()
+  @Transform(({ value }) => value.trim())
+  content: string;
+  @IsString()
+  @IsMongoId()
+  @existingBlog()
+  @IsNotEmpty()
+  blogId: string;
+}
+export class likeStatusInputClassModel {
+  @IsNotEmpty()
+  @IsIn(['None', 'Like', 'Dislike'])
+  likeStatus: string
+}
+
 
 export type PostsTypeFiltered = Omit<PostsType, 'extendedLikesInfo'> &
   { extendedLikesInfo: Omit<PostExtendedLikesInfoType, 'likesData' | 'dislikesData'> };
@@ -67,11 +103,5 @@ export type PutPostInputModelType = {
   blogId: string
 }
 export type likeStatusType = {
-  likeStatus: "None" | "Like" | "Dislike"
-}
-
-export class likeStatusClass {
-  @IsString()
-  @IsIn(['None', 'Like', 'Dislike'])
   likeStatus: "None" | "Like" | "Dislike"
 }

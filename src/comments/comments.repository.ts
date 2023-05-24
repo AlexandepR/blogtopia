@@ -98,7 +98,7 @@ export class CommentsRepository {
   async deleteComment(id: Types.ObjectId): Promise<boolean> {
     const isDeleted = await this.CommentModel
       .deleteOne({ _id: id });
-    return isDeleted.deletedCount === 1;
+    return isDeleted.deletedCount >= 1;
   }
   async deleteAllComment(): Promise<boolean> {
     const isDeleted = await this.CommentModel

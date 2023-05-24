@@ -1,6 +1,6 @@
 import { Controller, Delete, HttpCode, HttpStatus } from "@nestjs/common";
 import { TestingService } from "./testing.service";
-import { Public } from "../auth/decorators/public.decorator";
+import { Public } from "../utils/public.decorator";
 
 
 @Controller("testing")

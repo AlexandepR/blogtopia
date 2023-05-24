@@ -36,9 +36,9 @@ import { SecurityRepository } from "./security/security.repository";
 import { Security, SecuritySchema } from "./security/type/security.schema";
 import { MailerModule } from "@nestjs-modules/mailer";
 import {
-  CheckConfirmDataPipe,
-  IsLoginOrEmailNotExistsPipe,
-  validateInputBlogPipe
+  CheckConfirmDataPipe, existingBlog, existingBlogPipe,
+  IsLoginOrEmailNotExistsPipe
+  // validateInputBlogPipe
 } from "./pipes/validation/validate.pipe";
 
 ;
@@ -135,7 +135,8 @@ import {
     // IsLoginOrEmailAlreadyExistsPipe,
     IsLoginOrEmailNotExistsPipe,
     CheckConfirmDataPipe,
-    validateInputBlogPipe
+    existingBlogPipe,
+    // validateInputBlogPipe
   ]
 })
 export class AppModule {

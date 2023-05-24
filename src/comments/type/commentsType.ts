@@ -1,5 +1,13 @@
 import { Types } from "mongoose";
+import { IsString, Length } from "class-validator";
+import { Transform } from "class-transformer";
 
+export class commentContentInputClassModel {
+  @Length(20, 300)
+  @IsString()
+  @Transform(({ value }) => value.trim())
+  content: string
+}
 
 export type LikesType = {
   _id: Types.ObjectId

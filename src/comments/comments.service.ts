@@ -3,11 +3,13 @@ import { CommentsRepository } from "./comments.repository";
 import { PaginationType } from "../types/types";
 import { idParamsValidator, pagesCounter, parseQueryPaginator, skipPage } from "../utils/helpers";
 import { UsersRepository } from "../users/users.repository";
-import { CommentType, LikesType } from "./type/commentsType";
+import { commentContentInputClassModel, CommentType, LikesType } from "./type/commentsType";
 import { JwtService } from "../auth/jwt.service";
 import { Request } from 'express';
 import { Types } from "mongoose";
-import { likeStatusType } from "../posts/type/postsType";
+import { likeStatusInputClassModel } from "../posts/type/postsType";
+import { UserDocument } from "../users/type/users.schema";
+import { validateOrRejectModel } from "../helpers/validation.helpers";
 
 
 @Injectable()
@@ -22,8 +24,10 @@ export class CommentsService {
     const userId = await this.jwtService.findUserIdByAuthHeaders(req);
     const commentId = new Types.ObjectId(id)
     const comment = await this.commentsRepository.getCommentsById(commentId);
+    console.log(comment, '++++++++++++++++++++comment');
     if (comment) {
       const getMyStatusLikeInfo = await this.commentsRepository.getMyStatusLikeInfo(commentId, userId);
+      console.log(getMyStatusLikeInfo, '================================GetMy');
       return {
         id: comment._id.toString(),
         content: comment.content,
@@ -41,20 +45,22 @@ export class CommentsService {
     }
     return null;
   }
-  async updateComment (id: string, content: string, req: Request) {
-    const commentId = idParamsValidator(id);
-    const userId = await this.jwtService.findUserIdByAuthHeaders(req);
-    const user = await this.commentsRepository.getCommentsById(new Types.ObjectId(commentId));
-    if (!user) throw new HttpException('', HttpStatus.NOT_FOUND);
-    if (userId.toString() !== user?.commentatorInfo.userId) throw new HttpException('', HttpStatus.FORBIDDEN);
-    const commentIsUpdate = await this.commentsRepository.updateCommentId(new Types.ObjectId(req.params.commentId), content);
+  async updateComment (id: string, dto: commentContentInputClassModel, user: UserDocument) {
+    await validateOrRejectModel(dto, commentContentInputClassModel);
+    // const commentId = idParamsValidator(id);
+    // const userId = await this.jwtService.findUserIdByAuthHeaders(req);
+    // const user = await this.commentsRepository.getCommentsById(new Types.ObjectId(commentId));
+    // if (!user) throw new HttpException('', HttpStatus.NOT_FOUND);
+    // if (userId.toString() !== user?.commentatorInfo.userId) throw new HttpException('', HttpStatus.FORBIDDEN);
+    const commentIsUpdate = await this.commentsRepository.updateCommentId(new Types.ObjectId(id), dto.content);
     if (commentIsUpdate) {
       throw new HttpException('', HttpStatus.NO_CONTENT)
     } else {
       throw new HttpException('', HttpStatus.NOT_FOUND)
     }
   }
-  async updateLikeByCommentId (dto:likeStatusType, id:string, req:Request) {
+  async updateLikeByCommentId (dto:likeStatusInputClassModel, id:string, req:Request) {
+    await validateOrRejectModel(dto, likeStatusInputClassModel);
     const likeStatus = dto.likeStatus
     const commentId = idParamsValidator(id);
     const userId = await this.jwtService.findUserIdByAuthHeaders(req);
@@ -126,9 +132,9 @@ export class CommentsService {
   async deleteCommentById(id: string, req:Request) {
     const commentId = idParamsValidator(id);
     const userId = await this.jwtService.findUserIdByAuthHeaders(req);
-    const isUserTrue = await this.getComment(commentId, req);
-    if (!isUserTrue) {throw new HttpException('', HttpStatus.NOT_FOUND)}
-    if (userId.toString() !== isUserTrue?.commentatorInfo.userId) {
+    const getComment = await this.getComment(commentId, req);
+    if (!getComment) {throw new HttpException('', HttpStatus.NOT_FOUND)}
+    if (userId.toString() !== getComment?.commentatorInfo.userId) {
       throw new HttpException('', HttpStatus.FORBIDDEN)
     }
     const isDeleted = await this.commentsRepository.deleteComment(commentId);
