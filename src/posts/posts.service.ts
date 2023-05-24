@@ -70,15 +70,11 @@ export class PostsService {
                                            likesData,
                                            dislikesData,
                                            myStatus,
-                                           newestLikes: [{
-                                             description,
-                                             ...restNewest
-                                           }],
-                                           // ...restExtendedLikesInfo
+                                           newestLikes
                                          },
-                                         // __v,
                                          ...rest
                                        }) => {
+        const filteredNewestLikes = newestLikes.map(({ description, ...restNewest }) => restNewest);
           let userStatus: "None" | "Like" | "Dislike" = "None";
           if (userId) {
             const userLike = extendedLikesInfo.likesData.find((like) => like.userId.toString() === userId.toString());
@@ -97,10 +93,7 @@ export class PostsService {
               likesCount,
               dislikesCount,
               myStatus: userStatus,
-              // ...restExtendedLikesInfo,
-              newestLikes: [{
-                ...restNewest
-              }]
+              filteredNewestLikes
             }
           };
         }
@@ -168,7 +161,7 @@ export class PostsService {
     const { searchNameTerm, pageSize, pageNumber, sortDirection, sortBy } = parseQueryPaginator(query);
     const postId = new Types.ObjectId(id);
     const post = await this.postsRepository.findPostById(postId);
-    if(!post) throw new HttpException('', HttpStatus.BAD_REQUEST)
+    if(!post) throw new HttpException('', HttpStatus.NOT_FOUND)
     const totalCount = await this.commentsRepository.getTotalCount(postId);
     const skip = skipPage(pageNumber, pageSize);
     const pagesCount = pagesCounter(totalCount, pageSize);

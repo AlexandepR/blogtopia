@@ -89,7 +89,7 @@ export class CommentsService {
         const comment = await this.commentsRepository.getCommentsById(commentId);
         const updateCommentLikesCount = updateCommentLikesInfo(comment!, likeStatus, newLikesData);
         const updateLike = await this.commentsRepository.updateCommentLikesInfo(updateCommentLikesCount!, commentId);
-        return updateLike;
+        throw new HttpException('', HttpStatus.NO_CONTENT)
         // comment!.likesInfo.likesData.push(newLikesData);
         // comment!.likesInfo.likesCount = comment!.likesInfo.likesData.length;
         // comment!.likesInfo.dislikesCount = comment!.likesInfo.dislikesData.length;
@@ -102,7 +102,7 @@ export class CommentsService {
       const comment = await this.commentsRepository.getCommentsById(commentId);
       const updateCommentLikesCount = updateCommentLikesInfo(comment!, likeStatus, newLikesData);
       const updateLike = await this.commentsRepository.updateCommentLikesInfo(updateCommentLikesCount!, commentId);
-      return updateLike;
+      throw new HttpException('', HttpStatus.NO_CONTENT)
       // const comment = await this.commentsRepository.getCommentsById(commentId);
       // if (comment!.commentatorInfo.userId === userId.toString()) {
       //   comment!.likesInfo.myStatus = likeStatus;
@@ -120,7 +120,7 @@ export class CommentsService {
         const comment = await this.commentsRepository.getCommentsById(commentId);
         const updateCommentLikesCount = updateCommentLikesInfo(comment!, likeStatus, newLikesData);
         const updateLike = await this.commentsRepository.updateCommentLikesInfo(updateCommentLikesCount!, commentId);
-        return updateLike;
+        throw new HttpException('', HttpStatus.NO_CONTENT);
         // comment!.likesInfo.dislikesData.push(newLikesData);
         // comment!.likesInfo.dislikesCount = comment!.likesInfo.dislikesData.length;
         // comment!.likesInfo.likesCount = comment!.likesInfo.likesData.length;
@@ -133,7 +133,7 @@ export class CommentsService {
       const comment = await this.commentsRepository.getCommentsById(commentId);
       const updateCommentLikesCount = updateCommentLikesInfo(comment!, likeStatus, newLikesData);
       const updateLike = await this.commentsRepository.updateCommentLikesInfo(updateCommentLikesCount!, commentId);
-      return updateLike;
+      throw new HttpException('', HttpStatus.NO_CONTENT)
       // const comment = await this.commentsRepository.getCommentsById(commentId);
       // if (comment!.commentatorInfo.userId === userId.toString()) {
       //   comment!.likesInfo.myStatus = likeStatus;
