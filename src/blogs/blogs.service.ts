@@ -18,13 +18,13 @@ export class BlogInputClassModel {
   // @IsString()
   @ValidateInputBlog()
   name: string;
-  @MaxLength(500)
+  // @MaxLength(500)
   // @IsString()
   @ValidateInputBlog()
   description: string;
   @IsUrl()
   // @IsString()
-  // @ValidateInputBlog()
+  @ValidateInputBlog()
   websiteUrl: string;
 
 }

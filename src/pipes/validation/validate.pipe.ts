@@ -127,33 +127,45 @@ export function CheckConfirmData(validationOptions?: ValidationOptions) {
 
 @ValidatorConstraint({ name: "validateInputBlogPipe", async: true })
 export class validateInputBlogPipe implements ValidatorConstraintInterface {
-  constructor() {
-  }
+  constructor() {}
   async validate(dto: string, args: ValidationArguments) {
-    const { value, property } = args;
-    if (!value || value.trim().length <= 0) return false;
-    if (typeof value !== "string") return false;
-    if (property === "name") {
-      if(value.trim().length > 15) return false
-      return true
-    }
-    if (property === "description" && value.trim().length > 500) {
-      if(value.trim().length > 500) return false
-      return true
-    }
-    // if (property === "websiteUrl") {
-    //
-    // }
-
-
-    return false;
+    const {value} = args
+    if (!value || value.trim().length <= 0) return false
+    if( typeof value !== 'string') return false
+    return true
   }
   defaultMessage(args: ValidationArguments) {
-    const { property } = args;
+    const {property} = args
     // here you can provide default error message if validation failed
     return `${property} is empty`;
   }
 }
+//   }
+//   async validate(dto: string, args: ValidationArguments) {
+//     const { value, property } = args;
+//     if (!value || value.trim().length <= 0) return false;
+//     if (typeof value !== "string") return false;
+//     if (property === "name") {
+//       if(value.trim().length > 15) return false
+//       return true
+//     }
+//     if (property === "description" && value.trim().length > 500) {
+//       if(value.trim().length > 500) return false
+//       return true
+//     }
+//     // if (property === "websiteUrl") {
+//     //
+//     // }
+//
+//
+//     return false;
+//   }
+//   defaultMessage(args: ValidationArguments) {
+//     const { property } = args;
+//     // here you can provide default error message if validation failed
+//     return `${property} is empty`;
+//   }
+// }
 
 export function ValidateInputBlog(validationOptions?: ValidationOptions) {
   return function(object: Object, propertyName: string) {
