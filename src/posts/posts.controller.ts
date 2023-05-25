@@ -45,11 +45,11 @@ export class PostsController {
   @Get("/:id/comments")
   async getCommentByPost(
     @Param("id")
-      postId: string,
+      id: string,
     @Query()
       query: ParamsType
   ) {
-    return await this.postsService.getCommentByPost(postId,query);
+    return await this.postsService.getCommentsByPost(id,query);
   }
   @Post('/:postId/comments')
   async createCommentForPost(

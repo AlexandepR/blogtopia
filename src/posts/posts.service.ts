@@ -160,7 +160,7 @@ export class PostsService {
       }
   else {throw new HttpException('', HttpStatus.BAD_REQUEST)}
   }
-  async getCommentByPost(id: string, query: ParamsType) {
+  async getCommentsByPost(id: string, query: ParamsType) {
     const { searchNameTerm, pageSize, pageNumber, sortDirection, sortBy } = parseQueryPaginator(query);
     const postId = new Types.ObjectId(id);
     const post = await this.postsRepository.findPostById(postId);

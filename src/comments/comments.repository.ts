@@ -21,7 +21,7 @@ export class CommentsRepository {
     sortDirection: 'desc' | 'asc',
   ): Promise<CommentDocument[]> {
     const comments = await this.CommentModel
-      .find()
+      .find({postId})
       .sort([[sortBy, sortDirection]])
       .skip(skip)
       .limit(pageSize);
