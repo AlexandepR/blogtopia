@@ -93,9 +93,9 @@ export class PostsService {
               likesCount,
               dislikesCount,
               myStatus: userStatus,
-              newestLikes: {
+              newestLikes: [
                 ...filteredNewestLikes
-              }
+              ]
             }
           };
         }

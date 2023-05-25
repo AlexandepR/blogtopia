@@ -140,9 +140,9 @@ export class BlogsService {
             dislikesCount,
             myStatus: userStatus,
             // ...restExtendedLikesInfo,
-            newestLikes: {
+            newestLikes: [
               ...filteredNewestLikes
-            }
+            ]
           }
         };
       });
