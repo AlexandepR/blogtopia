@@ -93,7 +93,9 @@ export class PostsService {
               likesCount,
               dislikesCount,
               myStatus: userStatus,
-              filteredNewestLikes
+              newestLikes: {
+                ...filteredNewestLikes
+              }
             }
           };
         }
@@ -136,7 +138,8 @@ export class PostsService {
     await validateOrRejectModel(dto, CreateCommentInputClassModel);
     const postId = idParamsValidator(id);
     if(!postId) throw new HttpException('', HttpStatus.NOT_FOUND)
-    const findPost = this.postsRepository.findPostById(postId)
+    const findPost = await this.postsRepository.findPostById(postId)
+    if(!findPost) throw new HttpException('', HttpStatus.NOT_FOUND)
     const createComment = await this.postsRepository.createComment(dto.content, postId, user);
     if(!createComment) throw new HttpException('', HttpStatus.NOT_FOUND)
       if (createComment) {
@@ -172,16 +175,54 @@ export class PostsService {
       sortBy,
       sortDirection,
     );
-    if(!comments) throw new HttpException('', HttpStatus.BAD_REQUEST)
-    const commentList = commentResData(comments)
-    return {
-      pagesCount: pagesCount,
-      page: pageNumber,
-      pageSize: pageSize,
-      totalCount: totalCount,
-      items: commentList
-    };
+    if (comments) {
+      const commentsArray = comments.map((
+        {
+          _id, content,
+          commentatorInfo: { userId, userLogin },
+          createdAt, likesInfo, __v, ...rest
+        }) => {
+        let userStatus: "None" | "Like" | "Dislike" = "None";
+        if (userId) {
+          const userLike = likesInfo.likesData.find((like) => like.userId.toString() === userId.toString());
+          const userDislike = likesInfo.dislikesData.find((dislike) => dislike.userId.toString() === userId.toString());
+          userStatus = userLike ? 'Like' : userDislike ? 'Dislike' : 'None';
+        }
+        return {
+          id: _id.toString(),
+          content: content,
+          commentatorInfo: {
+            userId: userId.toString(),
+            userLogin: userLogin,
+          },
+          createdAt: createdAt,
+          likesInfo: {
+            likesCount: likesInfo.likesCount,
+            dislikesCount: likesInfo.dislikesCount,
+            myStatus: userStatus
+          }
+        }});
+
+      return {
+        pagesCount: pagesCount,
+        page: pageNumber,
+        pageSize: pageSize,
+        totalCount: totalCount,
+        items: commentsArray
+      };
+    }
+    return null;
   }
+  //   if(!comments) throw new HttpException('', HttpStatus.BAD_REQUEST)
+  //   const commentList = commentResData(comments)
+  //   return {
+  //     pagesCount: pagesCount,
+  //     page: pageNumber,
+  //     pageSize: pageSize,
+  //     totalCount: totalCount,
+  //     items: commentList
+  //   };
+  // }
   async getPost(id: string, req: Request): Promise<outputPostModelType> {
     const postId = new Types.ObjectId(id);
     const post = await this.postsRepository.findPostById(postId);

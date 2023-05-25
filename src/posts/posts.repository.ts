@@ -42,7 +42,11 @@ export class PostsRepository {
   async findPostById(postId: Types.ObjectId): Promise<PostDocument> {
     const post = await this.PostModel
       .findOne({ _id: postId });
-    return post;
+    if (post) {
+      return post;
+    } else {
+      return null;
+    }
   }
 
   async save(post: PostDocument) {

@@ -114,16 +114,14 @@ export class BlogsService {
                                         likesData,
                                         dislikesData,
                                         myStatus,
-                                        newestLikes: [{
-                                          description,
-                                          ...restNewest
-                                        }]
+                                        newestLikes
                                         // ...restExtendedLikesInfo
                                       },
                                       __v,
                                       ...rest
 
                                     }) => {
+        const filteredNewestLikes = newestLikes.map(({ description, ...restNewest }) => restNewest);
         let userStatus: "None" | "Like" | "Dislike" = "None";
         if (userId) {
           const userLike = extendedLikesInfo.likesData.find((like) => like.userId.toString() === userId.toString());
@@ -142,9 +140,9 @@ export class BlogsService {
             dislikesCount,
             myStatus: userStatus,
             // ...restExtendedLikesInfo,
-            newestLikes: [{
-              ...restNewest
-            }]
+            newestLikes: {
+              ...filteredNewestLikes
+            }
           }
         };
       });
