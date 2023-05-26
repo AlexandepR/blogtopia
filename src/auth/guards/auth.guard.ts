@@ -95,7 +95,7 @@ export class AuthGuard implements CanActivate {
   }
   private async extractUserFromRefreshToken(request: Request): Promise<boolean> {
     console.log(request.cookies.refreshToken,'------------request.cookies.refreshToken-----');
-    const refreshToken = request.cookies.refreshToken.replace(/;\s?HttpOnly;\s?Secure$/, "");
+    const refreshToken = request.cookies.refreshToken
     console.log(refreshToken,'------------refreshToken-----');
     if(!refreshToken) return false
      try {

@@ -14,7 +14,7 @@ export class Security {
   userId: Types.ObjectId;
   @Prop()
   // ip: string | string[];
-  ip: string[];
+  ip: string;
   @Prop()
   deviceName: string;
   static createSession (
@@ -28,7 +28,7 @@ export class Security {
     session.issuedDateRefreshToken =new Date().toISOString();;
     session.deviceId = randomUUID();
     session.userId = userId;
-    session.ip.push(ip);
+    session.ip = ip;
     session.deviceName = deviceName
 
     return session
