@@ -49,7 +49,8 @@ export class SecurityService {
     // if(!checkDeviceId) throw new NotFoundException
     const session = await this.securityRepository.findSessionByDeviceId(deviceId);
     // const getRefreshToken: any = jwt.verify(refreshToken, settingsEnv.JWT_REFRESH_TOKEN_SECRET);
-    if (session && req.requestUser._id !== session.userId.toString()) {
+    // if (session && req.requestUser._id !== session.userId.toString()) {
+    if (req.requestUser._id !== session.userId.toString()) {
       throw new HttpException('', HttpStatus.FORBIDDEN);}
     const terminateSession = await this.securityRepository.terminateSessionByDeviceId(deviceId);
     if (terminateSession) {throw new HttpException('', HttpStatus.NO_CONTENT)}
