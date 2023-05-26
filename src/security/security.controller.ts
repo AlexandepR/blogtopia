@@ -3,6 +3,7 @@ import { SecurityService } from "./security.service";
 import { Controller, Delete, Get, Param, Req } from "@nestjs/common";
 import { RefreshTokenAuthGuard } from "../utils/public.decorator";
 
+console.log("security----Controller")
 @Controller("security")
 export class SecurityController {
   constructor(
@@ -14,6 +15,7 @@ export class SecurityController {
   async getDevices(
     @Req() req: Request
   ) {
+    console.log('------/devices-----');
     return await this.securityService.getDevices(req);
   }
   @RefreshTokenAuthGuard()

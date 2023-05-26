@@ -85,10 +85,6 @@ import { SecurityController } from "./security/security.controller";
         name: User.name,
         schema: UserSchema,
       },
-      // {
-      //   name: Attempt.name,
-      //   schema: AttemptSchema
-      // },
       {
         name: Security.name,
         schema: SecuritySchema,

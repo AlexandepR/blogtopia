@@ -34,10 +34,10 @@ export class SecurityService {
     if (userSessions) {
       return userSessions.map((user) => (
         {
-          ip: user.ip,
-          title: user.deviceName,
-          lastActiveDate: user.issuedDateRefreshToken,
           deviceId: user.deviceId,
+          ip: user.ip,
+          lastActiveDate: user.issuedDateRefreshToken,
+          title: user.deviceName,
         }))
     } else {
       throw new UnauthorizedException();

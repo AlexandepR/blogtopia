@@ -82,6 +82,7 @@ export class AuthController {
     @Res() response: Response,
     @Body() signInDto: loginInputClassModel
   ) {
+    console.log('------------/login-----');
     const userAgent = req.headers["user-agent"];
     const { refreshTokenCookie, token } = await this.authService.login(signInDto, userAgent, ip);
     response.setHeader("Set-Cookie", refreshTokenCookie);
