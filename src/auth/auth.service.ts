@@ -98,8 +98,8 @@ export class AuthService {
 
       const token = await this.jwtService.сreateJWT(user);
       const refreshToken = await this.jwtService.createRefreshToken(user, createSession.deviceId);
-      const refreshTokenCookie = `refreshToken=${refreshToken}; HttpOnly; Secure`;
-      // const refreshTokenCookie = `refreshToken=${refreshToken}`;
+      // const refreshTokenCookie = `refreshToken=${refreshToken}; HttpOnly; Secure`;
+      const refreshTokenCookie = `refreshToken=${refreshToken}`;
       if (!token || !refreshToken || !refreshTokenCookie) throw new HttpException("", HttpStatus.UNAUTHORIZED);
       return { refreshTokenCookie, token };
     }
@@ -129,31 +129,35 @@ export class AuthService {
   async refreshToken(req: Request) {
     const refreshToken = req.cookies.refreshToken;
     // const user = req.user
-    const userId = await this.jwtService.findUserIdByAuthHeaders(req);
-    const user = await this.usersRepository.findUserById(userId)
+    // const userId = await this.jwtService.findUserIdByAuthHeaders(req);
+    // const user = await this.usersRepository.findUserById(userId)
+    const user = req.requestUser
     const updateRefreshToken = await this.jwtService.updateRefreshToken(refreshToken);
     if (user && updateRefreshToken) {
       await this.securityService.updateDateSession(user._id);
       await this.jwtService.refreshTokenToDeprecated(user, refreshToken);
       const token = await this.jwtService.сreateJWT(user);
-      const refreshTokenCookie = `refreshToken=${updateRefreshToken}; HttpOnly; Secure`;
-      // const refreshTokenCookie = `refreshToken=${updateRefreshToken}`;
+      // const refreshTokenCookie = `refreshToken=${updateRefreshToken}; HttpOnly; Secure`;
+      const refreshTokenCookie = `refreshToken=${updateRefreshToken}`;
       return { refreshTokenCookie, token };
     }
     throw new UnauthorizedException()
   }
   async logout(req: Request) {
     const refreshToken = req.cookies.refreshToken;
-    const findUser = await this.jwtService.getUserByRefreshToken(refreshToken);
+    // const findUser = await this.jwtService.getUserByRefreshToken(refreshToken);
+    const user = req.requestUser
     const getRefreshToken: any = jwt.verify(refreshToken, settingsEnv.JWT_REFRESH_TOKEN_SECRET);
     const terminateSessions = await this.securityService.terminateSessionByDeviceId(getRefreshToken.deviceId);
-    if (findUser && terminateSessions) {
-      const expiredRefreshToken = await this.jwtService.refreshTokenToDeprecated(findUser, refreshToken);
+    if (terminateSessions) {
+      const expiredRefreshToken = await this.jwtService.refreshTokenToDeprecated(user, refreshToken);
+      throw new HttpException("", HttpStatus.NO_CONTENT);
       if (!expiredRefreshToken) {
         throw new HttpException("", HttpStatus.NO_CONTENT);
       }
-    } else {
-      throw new HttpException("", HttpStatus.BAD_REQUEST);
+      // } else {
+      //   throw new HttpException("", HttpStatus.BAD_REQUEST);
+      // }
     }
   }
   async getOwnAccount(req: Request) {

@@ -118,15 +118,15 @@ export class AuthController {
     response.setHeader("Set-Cookie", refreshTokenCookie);
     response.send({ accessToken: token.token });
   }
-  @RefreshTokenAuthGuard()
   @Throttle(5, 10)
+  @RefreshTokenAuthGuard()
   @Post("/logout")
   async logout(
     @Req() req: Request
   ) {
     return await this.authService.logout(req);
   }
-  @RefreshTokenAuthGuard()
+  // @RefreshTokenAuthGuard()
   @Get("/me")
   async getOwnAccount(
     @Req() req: Request

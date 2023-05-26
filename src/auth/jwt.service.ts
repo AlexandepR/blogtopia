@@ -73,12 +73,13 @@ export class JwtService {
       return null
     }
   }
-  async refreshTokenToDeprecated(user: UserDocument, refreshToken: string) {
+  async refreshTokenToDeprecated(user: UserDocument, refreshToken: string):Promise<boolean> {
     try {
       const userId: Types.ObjectId = user._id
       await this.usersRepository.addExpiredRefreshToken(userId, refreshToken)
+      return true
     } catch (error) {
-      return null
+      return false
     }
   }
   getSessionInfoByRefreshToken(refreshToken: string) {
