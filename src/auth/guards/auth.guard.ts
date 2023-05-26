@@ -94,9 +94,7 @@ export class AuthGuard implements CanActivate {
     throw new UnauthorizedException();
   }
   private async extractUserFromRefreshToken(request: Request): Promise<boolean> {
-    console.log(request.cookies.refreshToken,'------------request.cookies.refreshToken-----');
-    const refreshToken = request.cookies.refreshToken
-    console.log(refreshToken,'------------refreshToken-----');
+    const refreshToken = request.cookies.refreshToken;
     if(!refreshToken) return false
      try {
     const getRefreshToken: any = jwt.verify(refreshToken, settingsEnv.JWT_REFRESH_TOKEN_SECRET)
