@@ -96,10 +96,13 @@ export class AuthService {
       const createSession = await this.securityService.createSession(user._id, ip, deviceName);
       if (!createSession) throw new HttpException("", HttpStatus.UNAUTHORIZED);
 
+      // const terminateSessions = await this.securityService
+      //   .terminateSessionByDeviceId(getRefreshToken.deviceId);
+      //
       const token = await this.jwtService.сreateJWT(user);
       const refreshToken = await this.jwtService.createRefreshToken(user, createSession.deviceId);
-      const refreshTokenCookie = `refreshToken=${refreshToken}; HttpOnly; Secure`;
-      // const refreshTokenCookie = `refreshToken=${refreshToken}`;
+      // const refreshTokenCookie = `refreshToken=${refreshToken}; HttpOnly; Secure`;
+      const refreshTokenCookie = `refreshToken=${refreshToken}`;
       if (!token || !refreshToken || !refreshTokenCookie) throw new HttpException("", HttpStatus.UNAUTHORIZED);
       return { refreshTokenCookie, token };
     }
@@ -137,8 +140,8 @@ export class AuthService {
       await this.securityService.updateDateSession(user._id);
       await this.jwtService.refreshTokenToDeprecated(user, refreshToken);
       const token = await this.jwtService.сreateJWT(user);
-      const refreshTokenCookie = `refreshToken=${updateRefreshToken}; HttpOnly; Secure`;
-      // const refreshTokenCookie = `refreshToken=${updateRefreshToken}`;
+      // const refreshTokenCookie = `refreshToken=${updateRefreshToken}; HttpOnly; Secure`;
+      const refreshTokenCookie = `refreshToken=${updateRefreshToken}`;
       return { refreshTokenCookie, token };
     }
     throw new UnauthorizedException()

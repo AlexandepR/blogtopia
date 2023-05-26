@@ -23,7 +23,7 @@ export class SecurityController {
     @Param("deviceId")
       deviceId: string
   ) {
-    return await this.securityService.deleteDeviceById(deviceId, req.cookies.refreshToken);
+    return await this.securityService.deleteDeviceById(deviceId, req);
   }
   @RefreshTokenAuthGuard()
   @Delete('/devices')

@@ -94,24 +94,17 @@ export class AuthGuard implements CanActivate {
     throw new UnauthorizedException();
   }
   private async extractUserFromRefreshToken(request: Request): Promise<boolean> {
-    console.log('=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-');
-    console.log(request.cookies.refreshToken,'--------------request.cookies.refreshToken-------');
     const refreshToken = request.cookies.refreshToken;
-    console.log('---------------------a-----------------');
     if(!refreshToken) return false
-    console.log('---------------------b-----------------');
      try {
-       console.log('---------------------try-----------------');
     const getRefreshToken: any = jwt.verify(refreshToken, settingsEnv.JWT_REFRESH_TOKEN_SECRET)
        const user = await this.usersRepository.findUserById(new Types.ObjectId(getRefreshToken.userId))
        for (const token of user.authData.expirationRefreshToken) {
          if (token === refreshToken) return false
        }
        request.requestUser = user;
-       console.log('---------------true1');
        return true
      } catch(err) {
-       console.log(err, '-------------CATCH-----');
        throw new UnauthorizedException();
      }
   }

@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, UnauthorizedException } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { UsersRepository } from "../users/users.repository";
 import { SecurityRepository } from "./security.repository";
 import { Types } from "mongoose";
@@ -44,24 +44,21 @@ export class SecurityService {
     }
   }
 
-  async deleteDeviceById(deviceId: string, refreshToken: string) {
-    console.log('6666666666666666666666666666666666666666666');
-    const checkDeviceId = idParamsValidator(deviceId);
-    console.log('77777777777777777777777777777777777777777777');
-    // const session = await this.securityRepository.findSessionByDeviceId(deviceId);
+  async deleteDeviceById(deviceId: string, req: Request) {
+    // const checkDeviceId = idParamsValidator(deviceId);
+    // if(!checkDeviceId) throw new NotFoundException
+    const session = await this.securityRepository.findSessionByDeviceId(deviceId);
     // const getRefreshToken: any = jwt.verify(refreshToken, settingsEnv.JWT_REFRESH_TOKEN_SECRET);
-    // if (session && getRefreshToken.userId !== session.userId.toString()) {
-    //   throw new HttpException('', HttpStatus.FORBIDDEN);}
+    if (session && req.requestUser._id !== session.userId.toString()) {
+      throw new HttpException('', HttpStatus.FORBIDDEN);}
     const terminateSession = await this.securityRepository.terminateSessionByDeviceId(deviceId);
-    console.log(terminateSession, 'terminateSessionjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj');
     if (terminateSession) {throw new HttpException('', HttpStatus.NO_CONTENT)}
-      throw new HttpException('', HttpStatus.BAD_REQUEST);
+      throw new HttpException('', HttpStatus.NOT_FOUND);
   }
   async terminateSessionByDeviceId (deviceId: string): Promise <boolean> {
     return await this.securityRepository.terminateSessionByDeviceId(deviceId)
   }
   async deleteAllDevices(refreshToken: string) {
-    console.log('ALLLLLLLLLLDEVICES=========');
     const getRefreshToken: any = jwt.verify(refreshToken, settingsEnv.JWT_REFRESH_TOKEN_SECRET);
     const terminateSessions = await this.securityRepository.terminateOtherSessions(new Types.ObjectId(getRefreshToken.userId), getRefreshToken.deviceId);
     if (terminateSessions && getRefreshToken) throw new HttpException('', HttpStatus.NO_CONTENT)
