@@ -40,6 +40,7 @@ import {
   IsLoginOrEmailNotExistsPipe
   // validateInputBlogPipe
 } from "./pipes/validation/validate.pipe";
+import { SecurityController } from "./security/security.controller";
 
 ;
 
@@ -111,6 +112,7 @@ import {
     UsersController,
     BlogsController,
     PostsController,
+    SecurityController,
     CommentsController,
     TestingController,
   ],

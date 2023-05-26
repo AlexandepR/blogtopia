@@ -28,8 +28,9 @@ export class SecurityService {
     return await this.securityRepository.updateDateSession(date, userId);
   }
   async getDevices(req: Request): Promise<DevicesResDataType[] | null> {
-    const infoRefreshToken: any = jwt.verify(req.cookies.refreshToken, settingsEnv.JWT_REFRESH_TOKEN_SECRET);
-    const userSessions = await this.securityRepository.findSessionsByUserId(new Types.ObjectId(infoRefreshToken.userId));
+    const userId = req.requestUser._id
+    // const infoRefreshToken: any = jwt.verify(req.cookies.refreshToken, settingsEnv.JWT_REFRESH_TOKEN_SECRET);
+    const userSessions = await this.securityRepository.findSessionsByUserId(userId);
     if (userSessions) {
       return userSessions.map((user) => (
         {
@@ -44,19 +45,23 @@ export class SecurityService {
   }
 
   async deleteDeviceById(deviceId: string, refreshToken: string) {
-    idParamsValidator(deviceId);
-    const session = await this.securityRepository.findSessionByDeviceId(deviceId);
-    const getRefreshToken: any = jwt.verify(refreshToken, settingsEnv.JWT_REFRESH_TOKEN_SECRET);
-    if (session && getRefreshToken.userId !== session.userId.toString()) {
-      throw new HttpException('', HttpStatus.FORBIDDEN);}
+    console.log('6666666666666666666666666666666666666666666');
+    const checkDeviceId = idParamsValidator(deviceId);
+    console.log('77777777777777777777777777777777777777777777');
+    // const session = await this.securityRepository.findSessionByDeviceId(deviceId);
+    // const getRefreshToken: any = jwt.verify(refreshToken, settingsEnv.JWT_REFRESH_TOKEN_SECRET);
+    // if (session && getRefreshToken.userId !== session.userId.toString()) {
+    //   throw new HttpException('', HttpStatus.FORBIDDEN);}
     const terminateSession = await this.securityRepository.terminateSessionByDeviceId(deviceId);
+    console.log(terminateSession, 'terminateSessionjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj');
     if (terminateSession) {throw new HttpException('', HttpStatus.NO_CONTENT)}
-      throw new HttpException('', HttpStatus.NOT_FOUND);
+      throw new HttpException('', HttpStatus.BAD_REQUEST);
   }
   async terminateSessionByDeviceId (deviceId: string): Promise <boolean> {
     return await this.securityRepository.terminateSessionByDeviceId(deviceId)
   }
   async deleteAllDevices(refreshToken: string) {
+    console.log('ALLLLLLLLLLDEVICES=========');
     const getRefreshToken: any = jwt.verify(refreshToken, settingsEnv.JWT_REFRESH_TOKEN_SECRET);
     const terminateSessions = await this.securityRepository.terminateOtherSessions(new Types.ObjectId(getRefreshToken.userId), getRefreshToken.deviceId);
     if (terminateSessions && getRefreshToken) throw new HttpException('', HttpStatus.NO_CONTENT)

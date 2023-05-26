@@ -20,7 +20,7 @@ import { BlogsRepository } from "../blogs/blogs.repository";
 import { Types } from "mongoose";
 import { PostsRepository } from "./posts.repository";
 import { IsMongoId, IsString, Length, MaxLength } from "class-validator";
-import { validateOrRejectModel } from "../helpers/validation.helpers";
+import { validateOrRejectModel } from "../utils/validation.helpers";
 import { Request } from "express";
 import { UsersRepository } from "../users/users.repository";
 import { CommentsRepository } from "../comments/comments.repository";

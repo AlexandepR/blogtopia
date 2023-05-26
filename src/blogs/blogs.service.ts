@@ -7,7 +7,7 @@ import { pagesCounter, parseQueryPaginator, skipPage } from "../utils/helpers";
 import { Types } from "mongoose";
 import { outputPostModelType, PostsTypeFiltered } from "../posts/type/postsType";
 import { PostsRepository } from "../posts/posts.repository";
-import { validateOrRejectModel } from "../helpers/validation.helpers";
+import { validateOrRejectModel } from "../utils/validation.helpers";
 import { JwtService } from "../auth/jwt.service";
 import { Request } from "express";
 

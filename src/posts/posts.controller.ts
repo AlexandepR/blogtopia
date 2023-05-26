@@ -17,7 +17,7 @@ import { CreateCommentInputClassModel, PostsService } from "./posts.service";
 import { Request } from 'express';
 import { CreatePostInputClassModel, likeStatusInputClassModel } from "./type/postsType";
 import { BasicAuth, Public, UserFromRequestDecorator } from "../utils/public.decorator";
-import { checkObjectId } from "../helpers/validation.helpers";
+import { checkObjectId } from "../utils/validation.helpers";
 import { UserDocument } from "../users/type/users.schema";
 
 @Controller("posts")

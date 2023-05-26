@@ -16,7 +16,7 @@ import {
 import { UsersService } from "./users.service";
 import { CreateUserInputClassModel, ParamsUsersType } from "./type/usersTypes";
 import { BasicAuth } from "../utils/public.decorator";
-import { checkObjectId } from "../helpers/validation.helpers";
+import { checkObjectId } from "../utils/validation.helpers";
 import { CheckLoginOrEmailGuard } from "../middleware/middleware";
 
 

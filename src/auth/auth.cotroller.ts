@@ -106,8 +106,9 @@ export class AuthController {
   ) {
     return await this.authService.newPassword(dto);
   }
-  @RefreshTokenAuthGuard()
+  @HttpCode(HttpStatus.OK)
   @Throttle(5, 10)
+  @RefreshTokenAuthGuard()
   @Post("/refresh-token")
   async refreshToken(
     @Res() response: Response,
@@ -125,7 +126,7 @@ export class AuthController {
   ) {
     return await this.authService.logout(req);
   }
-  // @Public()
+  @RefreshTokenAuthGuard()
   @Get("/me")
   async getOwnAccount(
     @Req() req: Request

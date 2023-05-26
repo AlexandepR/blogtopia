@@ -15,7 +15,7 @@ import { Request } from 'express';
 import { Types } from "mongoose";
 import { likeStatusInputClassModel } from "../posts/type/postsType";
 import { UserDocument } from "../users/type/users.schema";
-import { validateOrRejectModel } from "../helpers/validation.helpers";
+import { validateOrRejectModel } from "../utils/validation.helpers";
 
 
 @Injectable()

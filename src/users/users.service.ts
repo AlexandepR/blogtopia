@@ -5,7 +5,7 @@ import { Types } from "mongoose";
 import { CreateUserInputClassModel, ParamsUsersType, UserType } from "./type/usersTypes";
 import { User, UserDocument } from "./type/users.schema";
 import { generateHash, pagesCounter, parseQueryUsersPaginator, skipPage } from "../utils/helpers";
-import { validateOrRejectModel } from "../helpers/validation.helpers";
+import { validateOrRejectModel } from "../utils/validation.helpers";
 
 
 // const validateOrRejectModel = async (model: any, ctor: { new(): any }) => {

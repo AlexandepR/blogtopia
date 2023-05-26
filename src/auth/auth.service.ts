@@ -1,9 +1,16 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException } from "@nestjs/common";
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException
+} from "@nestjs/common";
 import { UsersRepository } from "../users/users.repository";
 import { v4 as uuidv4 } from "uuid";
 import { UsersService } from "../users/users.service";
 import { CreateUserInputClassModel } from "../users/type/usersTypes";
-import { validateOrRejectModel } from "../helpers/validation.helpers";
+import { validateOrRejectModel } from "../utils/validation.helpers";
 import {
   checkEmailInputClassModel, codeInputClassModel,
   codeInputModel,
@@ -133,7 +140,7 @@ export class AuthService {
       // const refreshTokenCookie = `refreshToken=${updateRefreshToken}`;
       return { refreshTokenCookie, token };
     }
-    throw new HttpException("", HttpStatus.BAD_REQUEST);
+    throw new UnauthorizedException()
   }
   async logout(req: Request) {
     const refreshToken = req.cookies.refreshToken;
@@ -150,9 +157,11 @@ export class AuthService {
     }
   }
   async getOwnAccount(req: Request) {
-    // const userId = req.user!._id.toString();
-    const userId = await this.jwtService.findUserIdByAuthHeaders(req);
-    const findUser = await this.usersService.findUserById(userId.toString());
+    const userId = req.requestUser._id;
+    if(!userId) throw new HttpException("", HttpStatus.UNAUTHORIZED);
+    // const userId = await this.jwtService.findUserIdByAuthHeaders(req);
+    const findUser = await this.usersRepository.findUserById(userId);
+    if(!findUser) throw new HttpException("", HttpStatus.UNAUTHORIZED);
     if (findUser) {
         return{
           'email': findUser.accountData.email,

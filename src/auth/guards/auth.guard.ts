@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
+import { CanActivate, ExecutionContext, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { JwtService } from "@nestjs/jwt";
 import { Request } from "express";
@@ -25,7 +25,6 @@ export class AuthGuard implements CanActivate {
     ]);
 
     if (isPublic) {
-
       return true;
     }
 
@@ -57,8 +56,10 @@ export class AuthGuard implements CanActivate {
     if (isRefreshToken) {
         const user = await this.extractUserFromRefreshToken(request)
       if (!user) {
-        throw new UnauthorizedException();
+        console.log('---------------UnauthorizedException');
+       throw new UnauthorizedException();
       }
+      console.log('---------------true2-finish');
       return true;
     }
 
@@ -70,10 +71,8 @@ export class AuthGuard implements CanActivate {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: settingsEnv.JWT_SECRET,
       });
-      // request.user = user;
       const user = await this.usersRepository.findUserById(new Types.ObjectId(payload.userId))
-      request.user = user;
-      // request.user._id = payload.userId;
+      request.requestUser = user;
     } catch {
       throw new UnauthorizedException();
     }
@@ -95,14 +94,25 @@ export class AuthGuard implements CanActivate {
     throw new UnauthorizedException();
   }
   private async extractUserFromRefreshToken(request: Request): Promise<boolean> {
+    console.log('=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-');
+    console.log(request.cookies.refreshToken,'--------------request.cookies.refreshToken-------');
     const refreshToken = request.cookies.refreshToken;
+    console.log('---------------------a-----------------');
+    if(!refreshToken) return false
+    console.log('---------------------b-----------------');
+     try {
+       console.log('---------------------try-----------------');
     const getRefreshToken: any = jwt.verify(refreshToken, settingsEnv.JWT_REFRESH_TOKEN_SECRET)
-    const user = await this.usersRepository.findUserById(new Types.ObjectId(getRefreshToken.userId))
-    if (!refreshToken || !getRefreshToken || !user) return false
-    for (const token of user.authData.expirationRefreshToken) {
-      if (token === refreshToken) return false
-    }
-    request.user = user;
-    return true
+       const user = await this.usersRepository.findUserById(new Types.ObjectId(getRefreshToken.userId))
+       for (const token of user.authData.expirationRefreshToken) {
+         if (token === refreshToken) return false
+       }
+       request.requestUser = user;
+       console.log('---------------true1');
+       return true
+     } catch(err) {
+       console.log(err, '-------------CATCH-----');
+       throw new UnauthorizedException();
+     }
   }
 }

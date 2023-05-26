@@ -60,7 +60,7 @@ export const addSettingsApp = (app: INestApplication) => {
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  // app.enableCors();
+  app.enableCors();
   addSettingsApp(app)
   const config = new DocumentBuilder()
     .setTitle("Blogs example")

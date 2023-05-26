@@ -4,10 +4,8 @@ import { Controller, Delete, Get, Param, Req } from "@nestjs/common";
 import { RefreshTokenAuthGuard } from "../utils/public.decorator";
 
 @Controller("security")
-export class AuthController {
+export class SecurityController {
   constructor(
-    // protected authService: AuthService,
-    // protected usersService: UsersService,
     protected securityService: SecurityService
   ) {
   }
