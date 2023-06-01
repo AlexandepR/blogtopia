@@ -5,9 +5,9 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface
 } from "class-validator";
-import { UsersRepository } from "../../users/users.repository";
+import { UsersRepository } from "../../modules/users/application/users.repository";
 import { NotFoundException } from "@nestjs/common";
-import { BlogsRepository } from "../../blogs/blogs.repository";
+import { BlogsRepository } from "../../modules/blogs/application/blogs.repository";
 import { Types } from "mongoose";
 
 // @ValidatorConstraint({ name: "IsLoginOrEmailAlreadyExistsPipe", async: true })

@@ -6,10 +6,12 @@ import { BadRequestException, INestApplication, ValidationPipe } from "@nestjs/c
 import { HttpExceptionFilter } from "./exception.filter";
 import cookieParser from "cookie-parser";
 import { useContainer } from "class-validator";
+import { ConfigService } from "@nestjs/config";
+import { ConfigurationConfigType } from "./configuration/config.module";
 
 
 export const addSettingsApp = (app: INestApplication) => {
-  useContainer(app.select(AppModule), {fallbackOnErrors: true})
+  useContainer(app.select(AppModule), { fallbackOnErrors: true });
   app.enableCors();
   app.use(cookieParser());
   app.useGlobalPipes(new ValidationPipe({
@@ -19,7 +21,6 @@ export const addSettingsApp = (app: INestApplication) => {
     transform: true,
     exceptionFactory: (errors) => {
       const errorsForResponse = [];
-
       // errors.forEach((e) => {
       //   const constraintsKeys = Object.keys(e.constraints);
       //   constraintsKeys.forEach((ckey) => {
@@ -52,16 +53,16 @@ export const addSettingsApp = (app: INestApplication) => {
       throw new BadRequestException(errorsForResponse);
     }
   }));
-  app.useGlobalFilters(new HttpExceptionFilter(),
+  app.useGlobalFilters(new HttpExceptionFilter()
     // new ErrorExceptionFilter()
   );
-}
+};
 
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors();
-  addSettingsApp(app)
+  addSettingsApp(app);
   const config = new DocumentBuilder()
     .setTitle("Blogs example")
     .setDescription("The blogs API description")
@@ -94,7 +95,13 @@ async function bootstrap() {
   // app.useGlobalFilters(new HttpExceptionFilter(),
   //   // new ErrorExceptionFilter()
   // );
-  await app.listen(settingsEnv.PORT || 5001);  //:27017
+
+  const configService = app.get(ConfigService<ConfigurationConfigType>);
+  // configService.get('PORT_TEST',{infer:true}).test
+  await app.listen(
+    configService.get("PORT"),
+    // settingsEnv.PORT || 5001
+  );
   console.log(`Application is running on: ${await app.getUrl()}`);
   const serverUrl = process.env.SERVER_URL;
 

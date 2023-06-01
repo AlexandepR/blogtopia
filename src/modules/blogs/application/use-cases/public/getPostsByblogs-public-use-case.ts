@@ -26,16 +26,15 @@ export class GetPostsByBlogUseCase implements ICommandHandler<GetPostsByBlogComm
   async execute(command: GetPostsByBlogCommand): Promise<PaginationType<PostsTypeFiltered[]>> {
     const { searchNameTerm, pageSize, pageNumber, sortDirection, sortBy } = parseQueryPaginator(command.query);
     const blogId = new Types.ObjectId(command.id);
-    const blog = await this.blogsRepository.findBlogById(blogId);
-    if (!blog) throw new NotFoundException()
     const banUsers: Array<string> = await this.usersRepository.getBannedUsers()
-    console.log(banUsers, 'banUsers in case');
     const filter = ({
       $or: [
         { "postOwnerInfo.userLogin": { $nin: banUsers } },
         { blogId: new Types.ObjectId(command.id) },
       ]
     });
+    const blog = await this.blogsRepository.findBlogById(blogId,filter);
+    if (!blog) throw new NotFoundException()
     const totalCountPosts = await this.postsRepository.getTotalCountPosts(filter);
     const skip = skipPage(pageNumber, pageSize);
     const pagesCount = pagesCounter(totalCountPosts, pageSize);

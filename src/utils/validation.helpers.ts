@@ -1,5 +1,6 @@
 import { IsMongoId, validateOrReject } from "class-validator";
-import { ExecutionContext, Injectable } from "@nestjs/common";
+import { ExecutionContext, Injectable, NotFoundException, PipeTransform } from "@nestjs/common";
+import { Types } from "mongoose";
 
 export const validateOrRejectModel = async ( model: any, ctor: { new(): any}) => {
   if (!(model instanceof ctor)) {
@@ -17,4 +18,13 @@ export const validateOrRejectModel = async ( model: any, ctor: { new(): any}) =>
 export class checkObjectId {
   @IsMongoId({message: 'Invalid Id format'})
   id:string;
+}
+
+class CheckObjectIdPipe implements PipeTransform {
+  transform(value: any) {
+    if (!Types.ObjectId.isValid(value)) {
+      throw new NotFoundException()
+    }
+    return value
+  }
 }

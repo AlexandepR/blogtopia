@@ -15,3 +15,5 @@ export const settingsEnv = {
   JWT_REFRESH_TOKEN_LIFE: process.env.JWT_REFRESH_TOKEN_LIFE,
   NODE_ENV: process.env.NODE_ENV,
 }
+
+

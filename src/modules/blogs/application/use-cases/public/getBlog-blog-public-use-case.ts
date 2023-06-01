@@ -7,6 +7,7 @@ import { PostsTypeFiltered } from "../../../../posts/type/postsType";
 import { Types } from "mongoose";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { BlogType } from "../../../type/blogsType";
+import { UsersRepository } from "../../../../users/application/users.repository";
 
 export class GetBlogCommand {
   constructor(
@@ -19,11 +20,18 @@ export class GetBlogCommand {
 export class GetBlogUseCase implements ICommandHandler<GetBlogCommand> {
   constructor(
     protected blogsRepository: BlogsRepository,
+    protected usersRepository: UsersRepository,
   ) {
   }
   async execute(command: GetBlogCommand): Promise<BlogType> {
     const blogId = new Types.ObjectId(command.id);
-    const blog = await this.blogsRepository.findBlogById(blogId);
+    const banUsers: Array<string> = await this.usersRepository.getBannedUsers();
+    const filter = ({
+      $or: [
+        { "blogOwnerInfo.userLogin": { $nin: banUsers } },
+      ]
+    });
+    const blog = await this.blogsRepository.findBlogById(blogId,filter);
     if (!blog) throw new HttpException("", HttpStatus.NOT_FOUND);
     return {
       id: command.id,

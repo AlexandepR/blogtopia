@@ -6,7 +6,7 @@ import { settingsEnv } from "../../settings/settings";
 // import { CreateUserInputClassModel, UsersService } from "../../users/users.service";
 
 import { addSettingsApp } from "../../main";
-import { CreateUserInputClassModel } from "../../users/type/usersTypes";
+import { CreateUserInputClassModel } from "../../modules/users/type/usersTypes";
 
 const user1: CreateUserInputClassModel = {
   login: "user1",

@@ -1,12 +1,12 @@
-import { QueryType } from "../blogs/type/blogsType";
-import { ParamsUsersType, QueryUsersPaginator } from "../users/type/usersTypes";
+import { ParamsUsersType, QueryUsersPaginator } from "../modules/users/type/usersTypes";
 import * as bcrypt from "bcrypt";
-import { User } from "../users/type/users.schema";
-import { PostLikesType } from "../posts/type/postsType";
-import { PostDocument } from "../posts/type/posts.schema";
+import { User } from "../modules/users/type/users.schema";
+import { PostLikesType } from "../modules/posts/type/postsType";
+import { PostDocument } from "../modules/posts/type/posts.schema";
 import { ObjectId, Types } from "mongoose";
-import { CommentDocument } from "../comments/type/comments.schema";
-import { LikesType } from "../comments/type/commentsType";
+import { CommentDocument } from "../modules/comments/type/comments.schema";
+import { LikesType } from "../modules/comments/type/commentsType";
+import { QueryType } from "../modules/blogs/type/blogsType";
 
 export const parseQueryPaginator = (query: QueryType): QueryType => {
   return {
@@ -98,24 +98,25 @@ export const commentResData = (comments) => {
 };
 export const updatePostLikesInfo = (post: PostDocument, likeStatus: string, newLikesData?: PostLikesType) => {
   if (newLikesData) {
-    if (likeStatus === 'Like'){
-      post!.extendedLikesInfo.likesData.push(newLikesData)
+    if (likeStatus === "Like") {
+      post!.extendedLikesInfo.likesData.push(newLikesData);
     }
-    if(likeStatus === 'Dislike') {
-      post!.extendedLikesInfo.dislikesData.push(newLikesData)
+    if (likeStatus === "Dislike") {
+      post!.extendedLikesInfo.dislikesData.push(newLikesData);
     }
-  };
+  }
+  ;
   post!.extendedLikesInfo.likesCount = post!.extendedLikesInfo.likesData.length;
   post!.extendedLikesInfo.dislikesCount = post!.extendedLikesInfo.dislikesData.length;
-  return post
-}
+  return post;
+};
 export const idParamsValidator = (id: string): Types.ObjectId | null => {
   try {
     return new Types.ObjectId(id);
   } catch (err) {
-    return null
+    return null;
   }
-}
+};
 export const sortNewestLikesForPost = (post) => {
   return post.extendedLikesInfo.likesData.sort((a, b) => {
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
@@ -123,20 +124,86 @@ export const sortNewestLikesForPost = (post) => {
     addedAt: createdAt,
     userId: userId.toString(),
     login: userLogin
-  }))
-}
+  }));
+};
 
 
 export const updateCommentLikesInfo = (comment: CommentDocument, likeStatus: string, newLikesData?: LikesType) => {
   if (newLikesData) {
-    if (likeStatus === 'Like'){
-      comment!.likesInfo.likesData.push(newLikesData)
+    if (likeStatus === "Like") {
+      comment!.likesInfo.likesData.push(newLikesData);
     }
-    if(likeStatus === 'Dislike') {
-      comment!.likesInfo.dislikesData.push(newLikesData)
+    if (likeStatus === "Dislike") {
+      comment!.likesInfo.dislikesData.push(newLikesData);
     }
-  };
+  }
+  ;
   comment!.likesInfo.likesCount = comment!.likesInfo.likesData.length;
   comment!.likesInfo.dislikesCount = comment!.likesInfo.dislikesData.length;
-  return comment
-}
+  return comment;
+};
+
+export const filterByNameTermOrUserLogin = (searchNameTerm: string, field: string, userLogin: string) => {
+  const findField = `${field}.userLogin`
+  console.log(findField, 'findField------------------------');
+  console.log(userLogin, 'userLogin------------------------');
+  const filter = searchNameTerm || userLogin
+    ? {
+      $or: [
+        { name: { $regex: `${ searchNameTerm }`, $options: "i" } },
+        { [findField] : userLogin }]
+    }
+    : {};
+    return filter
+};
+
+export const filterBanPostsLikesInfo = (posts, banUsers) => {
+  return posts.map(post => {
+  if (post.extendedLikesInfo && post.extendedLikesInfo.newestLikes) {
+    post.extendedLikesInfo.newestLikes = post.extendedLikesInfo.newestLikes.filter(
+      like => !banUsers.includes(like.login)
+    );
+    post.extendedLikesInfo.likesData = post.extendedLikesInfo.likesData.filter(
+      like => !banUsers.includes(like.userLogin)
+    );
+    post.extendedLikesInfo.dislikesData = post.extendedLikesInfo.dislikesData.filter(
+      like => !banUsers.includes(like.userLogin)
+    );
+    post!.extendedLikesInfo.likesCount = post!.extendedLikesInfo.likesData.length;
+    post!.extendedLikesInfo.dislikesCount = post!.extendedLikesInfo.dislikesData.length;
+  }
+  return post;
+})}
+
+export const filterBanCommentLikesInfo = (comments, banUsers) => {
+  return comments.map(comment => {
+  if (comment.LikesInfo) {
+    comment.LikesInfo.likesData = comment.LikesInfo.likesData.filter(
+      like => !banUsers.includes(like.userLogin)
+    );
+    comment.LikesInfo.dislikesData = comment.LikesInfo.dislikesData.filter(
+      like => !banUsers.includes(like.userLogin)
+    );
+    comment!.LikesInfo.likesCount = comment!.LikesInfo.likesData.length;
+    comment!.LikesInfo.dislikesCount = comment!.LikesInfo.dislikesData.length;
+  }
+  return comment;
+})}
+
+export const filterBanPostLikesInfo = (post, banUsers) => {
+  return post.map(post => {
+  if (post.extendedLikesInfo && post.extendedLikesInfo.newestLikes) {
+    post.extendedLikesInfo.newestLikes = post.extendedLikesInfo.newestLikes.filter(
+      like => !banUsers.includes(like.login)
+    );
+    post.extendedLikesInfo.likesData = post.extendedLikesInfo.likesData.filter(
+      like => !banUsers.includes(like.userLogin)
+    );
+    post.extendedLikesInfo.dislikesData = post.extendedLikesInfo.dislikesData.filter(
+      like => !banUsers.includes(like.userLogin)
+    );
+    post!.extendedLikesInfo.likesCount = post!.extendedLikesInfo.likesData.length;
+    post!.extendedLikesInfo.dislikesCount = post!.extendedLikesInfo.dislikesData.length;
+  }
+  return post;
+})}

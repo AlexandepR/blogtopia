@@ -11,6 +11,9 @@
 // export type SentEmailType = {
 //   sentDate: Date
 // }
+// import { createPostForBlogInputClassModel } from "../blogs/type/blogsType";
+import { IsNotEmpty } from "class-validator";
+
 export type PaginationType<T> = {
   pagesCount: number
   page: number
@@ -23,6 +26,18 @@ export type ParamsType = {
   pageSize: number,
   pageNumber: number,
   sortDirection: "asc" | "desc",
+  sortBy: string
+}
+export class ParamsTypeClassModel {
+  // @IsNotEmpty()
+  searchNameTerm: string
+  // @IsNotEmpty()
+  pageSize: number
+  // @IsNotEmpty()
+  pageNumber: number
+  // @IsNotEmpty()
+  sortDirection: "asc" | "desc"
+  // @IsNotEmpty()
   sortBy: string
 }
 //

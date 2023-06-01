@@ -1,6 +1,6 @@
-import { UsersService } from "../users/users.service";
+import { UsersService } from "../modules/users/application/users.service";
 import { CanActivate, ExecutionContext, HttpException, HttpStatus, Injectable, NestMiddleware } from "@nestjs/common";
-import { UsersRepository } from "../users/users.repository";
+import { UsersRepository } from "../modules/users/application/users.repository";
 
 // @Injectable()
 // export class EmailConfirmMiddleware implements NestMiddleware {
@@ -38,7 +38,6 @@ export class EmailConfirmGuard implements CanActivate {
 @Injectable()
 export class CheckLoginOrEmailGuard implements CanActivate {
   constructor(private usersService: UsersService) {}
-
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
     const login = req.body.login;
