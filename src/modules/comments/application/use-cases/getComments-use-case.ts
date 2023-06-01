@@ -6,6 +6,7 @@ import { idParamsValidator } from "../../../../utils/helpers";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { Types } from "mongoose";
 import { UserDocument } from "../../../users/type/users.schema";
+import { UsersRepository } from "../../../users/application/users.repository";
 
 
 export class GetCommentCommand {
@@ -20,12 +21,19 @@ export class GetCommentCommand {
 export class GetCommentUseCase implements ICommandHandler<GetCommentCommand> {
   constructor(
     protected commentsRepository: CommentsRepository,
+    protected usersRepository: UsersRepository,
   ) {
   }
   async execute(command: GetCommentCommand): Promise<CommentReturnType> {
     const userId = command.user._id
     const commentId = new Types.ObjectId(command.id)
-    const comment = await this.commentsRepository.getCommentsById(commentId);
+    const banUsers: Array<string> = await this.usersRepository.getBannedUsers();
+    const filter = ({
+      $or: [
+        { "commentatorInfo.userLogin": { $nin: banUsers } },
+      ]
+    });
+    const comment = await this.commentsRepository.getCommentsById(commentId,filter,banUsers);
     if (!comment) throw new HttpException('', HttpStatus.NOT_FOUND)
     if (comment) {
       const getMyStatusLikeInfo = await this.commentsRepository.getMyStatusLikeInfo(commentId, userId);

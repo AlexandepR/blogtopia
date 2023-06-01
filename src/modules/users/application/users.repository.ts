@@ -48,10 +48,8 @@ export class UsersRepository {
     const getBannedUsers = await this.UserModel
       .find({ "accountData.banInfo.isBanned": true })
       .select(['_id','accountData.login']);
-    // const bannedUserId = getBannedUsers.map(user => user._id.toString());
-    // const bannedUserId = getBannedUsers.map(user => user._id);
     const bannedUserLogin = getBannedUsers.map(user => user.accountData.login.toString());
-    return [...bannedUserLogin];
+    return bannedUserLogin;
   }
   async createUser(
     userDto: CreateUserInputModelType,
@@ -77,7 +75,6 @@ export class UsersRepository {
             ]
         }
       );
-    // .lean();
     if (findUser) {
       return findUser;
     } else {
@@ -107,7 +104,6 @@ export class UsersRepository {
     if (updateCodeUser.modifiedCount <= 0) return null;
     const user = await this.UserModel
       .findOne({ _id });
-    // .lean();
     if (user) {
       return user;
     } else {
@@ -117,9 +113,6 @@ export class UsersRepository {
   async updatePassRecoveryCode(email: string, newCode: string): Promise<boolean> {
     const updateCode = await this.UserModel
       .updateOne(
-        // { accountData: { email } },
-        // { $set:{ emailConfirmation: { passwordRecoveryCode: newCode } }}
-        // { email },
         { "accountData.email": email },
         { $set: { "emailConfirmation.passwordRecoveryCode": newCode } }
       );

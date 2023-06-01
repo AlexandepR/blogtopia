@@ -127,7 +127,7 @@ export class User {
     user.accountData.email = userDto.email;
     user.accountData.passwordHash = passwordHash;
     user.accountData.createdAt = new Date().toISOString();
-    user.accountData.banInfo = {isBanned: false, banDate: "" as unknown as Date,banReason:''};
+    user.accountData.banInfo = {isBanned: false, banDate: null,banReason: null};
     user.emailConfirmation.confirmationCode = uuidv4();
     user.emailConfirmation.expirationDate = add(new Date(), {
       hours: 1,

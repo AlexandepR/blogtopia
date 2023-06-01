@@ -1,4 +1,10 @@
-import { ForbiddenException, HttpException, HttpStatus } from "@nestjs/common";
+import {
+  ForbiddenException,
+  HttpException,
+  HttpStatus,
+  NotFoundException,
+  UnauthorizedException
+} from "@nestjs/common";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { CreateUserInputClassModel } from "../../../users/type/usersTypes";
 import { generateHash, isPasswordCorrect } from "../../../../utils/helpers";
@@ -31,7 +37,7 @@ export class LoginAuthUseCase implements ICommandHandler<LoginAuthCommand>{
   async execute(command: LoginAuthCommand) {
     await validateOrRejectModel(command.signInDto, loginInputClassModel);
     const user = await this.usersService.findUserByLoginOrEmail(command.signInDto.loginOrEmail);
-    if(user.accountData.banInfo.isBanned) throw new ForbiddenException()
+    if(user.accountData.banInfo.isBanned) throw new UnauthorizedException()
     if (user) {
       const isHash = await isPasswordCorrect(command.signInDto.password, user.accountData.passwordHash);
       if (!user || !user.emailConfirmation.isConfirmed || !isHash) throw new HttpException("", HttpStatus.UNAUTHORIZED);
@@ -39,8 +45,8 @@ export class LoginAuthUseCase implements ICommandHandler<LoginAuthCommand>{
       if (!createSession) throw new HttpException("", HttpStatus.UNAUTHORIZED);
       const token = await this.jwtService.сreateJWT(user);
       const refreshToken = await this.jwtService.createRefreshToken(user, createSession.deviceId);
-      // const refreshTokenCookie = `refreshToken=${refreshToken}; HttpOnly; Secure`;
-      const refreshTokenCookie = `refreshToken=${refreshToken}`;
+      const refreshTokenCookie = `refreshToken=${refreshToken}; HttpOnly; Secure`;
+      // const refreshTokenCookie = `refreshToken=${refreshToken}`;
       if (!token || !refreshToken || !refreshTokenCookie) throw new HttpException("", HttpStatus.UNAUTHORIZED);
       return { refreshTokenCookie, token };
     }

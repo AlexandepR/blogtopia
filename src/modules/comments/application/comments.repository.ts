@@ -28,14 +28,15 @@ export class CommentsRepository {
       .sort([[sortBy, sortDirection]])
       .skip(skip)
       .limit(pageSize);
-    const filterBanComment = filterBanCommentLikesInfo(comments, banUsers)
-    return comments;
+    return filterBanCommentLikesInfo(comments, banUsers)
+    // return comments;
   }
-  async getCommentsById(commentId: Types.ObjectId): Promise<CommentDocument | null> {
+  async getCommentsById(commentId: Types.ObjectId,filter?,banUsers?): Promise<CommentDocument | null> {
     const comments = await this.CommentModel
-      .findOne({ _id: commentId })
+      .findOne({$or: [{ _id: commentId },filter]})
     if (comments) {
-      return comments;
+      const filteredPosts = filterBanCommentLikesInfo(comments, banUsers)
+      return filteredPosts
     } else {
       return null;
     }

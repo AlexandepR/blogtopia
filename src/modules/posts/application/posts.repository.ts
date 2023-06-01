@@ -69,22 +69,6 @@ export class PostsRepository {
       .findOne({$or: [{_id: postId},filter]})
       // .findOne({$or: [{ _id: postId, filter ]});
     const filteredPosts = filterBanPostLikesInfo(post, banUsers)
-    // posts.map(post => {
-    //   if (post.extendedLikesInfo && post.extendedLikesInfo.newestLikes) {
-    //     post.extendedLikesInfo.newestLikes = post.extendedLikesInfo.newestLikes.filter(
-    //       like => !banUsers.includes(like.login)
-    //     );
-    //     post.extendedLikesInfo.likesData = post.extendedLikesInfo.likesData.filter(
-    //       like => !banUsers.includes(like.userLogin)
-    //     );
-    //     post.extendedLikesInfo.dislikesData = post.extendedLikesInfo.dislikesData.filter(
-    //       like => !banUsers.includes(like.userLogin)
-    //     );
-    //     post!.extendedLikesInfo.likesCount = post!.extendedLikesInfo.likesData.length;
-    //     post!.extendedLikesInfo.dislikesCount = post!.extendedLikesInfo.dislikesData.length;
-    //   }
-    //   return post;
-    // });
     if (filteredPosts) {
       return filteredPosts;
     } else {
