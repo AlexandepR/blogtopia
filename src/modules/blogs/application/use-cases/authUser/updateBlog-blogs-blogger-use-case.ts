@@ -1,13 +1,13 @@
-import { BlogDocument } from "../../type/blogs.schema";
+import { BlogDocument } from "../../../type/blogs.schema";
 import { BlogsRepository } from "../../blogs.repository";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { Types } from "mongoose";
-import { BlogInputClassModel } from "../../type/blogsType";
-import { validateOrRejectModel } from "../../../utils/validation.helpers";
+import { BlogInputClassModel } from "../../../type/blogsType";
+import { validateOrRejectModel } from "../../../../../utils/validation.helpers";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 
 
-export class updateBlogCommand {
+export class UpdateBlogCommand {
   constructor(
     public blogId: string,
     public UpdateBlogDto: BlogInputClassModel,
@@ -15,12 +15,12 @@ export class updateBlogCommand {
   }
 }
 
-@CommandHandler(updateBlogCommand)
-export class updateBlog implements ICommandHandler<updateBlogCommand>{
+@CommandHandler(UpdateBlogCommand)
+export class UpdateBlogByBloggerUseCase implements ICommandHandler<UpdateBlogCommand>{
   constructor(protected blogsRepository: BlogsRepository,
   ) {
   }
-  async execute(command: updateBlogCommand): Promise<BlogDocument> {
+  async execute(command: UpdateBlogCommand): Promise<BlogDocument> {
     await validateOrRejectModel(command.UpdateBlogDto, BlogInputClassModel);
     const blogId = new Types.ObjectId(command.blogId);
     const blog = await this.blogsRepository.findBlogById(blogId);
