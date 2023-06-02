@@ -47,6 +47,7 @@ export type ParamsUsersType = {
   sortBy: string,
   searchLoginTerm: string,
   searchEmailTerm: string,
+  banStatus?: "all" | "banned" | "notBanned"
 }
 export type QueryUsersPaginator = {
   filter: Record<string, any>,
@@ -54,6 +55,7 @@ export type QueryUsersPaginator = {
   pageNumber: number,
   sortDirection: "asc" | "desc",
   sortBy: string,
+  banStatus: any,
 }
 
 export type UserType = {

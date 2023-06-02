@@ -19,26 +19,36 @@ export const parseQueryPaginator = (query: QueryType): QueryType => {
 };
 export const parseQueryUsersPaginator = (query: ParamsUsersType): QueryUsersPaginator => {
   let filter = {};
-  if (query.searchLoginTerm) {
-    filter = { "accountData.login": { $regex: query.searchLoginTerm, $options: "i" } };
-  }
-  if (query.searchEmailTerm) {
-    filter = { "accountData.email": { $regex: query.searchEmailTerm, $options: "i" } };
-  }
-  if (query.searchLoginTerm && query.searchEmailTerm) {
+  // if (query.searchLoginTerm) {
+  //   filter = { "accountData.login": { $regex: query.searchLoginTerm, $options: "i" } };
+  // }
+  // if (query.searchEmailTerm) {
+  //   filter = { "accountData.email": { $regex: query.searchEmailTerm, $options: "i" } };
+  // }
+  if (query.searchLoginTerm || query.searchEmailTerm) {
     filter = {
       $or: [
-        { "accountData.login": { $regex: query.searchLoginTerm, $options: "i" } },
-        { "accountData.email": { $regex: query.searchEmailTerm, $options: "i" } },
+        {
+          "accountData.login": { $regex: `${query.searchLoginTerm}`, $options: "i" },
+        },
+        {
+          "accountData.email": { $regex: `${query.searchEmailTerm}`, $options: "i" }
+        },
       ]
     };
   }
+  console.log(query.banStatus,'query.banStatus---------1-------');
+  const banStatus = query.banStatus === 'banned' ? false : query.banStatus === 'notBanned' ? true : ''
+  const banfilter = banStatus !== '' ? { "accountData.banInfo.isBanned": { $nin: banStatus }} : {}
   return {
-    filter: ({ "accountData.banInfo.isBanned": { $nin: true }, ...filter }),
+    // "all" | "banned" | "notBanned"
+    // filter: ({ "accountData.banInfo.isBanned": { $nin: true }, ...filter }),
+    filter: filter,
     pageNumber: query.pageNumber ? +query.pageNumber : 1,
     pageSize: query.pageSize ? +query.pageSize : 10,
     sortBy: (query.sortBy || "createdAt") as string,
-    sortDirection: query.sortDirection === "asc" ? "asc" : "desc"
+    sortDirection: query.sortDirection === "asc" ? "asc" : "desc",
+    banStatus: banfilter
   };
 };
 

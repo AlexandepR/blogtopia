@@ -20,19 +20,24 @@ export class UsersRepository {
     pageSize: number,
     filter: any,
     sortBy: string,
-    sortDirection: "asc" | "desc"
+    sortDirection: "asc" | "desc",
+    banFilterStatus?: any,
   ): Promise<UserDocument[]> {
     const sortedUsers = `accountData.${sortBy}`;
+    console.log(banFilterStatus,'=========================banFilterStatus');
     const users = await this.UserModel
-      .find(filter, {
+      // .find({ banFilterStatus })
+      .find({ ...banFilterStatus, ...filter })
+      // , {
+      // .find({ or: [banFilterStatus, filter] }, {
           // _id: 0,
           // id: "$_id",
           // "login": 1,
           // "email": 1,
           // "createdAt": 1
           // 'password': 0,
-        }
-      )
+        // }
+      // )
       .sort([[sortedUsers, sortDirection]])
       .skip(skip)
       .limit(pageSize);

@@ -21,14 +21,14 @@ export class GetUsersByAdminUseCase implements ICommandHandler<GetUsersByAdminCo
   ) {
   }
   async execute(command: GetUsersByAdminCommand): Promise<PaginationType<GetUsersOutputModelType[]>> {
-    const { filter, pageSize, pageNumber, sortDirection, sortBy } = parseQueryUsersPaginator(command.query);
+    const { filter, pageSize, pageNumber, sortDirection, sortBy, banStatus } = parseQueryUsersPaginator(command.query);
     // const banUsers: Array<string> = await this.usersRepository.getBannedUsers();
     // const filterWithBan = ({ "accountData.banInfo.isBanned": { $nin: true }, ...filter });
     const totalCountUsers = await this.usersRepository.getTotalCountUsers(filter);
     const skip = skipPage(pageNumber, pageSize);
     const pagesCount = pagesCounter(totalCountUsers, pageSize);
     // const getTotalCount = await this.usersRepository.getTotalCountUsers(filter)
-    const allUsers = await this.usersRepository.getUsers(skip, pageSize, filter, sortBy, sortDirection);
+    const allUsers = await this.usersRepository.getUsers(skip, pageSize, filter, sortBy, sortDirection,banStatus);
     if (allUsers) {
       const users = allUsers.map(({
                                     _id,

@@ -45,12 +45,12 @@ export class UsersAdminController {
     return await this.commandBus.execute(command);
   }
   @HttpCode(HttpStatus.NO_CONTENT)
-  @Put(":userId/ban")
+  @Put(":id/ban")
   async updateBanInfo(
-    @Param("userId") userId: string,
+    @Param("id") id: string,
     @Body() dto: InfoBanStatusClassModel,
   ) {
-    const command = new UpdateBanInfoByAdminCommand(dto, userId);
+    const command = new UpdateBanInfoByAdminCommand(dto, id);
     return await this.commandBus.execute(command);
   }
   @Post()

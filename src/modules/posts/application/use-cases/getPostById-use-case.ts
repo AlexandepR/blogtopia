@@ -52,10 +52,11 @@ export class GetPostByIdUseCase implements ICommandHandler<GetPostByIdCommand> {
     const post = await this.postsRepository.findPostById(postId,filter);
     if (!post) throw new HttpException("", HttpStatus.NOT_FOUND);
     const filterBanUserLikes = filterBanPostLikesInfo(post,banUsers)
-    if (filterBanUserLikes) {
-      const userId = command.user._id;
-      // const userStatus = await this.postsRepository.findLikesStatus(postId, userId);
-      const userStatus = findLikeStatusForPost(filterBanUserLikes, userId);
+    // if (filterBanUserLikes) {
+    const userStatus = command.user ? findLikeStatusForPost(filterBanUserLikes, command.user._id) : 'None';
+      // const userId = command.user._id;
+      // // const userStatus = await this.postsRepository.findLikesStatus(postId, userId);
+      // const userStatus = findLikeStatusForPost(filterBanUserLikes, userId);
       const sortNewestLikes = sortNewestLikesForPost(post)
       return {
         id: post._id.toString(),
@@ -72,7 +73,7 @@ export class GetPostByIdUseCase implements ICommandHandler<GetPostByIdCommand> {
           newestLikes: sortNewestLikes
         }
       };
-    }
+    // }
     throw new NotFoundException()
   }
 }
