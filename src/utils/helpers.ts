@@ -3,7 +3,7 @@ import * as bcrypt from "bcrypt";
 import { User } from "../modules/users/type/users.schema";
 import { PostLikesType } from "../modules/posts/type/postsType";
 import { PostDocument } from "../modules/posts/type/posts.schema";
-import { ObjectId, Types } from "mongoose";
+import { Types } from "mongoose";
 import { CommentDocument } from "../modules/comments/type/comments.schema";
 import { LikesType } from "../modules/comments/type/commentsType";
 import { QueryType } from "../modules/blogs/type/blogsType";
@@ -29,12 +29,12 @@ export const parseQueryUsersPaginator = (query: ParamsUsersType): QueryUsersPagi
     filter = {
       $or: [
         { "accountData.login": { $regex: query.searchLoginTerm, $options: "i" } },
-        { "accountData.email": { $regex: query.searchEmailTerm, $options: "i" } }
+        { "accountData.email": { $regex: query.searchEmailTerm, $options: "i" } },
       ]
     };
   }
   return {
-    filter: filter,
+    filter: ({ "accountData.banInfo.isBanned": { $nin: true }, ...filter }),
     pageNumber: query.pageNumber ? +query.pageNumber : 1,
     pageSize: query.pageSize ? +query.pageSize : 10,
     sortBy: (query.sortBy || "createdAt") as string,
@@ -145,15 +145,24 @@ export const updateCommentLikesInfo = (comment: CommentDocument, likeStatus: str
 
 export const filterByNameTermOrUserLogin = (searchNameTerm: string, field: string, userLogin: string) => {
   const findField = `${field}.userLogin`
-  const filter = searchNameTerm || userLogin
-    ? {
-      $or: [
-        { name: { $regex: `${ searchNameTerm }`, $options: "i" } },
-        { [findField] : userLogin }]
-    }
-    : {};
-    return filter
+  const regexSearchNameTerm = searchNameTerm ? new RegExp(searchNameTerm, 'i') : '';
+  // const filter = searchNameTerm || userLogin
+  //   ? {
+  //     $or: [
+  //       { name: { $regex: searchNameTerm, $options: "i" } },
+  //       { [findField] : userLogin }]
+  //   }
+  //   : {};
+    return regexSearchNameTerm || userLogin
+      ? {
+        $or: [
+          { name: regexSearchNameTerm },
+          { [findField]: userLogin }
+        ]
+      }
+      : {}
 };
+
 
 export const filterBanPostsLikesInfo = (posts, banUsers) => {
   return posts.map(post => {

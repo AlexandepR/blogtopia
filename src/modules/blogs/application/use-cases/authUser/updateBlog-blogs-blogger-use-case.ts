@@ -1,6 +1,6 @@
 import { BlogDocument } from "../../../type/blogs.schema";
 import { BlogsRepository } from "../../blogs.repository";
-import { HttpException, HttpStatus } from "@nestjs/common";
+import { BadRequestException, HttpException, HttpStatus } from "@nestjs/common";
 import { Types } from "mongoose";
 import { BlogInputClassModel } from "../../../type/blogsType";
 import { validateOrRejectModel } from "../../../../../utils/validation.helpers";
@@ -22,6 +22,7 @@ export class UpdateBlogByBloggerUseCase implements ICommandHandler<UpdateBlogCom
   }
   async execute(command: UpdateBlogCommand): Promise<BlogDocument> {
     await validateOrRejectModel(command.UpdateBlogDto, BlogInputClassModel);
+    if(!command.UpdateBlogDto) {throw new BadRequestException()}
     const blogId = new Types.ObjectId(command.blogId);
     const blog = await this.blogsRepository.findBlogById(blogId);
     if (!blog) throw new HttpException("", HttpStatus.NOT_FOUND);

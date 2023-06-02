@@ -1,6 +1,12 @@
 import { UserDocument } from "../../../../users/type/users.schema";
 import { BlogsRepository } from "../../blogs.repository";
-import { HttpException, HttpStatus } from "@nestjs/common";
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  NotFoundException,
+  UnauthorizedException
+} from "@nestjs/common";
 import { BlogInputClassModel, BlogType } from "../../../type/blogsType";
 import { validateOrRejectModel } from "../../../../../utils/validation.helpers";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
@@ -18,6 +24,7 @@ export class CreateBlogByBloggerUseCase implements ICommandHandler<CreateBlogCom
   }
   async execute(command: CreateBlogCommand): Promise<BlogType> {
     await validateOrRejectModel(command.dto, BlogInputClassModel);
+    if(!command.user) {throw new BadRequestException()}
     const createBlog = await this.blogsRepository.createBlog(command.dto,command.user);
     if (!createBlog) throw new HttpException("", HttpStatus.NOT_FOUND);
     return {

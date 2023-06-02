@@ -58,15 +58,6 @@ export class BlogsBloggerController {
     const command = new GetBlogByIdCommand(id, user);
     return this.commandBus.execute(command);
   }
-  // @Get(":id/posts")
-  // async GetPostsByBlog(
-  //   @Req() req:Request,
-  //   @Param("id")
-  //     id: string,
-  //   @Query() query: ParamsType
-  // ) {
-  //   return await this.blogsService.getPosts(id, query, req);
-  // }
   @Post('')
   async createBlog(
     @Body() dto: BlogInputClassModel,
