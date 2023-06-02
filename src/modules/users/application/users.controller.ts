@@ -52,9 +52,9 @@ export class UsersController {
   @Delete(":id")
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteUser(
-    @Param(ValidationPipe)
-      params: checkObjectId) {
-    return await this.usersService.deleteUser(params.id);
+    @Param('id')
+      id: string) {
+    return await this.usersService.deleteUser(id);
   }
   @BasicAuth()
   @Delete()

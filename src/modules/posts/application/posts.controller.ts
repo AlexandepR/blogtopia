@@ -4,7 +4,7 @@ import {
   Delete,
   Get,
   HttpCode,
-  HttpStatus,
+  HttpStatus, NotFoundException,
   Param,
   Post,
   Put,
@@ -52,22 +52,24 @@ export class PostsController {
   async getPost(
     // @Req() req: Request,
     @UserFromRequestDecorator() user: UserDocument,
-    @Param(ValidationPipe)
-      param: checkObjectId
+    @Param('id')
+      id: string
   ) {
-    const command = new GetPostByIdCommand(param.id,user)
+    if(!id) throw new NotFoundException()
+    const command = new GetPostByIdCommand(id,user)
     return await this.commandBus.execute(command)
     // return await this.postsService.getPost(id,req);
   }
   @Public()
   @Get("/:id/comments")
   async getCommentByPost(
-    @Param(ValidationPipe)
-      param: checkObjectId,
+    @Param('id')
+      id: string,
     @Query()
       query: ParamsType
   ) {
-    const command = new GetCommentsByPostCommand(query, param.id)
+    if(!id) throw new NotFoundException()
+    const command = new GetCommentsByPostCommand(query,id)
     return await this.commandBus.execute(command)
     // return await this.postsService.getCommentsByPost(id,query);
   }
@@ -75,11 +77,12 @@ export class PostsController {
   async createCommentForPost(
     @Req() req: Request,
     @UserFromRequestDecorator() user: UserDocument,
-    @Param(ValidationPipe)
-      param: checkObjectId,
+    @Param('postId')
+      id: string,
     @Body() dto:CreateCommentInputClassModel
   ){
-    const command = new CreateCommentForPostCommand(param.id,dto,user)
+    if(!id) throw new NotFoundException()
+    const command = new CreateCommentForPostCommand(id,dto,user)
     return await this.commandBus.execute(command)
     // return await this.postsService.createCommentForPost(postId,dto, user)
   }
@@ -95,11 +98,12 @@ export class PostsController {
   @Put(":id")
   @HttpCode(HttpStatus.NO_CONTENT)
   async updatePost(
-    @Param(ValidationPipe)
-      param: checkObjectId,
+    @Param("id")
+      id: string,
     @Body() dto: CreatePostInputClassModel
   ) {
-    const command = new UpdatePostCommand(dto,param.id)
+    if(!id) throw new NotFoundException()
+    const command = new UpdatePostCommand(dto,id)
     return await this.commandBus.execute(command)
      // await this.postsService.updatePost(id, dto);
      // return
@@ -109,11 +113,12 @@ export class PostsController {
   async updateLikesInfoByPostId(
     // @Req() req: Request,
     @UserFromRequestDecorator()user:UserDocument,
-    @Param(ValidationPipe)
-      params: checkObjectId,
+    @Param("id")
+      id: string,
     @Body() dto: likeStatusInputClassModel
   ) {
-    const command = new UpdatePostLikeStatusCommand(dto, params.id, user)
+    if(!id) throw new NotFoundException()
+    const command = new UpdatePostLikeStatusCommand(dto, id, user)
       return await this.commandBus.execute(command)
       // return await this.postsService.updateLikesInfo(dto,params.id,req)
   }
@@ -121,11 +126,12 @@ export class PostsController {
   @Delete(":id")
   @HttpCode(HttpStatus.NO_CONTENT)
   async deletePost(
-    @Param(ValidationPipe)
-      param: checkObjectId,
+    @Param('id')
+      id: string,
   )
   {
-    const command = new DeletePostByIdCommand(param.id)
+    if(!id) throw new NotFoundException()
+    const command = new DeletePostByIdCommand(id)
     return await this.commandBus.execute(command)
     // return await this.postsService.deletePost(id);
     // return `This blog #${id} removes`;

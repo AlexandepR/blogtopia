@@ -65,9 +65,9 @@ export class UsersAdminController {
   @Delete(":id")
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteUser(
-    @Param(ValidationPipe)
-      params: checkObjectId) {
-    const command = new DeleteUserByAdminCommand(params.id);
+    @Param('id')
+      id: string) {
+    const command = new DeleteUserByAdminCommand(id);
     return await this.commandBus.execute(command);
   }
   @Delete()
