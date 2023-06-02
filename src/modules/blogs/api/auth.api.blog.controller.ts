@@ -100,17 +100,17 @@ export class BlogsBloggerController {
 
   @Put(":blogId/posts/:postId")
   async updatePost(
-    @Param("blogId") blogId: string,
-    @Param("postId") postId: string,
+    @Param(ValidationPipe) paramsBlogId: checkObjectId,
+    @Param(ValidationPipe) paramsPostId: checkObjectId,
     @Body() body: updatePostForBlogInputClassModel,
   ) {
     const UpdatePostDto: CreatePostInputClassModel = {
       title: body.title,
       shortDescription: body.shortDescription,
       content: body.content,
-      blogId: blogId,
+      blogId: paramsBlogId.id,
     }
-    const command = new UpdatePostByBlogCommand(postId, UpdatePostDto);
+    const command = new UpdatePostByBlogCommand(paramsPostId.id, UpdatePostDto);
     return await this.commandBus.execute(command);
   }
   @Delete(":id")
@@ -123,11 +123,10 @@ export class BlogsBloggerController {
   @Delete(":blogId/posts/:postId")
   @HttpCode(HttpStatus.NO_CONTENT)
   async deletePostByBlog (
-    @Param("blogId") blogId: string,
-    @Param("postId") postId: string,
+    @Param(ValidationPipe) paramsBlogId: checkObjectId,
+    @Param(ValidationPipe) paramsPostId: checkObjectId,
   ){
-    const command = new DeletePostByBlogCommand(blogId, postId);
+    const command = new DeletePostByBlogCommand(paramsBlogId.id, paramsPostId.id);
     await this.commandBus.execute(command);
-    return `This posts #${postId} removes`;
   }
 }
