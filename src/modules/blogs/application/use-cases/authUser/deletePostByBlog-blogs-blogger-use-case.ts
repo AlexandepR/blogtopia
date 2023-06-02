@@ -1,13 +1,15 @@
-import { NotFoundException } from "@nestjs/common";
+import { ForbiddenException, NotFoundException } from "@nestjs/common";
 import { BlogsRepository } from "../../blogs.repository";
 import { Types } from "mongoose";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { PostsRepository } from "../../../../posts/application/posts.repository";
+import { UserDocument } from "../../../../users/type/users.schema";
 
 export class DeletePostByBlogCommand {
   constructor(
       public blogId: string,
-      public postId: string
+      public postId: string,
+      public user: UserDocument,
   ){}
 }
 
@@ -21,6 +23,7 @@ export class DeletePostByBlogByBloggerUseCase implements ICommandHandler<DeleteP
   async execute(command: DeletePostByBlogCommand): Promise<boolean> {
     const blog = await this.blogsRepository.findBlogById(new Types.ObjectId(command.blogId));
     const post = await this.postsRepository.findPostById(new Types.ObjectId(command.postId));
+    if(blog.blogOwnerInfo.userLogin !== command.user.accountData.login) throw new ForbiddenException()
     if (!blog && !post) throw new NotFoundException()
     return await this.postsRepository.delete(new Types.ObjectId(command.postId));
   }

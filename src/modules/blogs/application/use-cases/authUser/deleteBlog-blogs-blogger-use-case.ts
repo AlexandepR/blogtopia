@@ -1,11 +1,13 @@
-import { HttpException, HttpStatus } from "@nestjs/common";
+import { ForbiddenException, HttpException, HttpStatus } from "@nestjs/common";
 import { BlogsRepository } from "../../blogs.repository";
 import { Types } from "mongoose";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
+import { UserDocument } from "../../../../users/type/users.schema";
 
 export class DeleteBlogCommand {
   constructor(
-    public id: string
+    public id: string,
+    public user: UserDocument
   ){}
 }
 
@@ -17,6 +19,7 @@ export class DeleteBlogByBloggerUseCase implements ICommandHandler<DeleteBlogCom
   async execute(command: DeleteBlogCommand): Promise<boolean> {
     const blogId = new Types.ObjectId(command.id);
     const blog = await this.blogsRepository.findBlogById(blogId);
+    if(blog.blogOwnerInfo.userLogin !== command.user.accountData.login) throw new ForbiddenException()
     if (!blog) throw new HttpException("", HttpStatus.NOT_FOUND);
     return await this.blogsRepository.delete(blogId);
   }

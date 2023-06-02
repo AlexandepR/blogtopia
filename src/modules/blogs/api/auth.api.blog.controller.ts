@@ -4,7 +4,7 @@ import {
   Delete,
   Get,
   HttpCode,
-  HttpStatus,
+  HttpStatus, NotFoundException,
   Param,
   Post,
   Put,
@@ -55,6 +55,7 @@ export class BlogsBloggerController {
     @Param("id")
       id: string
   ) {
+    if(!id) throw new NotFoundException()
     const command = new GetBlogByIdCommand(id, user);
     return this.commandBus.execute(command);
   }
@@ -73,6 +74,7 @@ export class BlogsBloggerController {
     @UserFromRequestDecorator()user:UserDocument,
     @Body() dto: createPostForBlogInputClassModel,
   ) {
+    if(!blogId) throw new NotFoundException()
     const command = new CreatePostByBlogCommand(user, dto, blogId);
     return await this.commandBus.execute(command);
   }
@@ -80,11 +82,12 @@ export class BlogsBloggerController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateBlog(
     @UserFromRequestDecorator()user:UserDocument,
-    @Param(ValidationPipe)
-      params: checkObjectId,
+    @Param("id")
+      id: string,
     @Body() dto: BlogInputClassModel,
   ) {
-    const command = new UpdateBlogCommand(params.id, dto, user);
+    if(!id) throw new NotFoundException()
+    const command = new UpdateBlogCommand(id, dto, user);
     const putBlog = await this.commandBus.execute(command);
     if(!putBlog) return (HttpStatus.NOT_FOUND)
     return putBlog
@@ -92,33 +95,39 @@ export class BlogsBloggerController {
 
   @Put(":blogId/posts/:postId")
   async updatePost(
-    @Param(ValidationPipe) paramsBlogId: checkObjectId,
-    @Param(ValidationPipe) paramsPostId: checkObjectId,
+    @UserFromRequestDecorator()user:UserDocument,
+    @Param("blogId") blogId: string,
+    @Param("postId") postId: string,
     @Body() body: updatePostForBlogInputClassModel,
   ) {
+    if(!blogId || !postId) throw new NotFoundException()
     const UpdatePostDto: CreatePostInputClassModel = {
       title: body.title,
       shortDescription: body.shortDescription,
       content: body.content,
-      blogId: paramsBlogId.id,
+      blogId: blogId,
     }
-    const command = new UpdatePostByBlogCommand(paramsPostId.id, UpdatePostDto);
+    const command = new UpdatePostByBlogCommand(postId, UpdatePostDto, user);
     return await this.commandBus.execute(command);
   }
   @Delete(":id")
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteBlog (
-    @Param(ValidationPipe)
-      params: checkObjectId) {
-    return await this.commandBus.execute(new DeleteBlogCommand(params.id));
+    @UserFromRequestDecorator()user:UserDocument,
+    @Param('id')
+      id: string) {
+    if(!id) throw new NotFoundException()
+    return await this.commandBus.execute(new DeleteBlogCommand(id,user));
   }
   @Delete(":blogId/posts/:postId")
   @HttpCode(HttpStatus.NO_CONTENT)
   async deletePostByBlog (
-    @Param(ValidationPipe) paramsBlogId: checkObjectId,
-    @Param(ValidationPipe) paramsPostId: checkObjectId,
+    @UserFromRequestDecorator()user:UserDocument,
+    @Param("blogId") blogId: string,
+    @Param("postId") postId: string,
   ){
-    const command = new DeletePostByBlogCommand(paramsBlogId.id, paramsPostId.id);
+    if(!blogId || !postId) throw new NotFoundException()
+    const command = new DeletePostByBlogCommand(blogId, postId,user);
     await this.commandBus.execute(command);
   }
 }

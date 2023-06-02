@@ -154,34 +154,33 @@ export const updateCommentLikesInfo = (comment: CommentDocument, likeStatus: str
 };
 
 export const filterByNameTermOrUserLogin = (searchNameTerm: string, field: string, userLogin: string) => {
-  const findField = `${field}.userLogin`
+  // const findField = `${field}.userLogin`
+  // const regexSearchNameTerm = searchNameTerm ? new RegExp(searchNameTerm, 'i') : '';
+  //
+  // return {
+  //   $or: [
+  //     { name: { $regex: `${searchNameTerm}`, $options: "i" }, },
+  //     {
+  //       // [`${field}.userLogin`] : userLogin
+  //       "blogOwnerInfo.userLogin" : userLogin
+  //     }],
+  // };
+  const findField = `${field}.userLogin`;
   const regexSearchNameTerm = searchNameTerm ? new RegExp(searchNameTerm, 'i') : '';
 
-  return {
-    $or: [
-      {
-        name: { $regex: `${searchNameTerm}`, $options: "i" },
-      },
-      {
-        // [`${field}.userLogin`] : userLogin
-        "blogOwnerInfo.userLogin" : userLogin
-      }],
-  };
-  // const filter = searchNameTerm || userLogin
-  //   ? {
-  //     $or: [
-  //       { name: { $regex: searchNameTerm, $options: "i" } },
-  //       { [findField] : userLogin }]
-  //   }
-  //   : {};
-  //   return regexSearchNameTerm || userLogin
-  //     ? {
-  //       $or: [
-  //         { name: regexSearchNameTerm },
-  //         { [findField]: userLogin }
-  //       ]
-  //     }
-  //     : {}
+  if (searchNameTerm) {
+    return {
+      $and: [
+        { name: { $regex: regexSearchNameTerm } },
+        { [findField]: userLogin }
+      ]
+    };
+  } else {
+    return {
+      [findField]: userLogin
+    };
+  }
+
 };
 
 
@@ -222,8 +221,8 @@ export const filterBanCommentLikesInfo = (comment, banUsers) => {
 export const filterBanPostLikesInfo = (post, banUsers) => {
   if(!post) throw new HttpException("", HttpStatus.NOT_FOUND);
   // return post.map(post => {
-  // if (post.extendedLikesInfo && post.extendedLikesInfo.newestLikes) {
-  if (post.extendedLikesInfo) {
+  if (post.extendedLikesInfo && banUsers) {
+  // if (post.extendedLikesInfo) {
     post.extendedLikesInfo.newestLikes = post.extendedLikesInfo.newestLikes.filter(
       like => !banUsers.includes(like.login)
     );

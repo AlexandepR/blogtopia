@@ -52,22 +52,22 @@ export class PostsController {
   async getPost(
     // @Req() req: Request,
     @UserFromRequestDecorator() user: UserDocument,
-    @Param("id")
-      id: string
+    @Param(ValidationPipe)
+      param: checkObjectId
   ) {
-    const command = new GetPostByIdCommand(id,user)
+    const command = new GetPostByIdCommand(param.id,user)
     return await this.commandBus.execute(command)
     // return await this.postsService.getPost(id,req);
   }
   @Public()
   @Get("/:id/comments")
   async getCommentByPost(
-    @Param("id")
-      id: string,
+    @Param(ValidationPipe)
+      param: checkObjectId,
     @Query()
       query: ParamsType
   ) {
-    const command = new GetCommentsByPostCommand(query, id)
+    const command = new GetCommentsByPostCommand(query, param.id)
     return await this.commandBus.execute(command)
     // return await this.postsService.getCommentsByPost(id,query);
   }
@@ -75,11 +75,11 @@ export class PostsController {
   async createCommentForPost(
     @Req() req: Request,
     @UserFromRequestDecorator() user: UserDocument,
-    @Param('postId')
-    postId: string,
+    @Param(ValidationPipe)
+      param: checkObjectId,
     @Body() dto:CreateCommentInputClassModel
   ){
-    const command = new CreateCommentForPostCommand(postId,dto,user)
+    const command = new CreateCommentForPostCommand(param.id,dto,user)
     return await this.commandBus.execute(command)
     // return await this.postsService.createCommentForPost(postId,dto, user)
   }
@@ -95,11 +95,11 @@ export class PostsController {
   @Put(":id")
   @HttpCode(HttpStatus.NO_CONTENT)
   async updatePost(
-    @Param("id")
-      id: string,
+    @Param(ValidationPipe)
+      param: checkObjectId,
     @Body() dto: CreatePostInputClassModel
   ) {
-    const command = new UpdatePostCommand(dto,id)
+    const command = new UpdatePostCommand(dto,param.id)
     return await this.commandBus.execute(command)
      // await this.postsService.updatePost(id, dto);
      // return
@@ -121,9 +121,11 @@ export class PostsController {
   @Delete(":id")
   @HttpCode(HttpStatus.NO_CONTENT)
   async deletePost(
-    @Param("id")
-      id: string) {
-    const command = new DeletePostByIdCommand(id)
+    @Param(ValidationPipe)
+      param: checkObjectId,
+  )
+  {
+    const command = new DeletePostByIdCommand(param.id)
     return await this.commandBus.execute(command)
     // return await this.postsService.deletePost(id);
     // return `This blog #${id} removes`;

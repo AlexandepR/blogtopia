@@ -30,7 +30,11 @@ export class UpdatePostLikeStatusUseCase implements ICommandHandler<UpdatePostLi
     const userId = command.user._id;
     const postId = new Types.ObjectId(command.id)
     const likeStatus = command.dto.likeStatus
-    const post = await this.postsRepository.findPostById(postId);
+    const banUsers: Array<string> = await this.usersRepository.getBannedUsers();
+    const filter = (
+      { "postOwnerInfo.userLogin": { $nin: banUsers }
+      });
+    const post = await this.postsRepository.findPostById(postId,filter);
     if (!userId || !post) if (!post) throw new HttpException("", HttpStatus.NOT_FOUND);
     const user =  await this.usersRepository.findUserById(userId)
     const {accountData: { login: userLogin }} = user!

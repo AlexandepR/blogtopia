@@ -70,7 +70,6 @@ export class BlogsRepository {
     return blog;
   }
   async save(blog: BlogDocument) {
-    blog.createdAt = undefined
     return await blog.save();
   }
   async getTotalCountBlogs(filter: any): Promise<number> {

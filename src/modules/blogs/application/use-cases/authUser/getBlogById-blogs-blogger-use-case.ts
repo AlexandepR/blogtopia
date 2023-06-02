@@ -3,7 +3,7 @@ import { UserDocument } from "../../../../users/type/users.schema";
 import { BlogDocument } from "../../../type/blogs.schema";
 import { filterByNameTermOrUserLogin, pagesCounter, parseQueryPaginator, skipPage } from "../../../../../utils/helpers";
 import { BlogsRepository } from "../../blogs.repository";
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { ForbiddenException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { CreatePostInputClassModel } from "../../../../posts/type/postsType";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { Types } from "mongoose";
@@ -24,6 +24,7 @@ export class GetBlogByIdByBloggerUseCase implements ICommandHandler<GetBlogByIdC
   async execute(command: GetBlogByIdCommand): Promise<BlogType> {
     const blogId = new Types.ObjectId(command.id);
     const blog = await this.blogsRepository.findBlogById(blogId);
+    if(blog.blogOwnerInfo.userLogin !== command.user.accountData.login) throw new ForbiddenException()
     if (!blog) throw new HttpException("", HttpStatus.NOT_FOUND);
     return {
       id: blog._id.toString(),
