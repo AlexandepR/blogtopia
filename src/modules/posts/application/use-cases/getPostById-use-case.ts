@@ -1,6 +1,7 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { validateOrRejectModel } from "../../../../utils/validation.helpers";
 import {
+  filterBanCommentLikesInfo, filterBanPostLikesInfo, findLikeStatusForPost,
   idParamsValidator,
   pagesCounter,
   parseQueryPaginator,
@@ -50,9 +51,11 @@ export class GetPostByIdUseCase implements ICommandHandler<GetPostByIdCommand> {
     });
     const post = await this.postsRepository.findPostById(postId,filter);
     if (!post) throw new HttpException("", HttpStatus.NOT_FOUND);
-    if (post) {
+    const filterBanUserLikes = filterBanPostLikesInfo(post,banUsers)
+    if (filterBanUserLikes) {
       const userId = command.user._id;
-      const userStatus = await this.postsRepository.findLikesStatus(postId, userId);
+      // const userStatus = await this.postsRepository.findLikesStatus(postId, userId);
+      const userStatus = findLikeStatusForPost(filterBanUserLikes, userId);
       const sortNewestLikes = sortNewestLikesForPost(post)
       return {
         id: post._id.toString(),

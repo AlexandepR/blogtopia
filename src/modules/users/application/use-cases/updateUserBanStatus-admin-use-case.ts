@@ -8,29 +8,28 @@ import { SecurityRepository } from "../../../security/application/security.repos
 export class UpdateBanInfoByAdminCommand {
   constructor(
     public dto: InfoBanStatusClassModel,
-    public userId: string,
+    public userId: string
   ) {
   }
 }
 
 @CommandHandler(UpdateBanInfoByAdminCommand)
-export class UpdateBanInfoByAdminUseCase implements ICommandHandler<UpdateBanInfoByAdminCommand>{
+export class UpdateBanInfoByAdminUseCase implements ICommandHandler<UpdateBanInfoByAdminCommand> {
   constructor(
     protected usersRepository: UsersRepository,
-    protected securityRepository: SecurityRepository,
+    protected securityRepository: SecurityRepository
   ) {
   }
   async execute(command: UpdateBanInfoByAdminCommand) {
-    if(command.dto.isBanned) {
-     await this.securityRepository.terminateAllSessions(new Types.ObjectId(command.userId));
-    }
-    const user = await this.usersRepository.findUserById(new Types.ObjectId(command.userId))
-    if(!user) throw new NotFoundException()
-    if(command.dto) {
-    user.banUser(command.dto)
+    const user = await this.usersRepository.findUserById(new Types.ObjectId(command.userId));
+    if (!user) throw new NotFoundException();
+    if (command.dto.isBanned) {
+      user.banUser(command.dto);
+      await this.securityRepository.terminateAllSessions(new Types.ObjectId(command.userId));
+      return await this.usersRepository.save(user);
     } else {
-      user.unBanUser()
+      user.unBanUser();
+      return await this.usersRepository.save(user);
     }
-    return await this.usersRepository.save(user)
   }
 }

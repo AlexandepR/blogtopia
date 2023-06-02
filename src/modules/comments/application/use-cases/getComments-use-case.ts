@@ -2,7 +2,7 @@ import { commentContentInputClassModel, CommentReturnType, CommentType } from ".
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { CommentsRepository } from "../comments.repository";
 import { validateOrRejectModel } from "../../../../utils/validation.helpers";
-import { idParamsValidator } from "../../../../utils/helpers";
+import { filterBanCommentLikesInfo, idParamsValidator } from "../../../../utils/helpers";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { Types } from "mongoose";
 import { UserDocument } from "../../../users/type/users.schema";
@@ -34,19 +34,20 @@ export class GetCommentUseCase implements ICommandHandler<GetCommentCommand> {
     });
     const comment = await this.commentsRepository.getCommentsById(commentId,filter,banUsers);
     if (!comment) throw new HttpException('', HttpStatus.NOT_FOUND)
-    if (comment) {
+    const filterBanUserLikes = filterBanCommentLikesInfo(comment,banUsers)
+    if (filterBanUserLikes) {
       const getMyStatusLikeInfo = await this.commentsRepository.getMyStatusLikeInfo(commentId, userId);
       return {
-        id: comment._id.toString(),
-        content: comment.content,
+        id: filterBanUserLikes._id.toString(),
+        content: filterBanUserLikes.content,
         commentatorInfo: {
-          userId: comment.commentatorInfo.userId.toString(),
-          userLogin: comment.commentatorInfo.userLogin
+          userId: filterBanUserLikes.commentatorInfo.userId.toString(),
+          userLogin: filterBanUserLikes.commentatorInfo.userLogin
         },
-        createdAt: comment.createdAt,
+        createdAt: filterBanUserLikes.createdAt,
         likesInfo: {
-          likesCount: comment.likesInfo.likesCount,
-          dislikesCount: comment.likesInfo.dislikesCount,
+          likesCount: filterBanUserLikes.likesInfo.likesCount,
+          dislikesCount: filterBanUserLikes.likesInfo.dislikesCount,
           myStatus: getMyStatusLikeInfo,
         }
       };

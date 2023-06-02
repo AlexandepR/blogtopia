@@ -79,11 +79,12 @@ export class BlogsBloggerController {
   @Put(":id")
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateBlog(
+    @UserFromRequestDecorator()user:UserDocument,
     @Param(ValidationPipe)
       params: checkObjectId,
     @Body() dto: BlogInputClassModel,
   ) {
-    const command = new UpdateBlogCommand(params.id, dto);
+    const command = new UpdateBlogCommand(params.id, dto, user);
     const putBlog = await this.commandBus.execute(command);
     if(!putBlog) return (HttpStatus.NOT_FOUND)
     return putBlog

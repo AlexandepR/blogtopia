@@ -37,7 +37,7 @@ export class LoginAuthUseCase implements ICommandHandler<LoginAuthCommand>{
   async execute(command: LoginAuthCommand) {
     await validateOrRejectModel(command.signInDto, loginInputClassModel);
     const user = await this.usersService.findUserByLoginOrEmail(command.signInDto.loginOrEmail);
-    if(user.accountData.banInfo.isBanned) throw new UnauthorizedException()
+    if(!user || user.accountData.banInfo.isBanned) throw new UnauthorizedException()
     if (user) {
       const isHash = await isPasswordCorrect(command.signInDto.password, user.accountData.passwordHash);
       if (!user || !user.emailConfirmation.isConfirmed || !isHash) throw new HttpException("", HttpStatus.UNAUTHORIZED);

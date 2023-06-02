@@ -183,16 +183,15 @@ export const filterBanPostsLikesInfo = (posts, banUsers) => {
 })}
 
 export const filterBanCommentLikesInfo = (comment, banUsers) => {
-  // return comments.map(comment => {
-  if (comment.LikesInfo) {
-    comment.LikesInfo.likesData = comment.LikesInfo.likesData.filter(
+  if (comment.likesInfo) {
+    comment.likesInfo.likesData = comment.likesInfo.likesData.filter(
       like => !banUsers.includes(like.userLogin)
     );
-    comment.LikesInfo.dislikesData = comment.LikesInfo.dislikesData.filter(
+    comment.likesInfo.dislikesData = comment.likesInfo.dislikesData.filter(
       like => !banUsers.includes(like.userLogin)
     );
-    comment!.LikesInfo.likesCount = comment!.LikesInfo.likesData.length;
-    comment!.LikesInfo.dislikesCount = comment!.LikesInfo.dislikesData.length;
+    comment!.likesInfo.likesCount = comment!.likesInfo.likesData.length;
+    comment!.likesInfo.dislikesCount = comment!.likesInfo.dislikesData.length;
   }
   return comment;
 }
@@ -215,6 +214,11 @@ export const filterBanPostLikesInfo = (post, banUsers) => {
     post!.extendedLikesInfo.dislikesCount = post!.extendedLikesInfo.dislikesData.length;
   }
   return post;
+}
+export const findLikeStatusForPost = (post, userId) => {
+  const userLike = post.extendedLikesInfo.likesData.find((like) => like.userId.toString() === userId.toString());
+  const userDislike = post.extendedLikesInfo.dislikesData.find((dislike) => dislike.userId.toString() === userId.toString());
+  return userLike ? "Like" : userDislike ? "Dislike" : "None";
 }
 // )
   // }

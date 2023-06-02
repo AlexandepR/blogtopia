@@ -56,6 +56,7 @@ export class Blog {
     this.name = updateBlogInfo.name;
     this.description = updateBlogInfo.description;
     this.websiteUrl = updateBlogInfo.websiteUrl;
+    this.createdAt = new Date().toISOString();
   }
   bindUserToBlog(user:UserDocument) {
     this.blogOwnerInfo.userId = user._id.toString();
