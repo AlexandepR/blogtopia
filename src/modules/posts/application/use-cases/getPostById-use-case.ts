@@ -41,10 +41,12 @@ export class GetPostByIdUseCase implements ICommandHandler<GetPostByIdCommand> {
   async execute(command: GetPostByIdCommand): Promise<outputPostModelType> {
     const postId = new Types.ObjectId(command.id);
     const banUsers: Array<string> = await this.usersRepository.getBannedUsers();
-    const filter = ({
-      $or: [
-        { "commentatorInfo.userLogin": { $nin: banUsers } },
-      ]
+    const filter = (
+      // {
+      // $or: [
+        { "commentatorInfo.userLogin": { $nin: banUsers }
+      //   },
+      // ]
     });
     const post = await this.postsRepository.findPostById(postId,filter);
     if (!post) throw new HttpException("", HttpStatus.NOT_FOUND);

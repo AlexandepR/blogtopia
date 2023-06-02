@@ -145,8 +145,6 @@ export const updateCommentLikesInfo = (comment: CommentDocument, likeStatus: str
 
 export const filterByNameTermOrUserLogin = (searchNameTerm: string, field: string, userLogin: string) => {
   const findField = `${field}.userLogin`
-  console.log(findField, 'findField------------------------');
-  console.log(userLogin, 'userLogin------------------------');
   const filter = searchNameTerm || userLogin
     ? {
       $or: [
@@ -175,8 +173,8 @@ export const filterBanPostsLikesInfo = (posts, banUsers) => {
   return post;
 })}
 
-export const filterBanCommentLikesInfo = (comments, banUsers) => {
-  return comments.map(comment => {
+export const filterBanCommentLikesInfo = (comment, banUsers) => {
+  // return comments.map(comment => {
   if (comment.LikesInfo) {
     comment.LikesInfo.likesData = comment.LikesInfo.likesData.filter(
       like => !banUsers.includes(like.userLogin)
@@ -188,11 +186,13 @@ export const filterBanCommentLikesInfo = (comments, banUsers) => {
     comment!.LikesInfo.dislikesCount = comment!.LikesInfo.dislikesData.length;
   }
   return comment;
-})}
+}
+// )}
 
 export const filterBanPostLikesInfo = (post, banUsers) => {
-  return post.map(post => {
-  if (post.extendedLikesInfo && post.extendedLikesInfo.newestLikes) {
+  // return post.map(post => {
+  // if (post.extendedLikesInfo && post.extendedLikesInfo.newestLikes) {
+  if (post.extendedLikesInfo) {
     post.extendedLikesInfo.newestLikes = post.extendedLikesInfo.newestLikes.filter(
       like => !banUsers.includes(like.login)
     );
@@ -206,4 +206,6 @@ export const filterBanPostLikesInfo = (post, banUsers) => {
     post!.extendedLikesInfo.dislikesCount = post!.extendedLikesInfo.dislikesData.length;
   }
   return post;
-})}
+}
+// )
+  // }

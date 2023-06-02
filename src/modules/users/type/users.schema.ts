@@ -104,10 +104,15 @@ export class User {
   @Prop({ type: AuthDevicesSessions })
   authDevicesSessions: AuthDevicesSessions;
 
-  updateBanInfo(dto: InfoBanStatusClassModel) {
+  banUser(dto: InfoBanStatusClassModel) {
     this.accountData.banInfo.banReason = dto.banReason
     this.accountData.banInfo.banDate = new Date()
     this.accountData.banInfo.isBanned = dto.isBanned
+  }
+  unBanUser() {
+    this.accountData.banInfo.banReason = null
+    this.accountData.banInfo.banDate = null
+    this.accountData.banInfo.isBanned = false
   }
   static create(
     userDto: CreateUserInputModelType,
@@ -151,7 +156,8 @@ export class User {
 export const UserSchema = SchemaFactory.createForClass(User);
 
 UserSchema.methods = {
-  updateBanInfo: User.prototype.updateBanInfo,
+  banUser: User.prototype.banUser,
+  unBanUser: User.prototype.unBanUser,
 };
 const userStaticMethods: UserModelStaticType = {
   create: User.create

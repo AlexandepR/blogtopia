@@ -2,9 +2,10 @@ import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Post, PostModelType } from "../../posts/type/posts.schema";
 import { Comment, CommentDocument, CommentModelType } from "../type/comments.schema";
-import { Blog, BlogModelType } from "../../blogs/type/blogs.schema";
+import { Blog, BlogDocument, BlogModelType } from "../../blogs/type/blogs.schema";
 import { Types } from "mongoose";
 import { filterBanCommentLikesInfo, filterBanPostLikesInfo } from "../../../utils/helpers";
+import { ObjectId } from "mongodb";
 
 @Injectable()
 export class CommentsRepository {
@@ -32,8 +33,12 @@ export class CommentsRepository {
     // return comments;
   }
   async getCommentsById(commentId: Types.ObjectId,filter?,banUsers?): Promise<CommentDocument | null> {
+    let query: any = { _id: commentId };
+    if (filter) {
+      query = { $and: [query, filter] };
+    }
     const comments = await this.CommentModel
-      .findOne({$or: [{ _id: commentId },filter]})
+      .findOne(query)
     if (comments) {
       const filteredPosts = filterBanCommentLikesInfo(comments, banUsers)
       return filteredPosts

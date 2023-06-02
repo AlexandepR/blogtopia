@@ -22,11 +22,15 @@ export class UpdateBanInfoByAdminUseCase implements ICommandHandler<UpdateBanInf
   }
   async execute(command: UpdateBanInfoByAdminCommand) {
     if(command.dto.isBanned) {
-      const terminateAllSessions = await this.securityRepository.terminateAllSessions(new Types.ObjectId(command.userId));
+     await this.securityRepository.terminateAllSessions(new Types.ObjectId(command.userId));
     }
     const user = await this.usersRepository.findUserById(new Types.ObjectId(command.userId))
     if(!user) throw new NotFoundException()
-    user.updateBanInfo(command.dto)
+    if(command.dto) {
+    user.banUser(command.dto)
+    } else {
+      user.unBanUser()
+    }
     return await this.usersRepository.save(user)
   }
 }

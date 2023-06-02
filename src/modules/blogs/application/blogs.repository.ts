@@ -60,8 +60,12 @@ export class BlogsRepository {
   //   return postForBlog.save();
   // }
   async findBlogById(blogId: ObjectId,filter?): Promise<BlogDocument> {
+    let query: any = { _id: blogId };
+    if (filter) {
+      query = { $or: [query, filter] };
+    }
     const blog = await this.BlogModel
-      .findOne({$or: [{ _id: blogId },filter]});
+      .findOne(query);
     // .lean()
     return blog;
   }

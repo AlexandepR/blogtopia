@@ -29,11 +29,16 @@ export class GetCommentsByPostUseCase implements ICommandHandler<GetCommentsByPo
     const { searchNameTerm, pageSize, pageNumber, sortDirection, sortBy } = parseQueryPaginator(command.query);
     const postId = new Types.ObjectId(command.id);
     const banUsers: Array<string> = await this.usersRepository.getBannedUsers();
-    const filter = ({
-      $or: [
-        { "commentatorInfo.userLogin": { $nin: banUsers } },
-      ]
-    });
+    const filter = (
+      { "commentatorInfo.userLogin": { $nin: banUsers }
+      });
+    // const filter = (
+    //   // {
+    //   // $or: [
+    //     { "commentatorInfo.userLogin": { $nin: banUsers } },
+    //   // ]
+    // // }
+    // );
     const post = await this.postsRepository.findPostById(postId,filter,banUsers);
     if(!post) throw new HttpException('', HttpStatus.NOT_FOUND)
     const totalCount = await this.commentsRepository.getTotalCount(postId);

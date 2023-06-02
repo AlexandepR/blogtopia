@@ -1,4 +1,16 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  Put,
+  Query,
+  ValidationPipe
+} from "@nestjs/common";
 import {
   BlogInputClassModel,
   createPostForBlogInputClassModel,
@@ -17,6 +29,8 @@ import { UpdatePostByBlogCommand } from "../application/use-cases/authUser/updat
 import { GetBlogsCommand } from "../application/use-cases/authUser/getBlogs-blogs-blogger-use-case";
 import { ParamsType } from "../../../types/types";
 import { BasicAuth, UserFromRequestDecorator } from "../../../utils/public.decorator";
+import { GetBlogByIdCommand } from "../application/use-cases/authUser/getBlogById-blogs-blogger-use-case";
+import { checkObjectId } from "../../../utils/validation.helpers";
 
 
 @Controller({
@@ -35,13 +49,15 @@ export class BlogsBloggerController {
     const command = new GetBlogsCommand(query, user);
     return this.commandBus.execute(command);
   }
-  // @Get(":id")
-  // async getBlog(
-  //   @Param("id")
-  //     id: string
-  // ) {
-  //   return await this.blogsService.getBlog(id);
-  // }
+  @Get(":id")
+  async getBlog(
+    @UserFromRequestDecorator()user:UserDocument,
+    @Param("id")
+      id: string
+  ) {
+    const command = new GetBlogByIdCommand(id, user);
+    return this.commandBus.execute(command);
+  }
   // @Get(":id/posts")
   // async GetPostsByBlog(
   //   @Req() req:Request,
@@ -72,11 +88,11 @@ export class BlogsBloggerController {
   @Put(":id")
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateBlog(
-    @Param("id")
-      id: string,
+    @Param(ValidationPipe)
+      params: checkObjectId,
     @Body() dto: BlogInputClassModel,
   ) {
-    const command = new UpdateBlogCommand(id, dto);
+    const command = new UpdateBlogCommand(params.id, dto);
     const putBlog = await this.commandBus.execute(command);
     if(!putBlog) return (HttpStatus.NOT_FOUND)
     return putBlog
@@ -100,10 +116,9 @@ export class BlogsBloggerController {
   @Delete(":id")
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteBlog (
-    @Param("id")
-      id: string) {
-    await this.commandBus.execute(new DeleteBlogCommand(id));
-    return `This blog #${id} removes`;
+    @Param(ValidationPipe)
+      params: checkObjectId) {
+    return await this.commandBus.execute(new DeleteBlogCommand(params.id));
   }
   @Delete(":blogId/posts/:postId")
   @HttpCode(HttpStatus.NO_CONTENT)

@@ -25,13 +25,12 @@ export class GetCommentUseCase implements ICommandHandler<GetCommentCommand> {
   ) {
   }
   async execute(command: GetCommentCommand): Promise<CommentReturnType> {
-    const userId = command.user._id
+    // if(command.user) {}
+    const userId = command.user ? command.user._id : null
     const commentId = new Types.ObjectId(command.id)
     const banUsers: Array<string> = await this.usersRepository.getBannedUsers();
-    const filter = ({
-      $or: [
-        { "commentatorInfo.userLogin": { $nin: banUsers } },
-      ]
+    const filter = (
+        { "commentatorInfo.userLogin": { $nin: banUsers }
     });
     const comment = await this.commentsRepository.getCommentsById(commentId,filter,banUsers);
     if (!comment) throw new HttpException('', HttpStatus.NOT_FOUND)

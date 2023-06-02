@@ -26,7 +26,6 @@ export class PostsRepository {
     sortDirection: "asc" | "desc",
     banUsers: Array<string>
   ): Promise<any> {
-    console.log(banUsers,'banUsersId-------repo-----------');
     const posts = await this.PostModel
       .find(filter)
       .sort([[sortBy, sortDirection]])
@@ -65,8 +64,12 @@ export class PostsRepository {
     filter?: any,
     banUsers?: Array<string>,
     ): Promise<PostDocument> {
+    let query: any = { _id: postId };
+    if (filter) {
+      query = { $and: [query, filter] };
+    }
     const post = await this.PostModel
-      .findOne({$or: [{_id: postId},filter]})
+      .findOne(query)
       // .findOne({$or: [{ _id: postId, filter ]});
     const filteredPosts = filterBanPostLikesInfo(post, banUsers)
     if (filteredPosts) {

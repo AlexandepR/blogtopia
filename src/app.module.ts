@@ -102,6 +102,7 @@ import { UsersAdminController } from "./modules/users/api/admin.api.user.control
 import { BlogsBloggerController } from "./modules/blogs/api/auth.api.blog.controller";
 import { AuthGuard } from "./guards/auth-guard/auth.guard";
 import { BlogsController } from "./modules/blogs/api/admin.api.blog.controller";
+import { GetBlogByIdByBloggerUseCase } from "./modules/blogs/application/use-cases/authUser/getBlogById-blogs-blogger-use-case";
 
 const adminUseCases = [
   GetBlogsByAdminUseCase,
@@ -125,6 +126,7 @@ const useCases = [
   DeletePostByBlogByBloggerUseCase,
   GetPostsByBlogUseCase,
   GetBlogUseCase,
+  GetBlogByIdByBloggerUseCase,
   ConfirmRegistrationAuthUseCase,
   RegistrationEmailResendAuthUseCase,
   RegistrationAuthUseCase,
