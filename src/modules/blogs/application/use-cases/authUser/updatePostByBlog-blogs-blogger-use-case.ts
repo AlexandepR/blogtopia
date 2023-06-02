@@ -27,8 +27,8 @@ export class UpdatePostByBlogByBloggerUseCase implements ICommandHandler<UpdateP
     await validateOrRejectModel(command.UpdatePostDto, CreatePostInputClassModel);
     const blog = await this.blogsRepository.findBlogById(new Types.ObjectId(command.UpdatePostDto.blogId));
     const post = await this.postsRepository.findPostById(new Types.ObjectId(command.postId));
-    if(blog.blogOwnerInfo.userLogin !== command.user.accountData.login) throw new ForbiddenException()
     if (!blog && !post) throw new NotFoundException()
+    if(blog.blogOwnerInfo.userLogin !== command.user.accountData.login) throw new ForbiddenException()
     // const dtoForPost = {
     //   title: command.UpdatePostDto.title,
     //   shortDescription: command.UpdatePostDto.shortDescription,

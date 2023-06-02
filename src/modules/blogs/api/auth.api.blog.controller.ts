@@ -64,6 +64,8 @@ export class BlogsBloggerController {
     @Body() dto: BlogInputClassModel,
     @UserFromRequestDecorator()user:UserDocument,
   ) {
+    console.log(dto,'{"nam"----1');
+    console.log(user,'{"user"----1');
     const command = new CreateBlogCommand(user, dto);
     return await this.commandBus.execute(command);
   }

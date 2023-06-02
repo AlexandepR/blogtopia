@@ -23,6 +23,8 @@ export class CreateBlogByBloggerUseCase implements ICommandHandler<CreateBlogCom
   constructor(protected blogsRepository: BlogsRepository) {
   }
   async execute(command: CreateBlogCommand): Promise<BlogType> {
+    console.log(command.user,'{"nam"--user--2');
+    console.log(command,'{"nam"----2');
     await validateOrRejectModel(command.dto, BlogInputClassModel);
     if(!command.user) {throw new BadRequestException()}
     const createBlog = await this.blogsRepository.createBlog(command.dto,command.user);
