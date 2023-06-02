@@ -31,7 +31,7 @@ export class UpdatePostByBlogByBloggerUseCase implements ICommandHandler<UpdateP
     console.log(blog, '---------blog');
     console.log(post, '---------post');
     if (blog && post) {
-      if(blog.blogOwnerInfo.userLogin !== command.user.accountData.login) throw new ForbiddenException()
+      if(blog.blogOwnerInfo.userLogin || post.postOwnerInfo.userLogin !== command.user.accountData.login) throw new ForbiddenException()
       // const dtoForPost = {
       //   title: command.UpdatePostDto.title,
       //   shortDescription: command.UpdatePostDto.shortDescription,

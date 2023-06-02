@@ -94,6 +94,7 @@ export class BlogsBloggerController {
   }
 
   @Put(":blogId/posts/:postId")
+  @HttpCode(HttpStatus.NO_CONTENT)
   async updatePost(
     @UserFromRequestDecorator()user:UserDocument,
     @Param("blogId") blogId: string,

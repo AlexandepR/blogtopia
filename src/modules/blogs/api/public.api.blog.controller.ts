@@ -29,7 +29,8 @@ export class BlogsPublicController {
     @Param("id")
       id: string
   ) {
-    return this.commandBus.execute(new GetBlogCommand(id));
+    const command = new GetBlogCommand(id)
+    return this.commandBus.execute(command);
   }
   @Public()
   @Get(":id/posts")

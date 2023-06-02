@@ -24,7 +24,7 @@ export class DeletePostByBlogByBloggerUseCase implements ICommandHandler<DeleteP
     if(!Types.ObjectId.isValid(command.blogId) || !Types.ObjectId.isValid(command.postId)) {throw new NotFoundException()}
     const blog = await this.blogsRepository.findBlogById(new Types.ObjectId(command.blogId));
     const post = await this.postsRepository.findPostById(new Types.ObjectId(command.postId));
-    if(blog.blogOwnerInfo.userLogin !== command.user.accountData.login) throw new ForbiddenException()
+    if(post.postOwnerInfo.userLogin !== command.user.accountData.login ) throw new ForbiddenException()
     if (!blog && !post) throw new NotFoundException()
     return await this.postsRepository.delete(new Types.ObjectId(command.postId));
   }
