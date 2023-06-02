@@ -24,7 +24,6 @@ export class UsersRepository {
     banFilterStatus?: any,
   ): Promise<UserDocument[]> {
     const sortedUsers = `accountData.${sortBy}`;
-    console.log(banFilterStatus,'=========================banFilterStatus');
     const users = await this.UserModel
       // .find({ banFilterStatus })
       .find({ ...banFilterStatus, ...filter })
@@ -44,9 +43,9 @@ export class UsersRepository {
     // .lean();
     return users;
   }
-  async getTotalCountUsers(filter: any): Promise<number> {
+  async getTotalCountUsers(filter: any,banStatus?: any): Promise<number> {
     const count = await this.UserModel
-      .countDocuments(filter);
+      .countDocuments({ ...banStatus, ...filter });
     return count;
   }
   async getBannedUsers(): Promise<Array<string>> {

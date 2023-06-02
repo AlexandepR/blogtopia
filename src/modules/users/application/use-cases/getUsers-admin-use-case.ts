@@ -24,7 +24,7 @@ export class GetUsersByAdminUseCase implements ICommandHandler<GetUsersByAdminCo
     const { filter, pageSize, pageNumber, sortDirection, sortBy, banStatus } = parseQueryUsersPaginator(command.query);
     // const banUsers: Array<string> = await this.usersRepository.getBannedUsers();
     // const filterWithBan = ({ "accountData.banInfo.isBanned": { $nin: true }, ...filter });
-    const totalCountUsers = await this.usersRepository.getTotalCountUsers(filter);
+    const totalCountUsers = await this.usersRepository.getTotalCountUsers(filter,banStatus);
     const skip = skipPage(pageNumber, pageSize);
     const pagesCount = pagesCounter(totalCountUsers, pageSize);
     // const getTotalCount = await this.usersRepository.getTotalCountUsers(filter)

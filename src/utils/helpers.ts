@@ -7,6 +7,7 @@ import { Types } from "mongoose";
 import { CommentDocument } from "../modules/comments/type/comments.schema";
 import { LikesType } from "../modules/comments/type/commentsType";
 import { QueryType } from "../modules/blogs/type/blogsType";
+import { HttpException, HttpStatus } from "@nestjs/common";
 
 export const parseQueryPaginator = (query: QueryType): QueryType => {
   return {
@@ -37,7 +38,6 @@ export const parseQueryUsersPaginator = (query: ParamsUsersType): QueryUsersPagi
       ]
     };
   }
-  console.log(query.banStatus,'query.banStatus---------1-------');
   const banStatus = query.banStatus === 'banned' ? false : query.banStatus === 'notBanned' ? true : ''
   const banfilter = banStatus !== '' ? { "accountData.banInfo.isBanned": { $nin: banStatus }} : {}
   return {
@@ -156,6 +156,17 @@ export const updateCommentLikesInfo = (comment: CommentDocument, likeStatus: str
 export const filterByNameTermOrUserLogin = (searchNameTerm: string, field: string, userLogin: string) => {
   const findField = `${field}.userLogin`
   const regexSearchNameTerm = searchNameTerm ? new RegExp(searchNameTerm, 'i') : '';
+
+  return {
+    $or: [
+      {
+        name: { $regex: `${searchNameTerm}`, $options: "i" },
+      },
+      {
+        // [`${field}.userLogin`] : userLogin
+        "blogOwnerInfo.userLogin" : userLogin
+      }],
+  };
   // const filter = searchNameTerm || userLogin
   //   ? {
   //     $or: [
@@ -163,14 +174,14 @@ export const filterByNameTermOrUserLogin = (searchNameTerm: string, field: strin
   //       { [findField] : userLogin }]
   //   }
   //   : {};
-    return regexSearchNameTerm || userLogin
-      ? {
-        $or: [
-          { name: regexSearchNameTerm },
-          { [findField]: userLogin }
-        ]
-      }
-      : {}
+  //   return regexSearchNameTerm || userLogin
+  //     ? {
+  //       $or: [
+  //         { name: regexSearchNameTerm },
+  //         { [findField]: userLogin }
+  //       ]
+  //     }
+  //     : {}
 };
 
 
@@ -193,6 +204,7 @@ export const filterBanPostsLikesInfo = (posts, banUsers) => {
 })}
 
 export const filterBanCommentLikesInfo = (comment, banUsers) => {
+  if(!comment) throw new HttpException("", HttpStatus.NOT_FOUND);
   if (comment.likesInfo) {
     comment.likesInfo.likesData = comment.likesInfo.likesData.filter(
       like => !banUsers.includes(like.userLogin)
@@ -208,6 +220,7 @@ export const filterBanCommentLikesInfo = (comment, banUsers) => {
 // )}
 
 export const filterBanPostLikesInfo = (post, banUsers) => {
+  if(!post) throw new HttpException("", HttpStatus.NOT_FOUND);
   // return post.map(post => {
   // if (post.extendedLikesInfo && post.extendedLikesInfo.newestLikes) {
   if (post.extendedLikesInfo) {

@@ -45,7 +45,7 @@ export class GetPostByIdUseCase implements ICommandHandler<GetPostByIdCommand> {
     const filter = (
       // {
       // $or: [
-        { "commentatorInfo.userLogin": { $nin: banUsers }
+        { "postOwnerInfo.userLogin": { $nin: banUsers }
       //   },
       // ]
     });
