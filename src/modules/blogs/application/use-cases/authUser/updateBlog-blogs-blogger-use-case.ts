@@ -25,7 +25,6 @@ export class UpdateBlogByBloggerUseCase implements ICommandHandler<UpdateBlogCom
   async execute(command: UpdateBlogCommand): Promise<BlogDocument> {
     await validateOrRejectModel(command.UpdateBlogDto, BlogInputClassModel);
     if(!command.UpdateBlogDto) {throw new BadRequestException()}
-
     const blogId = new Types.ObjectId(command.blogId);
     const filterIsOwn = ({'blogOwnerInfo.userLogin': command.user.accountData.login})
     const blog = await this.blogsRepository.findBlogById(blogId,filterIsOwn);
