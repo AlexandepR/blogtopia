@@ -1,4 +1,4 @@
-import { ForbiddenException, HttpException, HttpStatus } from "@nestjs/common";
+import { ForbiddenException, HttpException, HttpStatus, NotFoundException } from "@nestjs/common";
 import { BlogsRepository } from "../../blogs.repository";
 import { Types } from "mongoose";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
@@ -17,6 +17,7 @@ export class DeleteBlogByBloggerUseCase implements ICommandHandler<DeleteBlogCom
   ) {
   }
   async execute(command: DeleteBlogCommand): Promise<boolean> {
+    if(!Types.ObjectId.isValid(command.id)) {throw new NotFoundException()}
     const blogId = new Types.ObjectId(command.id);
     const blog = await this.blogsRepository.findBlogById(blogId);
     if (!blog) throw new HttpException("", HttpStatus.NOT_FOUND);

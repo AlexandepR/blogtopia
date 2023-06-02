@@ -1,6 +1,6 @@
 import { BlogDocument } from "../../../type/blogs.schema";
 import { BlogsRepository } from "../../blogs.repository";
-import { BadRequestException, ForbiddenException, HttpException, HttpStatus } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, HttpException, HttpStatus, NotFoundException } from "@nestjs/common";
 import { Types } from "mongoose";
 import { BlogInputClassModel } from "../../../type/blogsType";
 import { validateOrRejectModel } from "../../../../../utils/validation.helpers";
@@ -24,6 +24,7 @@ export class UpdateBlogByBloggerUseCase implements ICommandHandler<UpdateBlogCom
   }
   async execute(command: UpdateBlogCommand): Promise<BlogDocument> {
     await validateOrRejectModel(command.UpdateBlogDto, BlogInputClassModel);
+    if(!Types.ObjectId.isValid(command.blogId)) {throw new NotFoundException()}
     if(!command.UpdateBlogDto) {throw new BadRequestException()}
     const blogId = new Types.ObjectId(command.blogId);
     const filterIsOwn = ({'blogOwnerInfo.userLogin': command.user.accountData.login})

@@ -1,6 +1,6 @@
 import { UserDocument } from "../../../../users/type/users.schema";
 import { BlogsRepository } from "../../blogs.repository";
-import { HttpException, HttpStatus } from "@nestjs/common";
+import { ForbiddenException, HttpException, HttpStatus, NotFoundException } from "@nestjs/common";
 import { createPostForBlogInputClassModel } from "../../../type/blogsType";
 import { outputPostModelType } from "../../../../posts/type/postsType";
 import { validateOrRejectModel } from "../../../../../utils/validation.helpers";
@@ -26,8 +26,10 @@ export class CreatePostByBlogByBloggerUseCase implements ICommandHandler<CreateP
   async execute(command: CreatePostByBlogCommand)
     : Promise<outputPostModelType | null> {
     await validateOrRejectModel(command.dto, createPostForBlogInputClassModel);
-    const blogId = new Types.ObjectId(command.blogId);
+    if(!Types.ObjectId.isValid(command.blogId)) {throw new NotFoundException()}
+    const blogId = new Types.ObjectId(command.blogId)
     const getBlog = await this.blogsRepository.findBlogById(blogId);
+    if(getBlog.blogOwnerInfo.userLogin !== command.user.accountData.login) throw new ForbiddenException()
     if (!getBlog) throw new HttpException("", HttpStatus.NOT_FOUND);
     const dto = {
       ...command.dto,

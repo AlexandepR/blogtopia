@@ -11,7 +11,7 @@ import { UserDocument } from "../../../../users/type/users.schema";
 export class UpdatePostByBlogCommand {
   constructor(
     public postId: string,
-    public UpdatePostDto: CreatePostInputClassModel,
+    public dto: CreatePostInputClassModel,
     public user: UserDocument,
   ) {}
 }
@@ -24,18 +24,23 @@ export class UpdatePostByBlogByBloggerUseCase implements ICommandHandler<UpdateP
   ) {
   }
   async execute(command: UpdatePostByBlogCommand): Promise<any> {
-    await validateOrRejectModel(command.UpdatePostDto, CreatePostInputClassModel);
-    const blog = await this.blogsRepository.findBlogById(new Types.ObjectId(command.UpdatePostDto.blogId));
+    await validateOrRejectModel(command.dto, CreatePostInputClassModel);
+    if(!Types.ObjectId.isValid(command.dto.blogId) || !Types.ObjectId.isValid(command.postId)) {throw new NotFoundException()}
+    const blog = await this.blogsRepository.findBlogById(new Types.ObjectId(command.dto.blogId));
     const post = await this.postsRepository.findPostById(new Types.ObjectId(command.postId));
-    if (!blog && !post) throw new NotFoundException()
-    if(blog.blogOwnerInfo.userLogin !== command.user.accountData.login) throw new ForbiddenException()
-    // const dtoForPost = {
-    //   title: command.UpdatePostDto.title,
-    //   shortDescription: command.UpdatePostDto.shortDescription,
-    //   content: command.UpdatePostDto.content,
-    //   blogId: command.UpdatePostDto.blogId
-    // }
-    await post.updatePost(command.UpdatePostDto);
-    return await post.save();
+    console.log(blog, '---------blog');
+    console.log(post, '---------post');
+    if (blog && post) {
+      if(blog.blogOwnerInfo.userLogin !== command.user.accountData.login) throw new ForbiddenException()
+      // const dtoForPost = {
+      //   title: command.UpdatePostDto.title,
+      //   shortDescription: command.UpdatePostDto.shortDescription,
+      //   content: command.UpdatePostDto.content,
+      //   blogId: command.UpdatePostDto.blogId
+      // }
+      await post.updatePost(command.dto);
+      return await post.save();
+    }
+    throw new NotFoundException()
   }
 }

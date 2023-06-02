@@ -39,6 +39,9 @@ export class updatePostForBlogInputClassModel {
   @IsNotEmpty()
   @Transform(({ value }) => value.trim())
   content: string;
+  @IsNotEmpty()
+  @Transform(({ value }) => value.trim())
+  blogId: string
 }
 export class createPostForBlogInputClassModel {
   @MaxLength(30)

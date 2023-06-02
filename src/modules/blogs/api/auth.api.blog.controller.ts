@@ -64,8 +64,6 @@ export class BlogsBloggerController {
     @Body() dto: BlogInputClassModel,
     @UserFromRequestDecorator()user:UserDocument,
   ) {
-    console.log(dto,'{"nam"----1');
-    console.log(user,'{"user"----1');
     const command = new CreateBlogCommand(user, dto);
     return await this.commandBus.execute(command);
   }
@@ -100,16 +98,16 @@ export class BlogsBloggerController {
     @UserFromRequestDecorator()user:UserDocument,
     @Param("blogId") blogId: string,
     @Param("postId") postId: string,
-    @Body() body: updatePostForBlogInputClassModel,
+    @Body() dto: CreatePostInputClassModel,
   ) {
     if(!blogId || !postId) throw new NotFoundException()
-    const UpdatePostDto: CreatePostInputClassModel = {
-      title: body.title,
-      shortDescription: body.shortDescription,
-      content: body.content,
-      blogId: blogId,
-    }
-    const command = new UpdatePostByBlogCommand(postId, UpdatePostDto, user);
+    // const UpdatePostDto: CreatePostInputClassModel = {
+    //   title: body.title,
+    //   shortDescription: body.shortDescription,
+    //   content: body.content,
+    //   blogId: blogId,
+    // }
+    const command = new UpdatePostByBlogCommand(postId, dto, user);
     return await this.commandBus.execute(command);
   }
   @Delete(":id")

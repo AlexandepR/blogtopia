@@ -26,7 +26,7 @@ export class CreatePostInputClassModel {
   content: string;
   @IsString()
   @IsMongoId()
-  @existingBlog()
+  // @existingBlog()
   @IsNotEmpty()
   blogId: string;
 }

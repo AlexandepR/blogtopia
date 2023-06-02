@@ -24,6 +24,7 @@ export class GetBlogUseCase implements ICommandHandler<GetBlogCommand> {
   ) {
   }
   async execute(command: GetBlogCommand): Promise<BlogType> {
+
     const blogId = new Types.ObjectId(command.id);
     const banUsers: Array<string> = await this.usersRepository.getBannedUsers();
     const filter = ({

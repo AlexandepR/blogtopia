@@ -56,10 +56,8 @@ export class AuthGuard implements CanActivate {
     if (isRefreshToken) {
         const user = await this.extractUserFromRefreshToken(request)
       if (!user) {
-        console.log('---------------UnauthorizedException');
        throw new UnauthorizedException();
       }
-      console.log('---------------true2-finish');
       return true;
     }
 
