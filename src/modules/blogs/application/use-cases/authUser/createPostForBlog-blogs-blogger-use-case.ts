@@ -29,13 +29,15 @@ export class CreatePostByBlogByBloggerUseCase implements ICommandHandler<CreateP
     if(!Types.ObjectId.isValid(command.blogId)) {throw new NotFoundException()}
     const blogId = new Types.ObjectId(command.blogId)
     const getBlog = await this.blogsRepository.findBlogById(blogId);
-    if(getBlog.blogOwnerInfo.userLogin !== command.user.accountData.login) throw new ForbiddenException()
-    if (!getBlog) throw new HttpException("", HttpStatus.NOT_FOUND);
+    if(!getBlog) throw new NotFoundException()
+    if(getBlog.blogOwnerInfo.userLogin !== command.user.accountData.login ||
+      getBlog.blogOwnerInfo.userId !== command.user._id.toString()) throw new ForbiddenException()
+    // if(getBlog.blogOwnerInfo.userLogin !== command.user.accountData.login) throw new ForbiddenException()
     const dto = {
       ...command.dto,
       blogId: command.blogId
     }
-    const createPost = await this.postsRepository.createPost(dto, getBlog,command.user);
+    const createPost = await this.postsRepository.createPost(dto, getBlog, command.user);
     return {
       id: createPost._id.toString(),
       title: createPost.title,

@@ -22,6 +22,6 @@ export class DeleteBlogByBloggerUseCase implements ICommandHandler<DeleteBlogCom
     const blog = await this.blogsRepository.findBlogById(blogId);
     if (!blog) throw new HttpException("", HttpStatus.NOT_FOUND);
     if(blog.blogOwnerInfo.userLogin !== command.user.accountData.login) throw new ForbiddenException()
-    return await this.blogsRepository.delete(blogId);
+    return await this.blogsRepository.deleteBlog(blogId);
   }
 }

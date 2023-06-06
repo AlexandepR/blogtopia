@@ -23,9 +23,13 @@ export class DeletePostByBlogByBloggerUseCase implements ICommandHandler<DeleteP
   async execute(command: DeletePostByBlogCommand): Promise<boolean> {
     if(!Types.ObjectId.isValid(command.blogId) || !Types.ObjectId.isValid(command.postId)) {throw new NotFoundException()}
     const blog = await this.blogsRepository.findBlogById(new Types.ObjectId(command.blogId));
+    if (!blog) throw new NotFoundException()
     const post = await this.postsRepository.findPostById(new Types.ObjectId(command.postId));
-    if(post.postOwnerInfo.userLogin !== command.user.accountData.login ) throw new ForbiddenException()
-    if (!blog && !post) throw new NotFoundException()
+    if (!post) throw new NotFoundException()
+    if(post.postOwnerInfo.userLogin !== command.user.accountData.login ||
+      post.postOwnerInfo.userId !== command.user._id.toString()) throw new ForbiddenException()
+    // if(blog.blogOwnerInfo.userLogin !== command.user.accountData.login ||
+    //   blog.blogOwnerInfo.userId !== command.user._id.toString()) throw new ForbiddenException()
     return await this.postsRepository.delete(new Types.ObjectId(command.postId));
   }
 }

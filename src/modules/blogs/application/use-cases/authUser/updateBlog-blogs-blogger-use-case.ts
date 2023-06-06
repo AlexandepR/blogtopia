@@ -25,14 +25,13 @@ export class UpdateBlogByBloggerUseCase implements ICommandHandler<UpdateBlogCom
   async execute(command: UpdateBlogCommand): Promise<BlogDocument> {
     await validateOrRejectModel(command.UpdateBlogDto, BlogInputClassModel);
     if(!Types.ObjectId.isValid(command.blogId)) {throw new NotFoundException()}
-    if(!command.UpdateBlogDto) {throw new BadRequestException()}
     const blogId = new Types.ObjectId(command.blogId);
     const filterIsOwn = ({'blogOwnerInfo.userLogin': command.user.accountData.login})
-    const blog = await this.blogsRepository.findBlogById(blogId,filterIsOwn);
+    const blog = await this.blogsRepository.findBlogById(blogId);
     if (!blog) throw new HttpException("", HttpStatus.NOT_FOUND);
+    if(blog.blogOwnerInfo.userLogin !== command.user.accountData.login) throw new ForbiddenException()
     console.log(blog.blogOwnerInfo.userLogin, '1');
     console.log(command.user.accountData.login, '2');
-    if(blog.blogOwnerInfo.userLogin !== command.user.accountData.login) throw new ForbiddenException()
     blog.updateBlog(command.UpdateBlogDto);
     return await blog.save();
   }

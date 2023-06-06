@@ -24,7 +24,7 @@ export class GetBlogByIdByBloggerUseCase implements ICommandHandler<GetBlogByIdC
   async execute(command: GetBlogByIdCommand): Promise<BlogType> {
     const blogId = new Types.ObjectId(command.id);
     const blog = await this.blogsRepository.findBlogById(blogId);
-    if(blog.blogOwnerInfo.userLogin !== command.user.accountData.login) throw new ForbiddenException()
+    // if(blog.blogOwnerInfo.userLogin !== command.user.accountData.login) throw new ForbiddenException()
     if (!blog) throw new HttpException("", HttpStatus.NOT_FOUND);
     return {
       id: blog._id.toString(),

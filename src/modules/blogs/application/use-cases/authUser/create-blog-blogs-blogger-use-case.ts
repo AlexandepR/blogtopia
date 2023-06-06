@@ -28,7 +28,7 @@ export class CreateBlogByBloggerUseCase implements ICommandHandler<CreateBlogCom
     const createBlog = await this.blogsRepository.createBlog(command.dto,command.user);
     if (!createBlog) throw new HttpException("", HttpStatus.NOT_FOUND);
     return {
-      id: createBlog._id.toString(),
+      id: createBlog._id.toHexString(),
       name: createBlog.name,
       description: createBlog.description,
       websiteUrl: createBlog.websiteUrl,
