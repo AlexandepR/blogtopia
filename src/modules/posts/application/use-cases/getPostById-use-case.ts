@@ -49,7 +49,7 @@ export class GetPostByIdUseCase implements ICommandHandler<GetPostByIdCommand> {
       //   },
       // ]
     });
-    const post = await this.postsRepository.findPostById(postId,filter);
+    const post = await this.postsRepository.findPostByIdForBlogger(postId,filter);
     if (!post) throw new HttpException("", HttpStatus.NOT_FOUND);
     const filterBanUserLikes = filterBanPostLikesInfo(post,banUsers)
     // if (filterBanUserLikes) {

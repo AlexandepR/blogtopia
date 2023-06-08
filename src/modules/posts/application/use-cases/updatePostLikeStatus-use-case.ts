@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { validateOrRejectModel } from "../../../../utils/validation.helpers";
 import { updatePostLikesInfo } from "../../../../utils/helpers";
-import { HttpException, HttpStatus } from "@nestjs/common";
+import { HttpException, HttpStatus, NotFoundException } from "@nestjs/common";
 import { Types } from "mongoose";
 import { UserDocument } from "../../../users/type/users.schema";
 import { likeStatusInputClassModel, PostLikesType, PostsNewestLikesType } from "../../type/postsType";
@@ -28,13 +28,14 @@ export class UpdatePostLikeStatusUseCase implements ICommandHandler<UpdatePostLi
   async execute(command: UpdatePostLikeStatusCommand): Promise<boolean> {
     await validateOrRejectModel(command.dto, likeStatusInputClassModel);
     const userId = command.user._id;
+    if(!Types.ObjectId.isValid(command.id)) {throw new NotFoundException()}
     const postId = new Types.ObjectId(command.id)
     const likeStatus = command.dto.likeStatus
     const banUsers: Array<string> = await this.usersRepository.getBannedUsers();
     const filter = (
       { "postOwnerInfo.userLogin": { $nin: banUsers }
       });
-    const post = await this.postsRepository.findPostById(postId,filter);
+    const post = await this.postsRepository.findPostByIdForBlogger(postId,filter);
     if (!userId || !post) if (!post) throw new HttpException("", HttpStatus.NOT_FOUND);
     const user =  await this.usersRepository.findUserById(userId)
     const {accountData: { login: userLogin }} = user!

@@ -45,18 +45,18 @@ export class updatePostForBlogInputClassModel {
 }
 export class createPostForBlogInputClassModel {
   @MaxLength(30)
-  @IsString()
+  // @IsString()
   @Transform(({ value }) => value.trim())
-  @IsNotEmpty()
+  // @IsNotEmpty()
   title: string;
   @MaxLength(100)
-  @IsString()
-  @IsNotEmpty()
+  // @IsString()
+  // @IsNotEmpty()
   @Transform(({ value }) => value.trim())
   shortDescription: string;
   @MaxLength(1000)
-  @IsString()
-  @IsNotEmpty()
+  // @IsString()
+  // @IsNotEmpty()
   @Transform(({ value }) => value.trim())
   content: string;
 }
@@ -79,7 +79,7 @@ export type BlogType = {
   name: string
   description: string
   websiteUrl: string
-  createdAt: string
+  createdAt: Date
   isMembership: boolean
 }
 export type QueryType = {

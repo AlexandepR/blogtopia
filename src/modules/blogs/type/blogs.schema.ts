@@ -8,6 +8,7 @@ import {
 } from "./blogsType";
 import { PostDocument, PostModelType } from "../../posts/type/posts.schema";
 import { UserDocument } from "../../users/type/users.schema";
+import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 
 
 @Schema({
@@ -22,9 +23,13 @@ class BlogOwnerInfo {
 }
 
 
-@Schema()
-export class Blog {
-  _id: Types.ObjectId;
+class BlogEntity {
+
+}
+
+@Schema({timestamps:true})
+export class Blog extends TimeStamps{
+  _id: Types.ObjectId
   // @Prop({
   //   required: true
   // })
@@ -46,8 +51,7 @@ export class Blog {
     match: /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/
   })
   websiteUrl: string;
-  @Prop()
-  createdAt: string;
+
   @Prop({ type: BlogOwnerInfo })
   blogOwnerInfo: BlogOwnerInfo;
   @Prop()
@@ -56,21 +60,13 @@ export class Blog {
     this.name = updateBlogInfo.name;
     this.description = updateBlogInfo.description;
     this.websiteUrl = updateBlogInfo.websiteUrl;
+    // this.createdAt = createdAt
     // this.createdAt = new Date().toISOString();
   }
   bindUserToBlog(user:UserDocument) {
     this.blogOwnerInfo.userId = user._id.toString();
     this.blogOwnerInfo.userLogin = user.accountData.login;
   }
-  // updatePostByBlog(
-  //   post: PostDocument,
-  //   dto: updatePostForBlogInputModel,
-  //   blogId:string) {
-  //   this.title = dto.title;
-  //   this.shortDescription = dto.shortDescription;
-  //   this.content = dto.content;
-  //   this.blogId = new Types.ObjectId(dto.blogId);
-  // }
   static create(
     dto: CreateBlogInputModelType,
     BlogModel: BlogModelType,
@@ -85,7 +81,7 @@ export class Blog {
     createNewBlog.description = dto.description;
     createNewBlog.websiteUrl = dto.websiteUrl;
     createNewBlog.isMembership = false;
-    createNewBlog.createdAt = new Date().toISOString();
+    // createNewBlog.createdAt = new Date().toISOString();
     return createNewBlog;
   }
   // static createPost(

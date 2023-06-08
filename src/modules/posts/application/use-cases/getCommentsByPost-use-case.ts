@@ -39,7 +39,7 @@ export class GetCommentsByPostUseCase implements ICommandHandler<GetCommentsByPo
     //   // ]
     // // }
     // );
-    const post = await this.postsRepository.findPostById(postId,filter,banUsers);
+    const post = await this.postsRepository.findPostByIdWithFilter(postId,filter,banUsers);
     if(!post) throw new HttpException('', HttpStatus.NOT_FOUND)
     const totalCount = await this.commentsRepository.getTotalCount(postId);
     const skip = skipPage(pageNumber, pageSize);
