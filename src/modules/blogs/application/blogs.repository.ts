@@ -21,7 +21,6 @@ export class BlogsRepository {
     sortBy: string,
     sortDirection: "asc" | "desc",
     isAdmin?: boolean,
-    banUsers?: Array<string>,
   ): Promise<BlogDocument[]> {
     const getBlogOwnerInfo = isAdmin ? "blogOwnerInfo" : ''
     const blogs = await this.BlogModel
@@ -51,22 +50,17 @@ export class BlogsRepository {
   }
   async createBlog(createDto: CreateBlogInputModelType, user: UserDocument): Promise<Blog> {
     const newBlog = Blog.create(createDto, this.BlogModel, user);
-    // const newBlog = this.BlogModel.create(createDto, this.BlogModel);
     return newBlog.save();
   }
-  // async createPost(postDto: createPostForBlogInputModel, getBlog: BlogDocument, user: UserDocument): Promise<Post> {
-  //   const postForBlog = Blog.createPost(postDto, getBlog, this.PostModel, user);
-  //   // const newBlog = this.BlogModel.create(createDto, this.BlogModel);
-  //   return postForBlog.save();
-  // }
-  async findBlogById(blogId: ObjectId,filter?): Promise<BlogDocument> {
-    let query: any = { _id: blogId };
-    if (filter) {
-      query = { $or: [query, filter] };
-    }
+  async findBlogByIdForBlogger(blogId: ObjectId,filter?): Promise<BlogDocument> {
+     const query = { $and: [{ _id: blogId }, filter] };
     const blog = await this.BlogModel
       .findOne(query);
-    // .lean()
+    return blog;
+  }
+  async findBlogById(blogId: ObjectId): Promise<BlogDocument> {
+    const blog = await this.BlogModel
+      .findOne({ _id: blogId });
     return blog;
   }
   async save(blog: BlogDocument) {
@@ -77,7 +71,7 @@ export class BlogsRepository {
       .countDocuments(filter);
     return count;
   }
-  async delete(id: ObjectId): Promise<boolean> {
+  async deleteBlog(id: ObjectId): Promise<boolean> {
     const deleteBlog = await this.BlogModel
       .deleteOne({ _id: id });
     return !!deleteBlog;
