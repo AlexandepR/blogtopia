@@ -32,10 +32,10 @@ export class GetBlogUseCase implements ICommandHandler<GetBlogCommand> {
         { "blogOwnerInfo.userLogin": { $nin: banUsers } },
       ]
     });
-    const blog = await this.blogsRepository.findBlogById(blogId,filter);
+    const blog = await this.blogsRepository.findBlogByIdForBlogger(blogId,filter);
     if (!blog) throw new HttpException("", HttpStatus.NOT_FOUND);
     return {
-      id: command.id,
+      id: blog._id.toString(),
       name: blog.name,
       description: blog.description,
       websiteUrl: blog.websiteUrl,

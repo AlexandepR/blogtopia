@@ -27,13 +27,15 @@ export class GetPostsByBlogUseCase implements ICommandHandler<GetPostsByBlogComm
     const { searchNameTerm, pageSize, pageNumber, sortDirection, sortBy } = parseQueryPaginator(command.query);
     const blogId = new Types.ObjectId(command.id);
     const banUsers: Array<string> = await this.usersRepository.getBannedUsers()
-    const filter = ({
-      $or: [
-        { "postOwnerInfo.userLogin": { $nin: banUsers } },
-        { blogId: new Types.ObjectId(command.id) },
-      ]
-    });
-    const blog = await this.blogsRepository.findBlogById(blogId,filter);
+    // const filter = ({
+    //   $or: [
+    //     { "postOwnerInfo.userLogin": { $nin: banUsers } },
+    //     { blogId: new Types.ObjectId(command.id) },
+    //   ]
+    // });
+    const filter = { "postOwnerInfo.userLogin": { $nin: banUsers } }
+    // const blog = await this.blogsRepository.findBlogByIdForBlogger(blogId,filter);
+    const blog = await this.blogsRepository.findBlogByIdForBlogger(blogId,filter);;
     if (!blog) throw new NotFoundException()
     const totalCountPosts = await this.postsRepository.getTotalCountPosts(filter);
     const skip = skipPage(pageNumber, pageSize);
