@@ -5,20 +5,20 @@ import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { CommentsRepository } from "../../../../comments/application/comments.repository";
 
 
-export class GetAllCommentsForAllPostsCommand {
+export class GetAllCommentsForBloggerCommand {
   constructor(
     public query: ParamsPaginationType,
     public user: UserDocument,
   ) {}
 }
 
-@CommandHandler(GetAllCommentsForAllPostsCommand)
-export class GetAllCommentsForAllPostsCommandUseCase implements ICommandHandler<GetAllCommentsForAllPostsCommand>{
+@CommandHandler(GetAllCommentsForBloggerCommand)
+export class GetAllCommentsForBloggerUseCase implements ICommandHandler<GetAllCommentsForBloggerCommand>{
   constructor(
     protected commentsRepository: CommentsRepository,
     ) {
   }
-  async execute(command: GetAllCommentsForAllPostsCommand): Promise<any> {
+  async execute(command: GetAllCommentsForBloggerCommand): Promise<any> {
     const { pageSize, pageNumber, sortDirection, sortBy } = parseQueryPaginator(command.query);
     const userId = command.user._id
     const totalComments = await this.commentsRepository.getTotalOwnComments(userId)
