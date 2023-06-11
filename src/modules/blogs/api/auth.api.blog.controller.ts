@@ -1,36 +1,21 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  HttpCode,
-  HttpStatus, NotFoundException,
-  Param,
-  Post,
-  Put,
-  Query,
-  ValidationPipe
-} from "@nestjs/common";
-import {
-  BlogInputClassModel,
-  createPostForBlogInputClassModel,
-  updatePostForBlogInputClassModel
-} from "../type/blogsType";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query } from "@nestjs/common";
+import { BanInfoInputClassModel, BlogInputClassModel } from "../type/blogsType";
 
 import { UserDocument } from "../../users/type/users.schema";
-import { CreatePostInputClassModel } from "../../posts/type/postsType";
+import { CreatePostForBlogInputClassModel } from "../../posts/type/postsType";
 import { CommandBus } from "@nestjs/cqrs";
-import { UpdateBlogCommand } from "../application/use-cases/authUser/updateBlog-blogs-blogger-use-case";
-import { DeletePostByBlogCommand } from "../application/use-cases/authUser/deletePostByBlog-blogs-blogger-use-case";
-import { CreateBlogCommand } from "../application/use-cases/authUser/create-blog-blogs-blogger-use-case";
-import { CreatePostByBlogCommand } from "../application/use-cases/authUser/createPostForBlog-blogs-blogger-use-case";
-import { DeleteBlogCommand } from "../application/use-cases/authUser/deleteBlog-blogs-blogger-use-case";
-import { UpdatePostByBlogCommand } from "../application/use-cases/authUser/updatePostByBlog-blogs-blogger-use-case";
-import { GetBlogsCommand } from "../application/use-cases/authUser/getBlogs-blogs-blogger-use-case";
-import { ParamsType } from "../../../types/types";
-import { BasicAuth, UserFromRequestDecorator } from "../../../utils/public.decorator";
-import { GetBlogByIdCommand } from "../application/use-cases/authUser/getBlogById-blogs-blogger-use-case";
-import { checkObjectId } from "../../../utils/validation.helpers";
+import { UpdateBlogCommand } from "../application/use-cases/authUser/updateBlog-blogger-use-case";
+import { DeletePostByBlogCommand } from "../application/use-cases/authUser/deletePostByBlog-blogger-use-case";
+import { CreateBlogCommand } from "../application/use-cases/authUser/create-blog-blogger-use-case";
+import { CreatePostByBlogCommand } from "../application/use-cases/authUser/createPostForBlog-blogger-use-case";
+import { DeleteBlogCommand } from "../application/use-cases/authUser/deleteBlog-blogger-use-case";
+import { UpdatePostByBlogCommand } from "../application/use-cases/authUser/updatePostByBlog-blogger-use-case";
+import { GetBlogsCommand } from "../application/use-cases/authUser/getBlogs-blogger-use-case";
+import { ParamsPaginationType, ParamsType } from "../../../types/types";
+import { UserFromRequestDecorator } from "../../../utils/public.decorator";
+import { GetBlogByIdCommand } from "../application/use-cases/authUser/getBlogById-blogger-use-case";
+import { UpdateBanStatusCommand } from "../application/use-cases/authUser/updateBanStatusBlog-blogger-use-case";
+import { GetAllCommentsForBloggerCommand } from "../application/use-cases/authUser/GetAllCommentsForAllPosts-blogger-use-case";
 
 
 @Controller({
@@ -55,28 +40,36 @@ export class BlogsBloggerController {
     @Param("id")
       id: string
   ) {
-    if(!id) throw new NotFoundException()
+    // if(!id) throw new NotFoundException()
     const command = new GetBlogByIdCommand(id, user);
     return this.commandBus.execute(command);
   }
+  @Get('comments')
+  async getAllComments(
+    @Query() query: ParamsPaginationType,
+    @UserFromRequestDecorator()user:UserDocument,
+  ){
+    const command = new GetAllCommentsForBloggerCommand(query, user)
+    return this.commandBus.execute(command)
+  }
+
   @Post('')
   async createBlog(
     @Body() dto: BlogInputClassModel,
     @UserFromRequestDecorator()user:UserDocument,
   ) {
     const command = new CreateBlogCommand(user, dto);
-    return await this.commandBus.execute(command);
+    return await this.commandBus.execute(command)
   }
   @Post(":id/posts")
   async createPostForBlog(
     @Param("id")
-      blogId: string,
+     id: string,
     @UserFromRequestDecorator()user:UserDocument,
-    @Body() dto: createPostForBlogInputClassModel,
+    @Body() dto: CreatePostForBlogInputClassModel,
   ) {
-    if(!blogId) throw new NotFoundException()
-    const command = new CreatePostByBlogCommand(user, dto, blogId);
-    return await this.commandBus.execute(command);
+    const command = new CreatePostByBlogCommand(user, dto, id);
+    return await this.commandBus.execute(command)
   }
   @Put(":id")
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -86,11 +79,8 @@ export class BlogsBloggerController {
       id: string,
     @Body() dto: BlogInputClassModel,
   ) {
-    if(!id) throw new NotFoundException()
     const command = new UpdateBlogCommand(id, dto, user);
-    const putBlog = await this.commandBus.execute(command);
-    if(!putBlog) return (HttpStatus.NOT_FOUND)
-    return putBlog
+    return await this.commandBus.execute(command)
   }
 
   @Put(":blogId/posts/:postId")
@@ -99,26 +89,27 @@ export class BlogsBloggerController {
     @UserFromRequestDecorator()user:UserDocument,
     @Param("blogId") blogId: string,
     @Param("postId") postId: string,
-    @Body() dto: CreatePostInputClassModel,
+    @Body() dto: CreatePostForBlogInputClassModel,
   ) {
-    if(!blogId || !postId) throw new NotFoundException()
-    // const UpdatePostDto: CreatePostInputClassModel = {
-    //   title: body.title,
-    //   shortDescription: body.shortDescription,
-    //   content: body.content,
-    //   blogId: blogId,
-    // }
-    const command = new UpdatePostByBlogCommand(postId, dto, user);
+    const command = new UpdatePostByBlogCommand(blogId, postId, dto, user);
     return await this.commandBus.execute(command);
   }
+  @Put(":userId/ban")
+  async updateBanStatus(
+    @Param("userId") userId: string,
+    @Body() dto: BanInfoInputClassModel,
+  ){
+    const command = new UpdateBanStatusCommand(userId, dto)
+    return await this.commandBus.execute(command)
+  }
+
   @Delete(":id")
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteBlog (
     @UserFromRequestDecorator()user:UserDocument,
     @Param('id')
       id: string) {
-    if(!id) throw new NotFoundException()
-    return await this.commandBus.execute(new DeleteBlogCommand(id,user));
+    return await this.commandBus.execute(new DeleteBlogCommand(id, user));
   }
   @Delete(":blogId/posts/:postId")
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -127,7 +118,6 @@ export class BlogsBloggerController {
     @Param("blogId") blogId: string,
     @Param("postId") postId: string,
   ){
-    if(!blogId || !postId) throw new NotFoundException()
     const command = new DeletePostByBlogCommand(blogId, postId,user);
     await this.commandBus.execute(command);
   }
