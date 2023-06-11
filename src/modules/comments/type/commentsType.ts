@@ -6,7 +6,7 @@ export class commentContentInputClassModel {
   @Length(20, 300)
   @IsString()
   @Transform(({ value }) => value.trim())
-  content: string
+  content: string;
 }
 
 export type LikesType = {
@@ -20,7 +20,7 @@ export type CommentLikesInfoType = {
   dislikesData: LikesType[]
   likesCount: number
   dislikesCount: number
-  myStatus: 'None' | 'Like' | 'Dislike'
+  myStatus: "None" | "Like" | "Dislike"
 }
 export type CommentType = {
   id: string
@@ -45,6 +45,22 @@ export type CommentReturnType = {
   likesInfo: {
     likesCount: number
     dislikesCount: number
-    myStatus: 'None' | 'Like' | 'Dislike'
+    myStatus: "None" | "Like" | "Dislike"
   }
+}
+
+export type CommentDataType = {
+  id: Types.ObjectId;
+  content: string;
+  commentatorInfo: {
+    userId: string,
+    userLogin: string;
+  }
+  createdAt: string;
+  postInfo: {
+    id: Types.ObjectId;
+    title: string;
+    blogId: Types.ObjectId;
+    blogName: string;
+  };
 }

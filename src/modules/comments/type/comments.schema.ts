@@ -13,18 +13,18 @@ export class CommentLikesData {
   userId: Types.ObjectId;
   userLogin: string;
 }
-
+@Schema()
+class PostInfo {
+  id: Types.ObjectId;
+  title: string;
+  blogId: Types.ObjectId;
+  blogName: string;
+}
 @Schema()
 class CommentatorInfo {
-
-  @Prop({
-    required: true
-  })
+  @Prop({ required: true })
   userId: string;
-
-  @Prop({
-    required: true
-  })
+  @Prop({ required: true })
   userLogin: string;
 }
 
@@ -45,50 +45,33 @@ class LikesInfo {
 @Schema()
 export class Comment {
   _id: Types.ObjectId;
-
-  @Prop({
-    required: true
-  })
+  @Prop({ required: true })
   content: string;
-
-  // @Prop({
-  //   required: true
-  // })
-
-  @Prop({
-    required: true
-  })
-  postId: string;
-
-  @Prop({
-    required: true,
-    type: CommentatorInfo
-  })
+  // @Prop({ required: true })
+  // postId: string;
+  @Prop({ required: true, type: CommentatorInfo })
   commentatorInfo: CommentatorInfo;
-
-  @Prop({
-    required: true
-  })
+  @Prop({ required: true })
   createdAt: string;
-
-  @Prop({
-    type: LikesInfo
-  })
+  @Prop({ type: LikesInfo })
   likesInfo: LikesInfo;
+  @Prop({type: PostInfo})
+  postInfo: PostInfo;
 
   updateComment(){
 
   }
   static createComment(
     content: string,
-    postId: Types.ObjectId,
+    // postId: Types.ObjectId,
+    post: PostDocument,
     CommentModel: CommentModelType,
     user: UserDocument,
   ): CommentDocument {
     const createNewComment = new CommentModel();
 
     createNewComment.content = content;
-    createNewComment.postId = postId.toString()
+    // createNewComment.postId = postId.toString()
     createNewComment.commentatorInfo = {
       userId: user._id.toString(),
       userLogin: user.accountData.login
@@ -100,6 +83,12 @@ export class Comment {
       likesCount: 0,
       dislikesCount: 0,
       myStatus: 'None',
+    }
+    createNewComment.postInfo = {
+      id: post._id,
+      title: post.title,
+      blogId: post.blogId,
+      blogName: post.blogName,
     }
     return createNewComment
   }
@@ -117,7 +106,8 @@ CommentSchema.statics = commentStaticMethods;
 export type CommentModelStaticType = {
   createComment: (
     content: string,
-    postId: Types.ObjectId,
+    // postId: Types.ObjectId,
+    post: PostDocument,
     CommentModel: CommentModelType,
     user: UserDocument) => CommentDocument
 }
