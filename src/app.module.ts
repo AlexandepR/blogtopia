@@ -17,7 +17,7 @@ import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
 import { GetBlogsPublicUseCase } from "./modules/blogs/application/use-cases/public/get-blogs-public-use-case";
 import { Blog, BlogSchema } from "./modules/blogs/type/blogs.schema";
-import { allMongooseModels, controllers, moduleImports, repo, services, useCases } from "./types/use-cases";
+import { allMongooseModels, controllers, moduleImports, repo, services, useCases } from "./use-cases";
 
 
 // const mongooseModels = [...allMongooseModels];
