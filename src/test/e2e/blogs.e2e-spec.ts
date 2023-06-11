@@ -4,7 +4,8 @@ import { AppModule } from "../../app.module";
 // import * as request from "supertest";
 import request from "supertest";
 import { settingsEnv } from "../../settings/settings";
-import { addSettingsApp } from "../../main";
+import { addSettingsApp } from "../../addSettingsApp";
+
 
 const blog1 = {
   name: "testBlog1",

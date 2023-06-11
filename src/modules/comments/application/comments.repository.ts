@@ -1,18 +1,15 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Post, PostModelType } from "../../posts/type/posts.schema";
 import { Comment, CommentDocument, CommentModelType } from "../type/comments.schema";
-import { Blog, BlogDocument, BlogModelType } from "../../blogs/type/blogs.schema";
 import { Types } from "mongoose";
-import { filterBanCommentLikesInfo, filterBanPostLikesInfo } from "../../../utils/helpers";
-import { ObjectId } from "mongodb";
+import { filterBanCommentLikesInfo } from "../../../utils/helpers";
+import { CommentDataType } from "../type/commentsType";
+
 
 @Injectable()
 export class CommentsRepository {
   constructor(
-    // @InjectModel(Blog.name) private BlogModel: BlogModelType,
-    // @InjectModel(Post.name) private PostModel: PostModelType,
-    @InjectModel(Comment.name) private CommentModel: CommentModelType,
+    @InjectModel(Comment.name) private CommentModel: CommentModelType
   ) {
   }
   async getComments(
@@ -20,54 +17,76 @@ export class CommentsRepository {
     pageSize: number,
     skip: number,
     sortBy: string,
-    sortDirection: 'desc' | 'asc',
+    sortDirection: "desc" | "asc",
     filter,
     banUsers: Array<string>
   ): Promise<CommentDocument[]> {
     const comments = await this.CommentModel
-      .find({$or: [{postId},filter]})
+      .find({ $or: [{ postId }, filter] })
       .sort([[sortBy, sortDirection]])
       .skip(skip)
       .limit(pageSize);
-    return filterBanCommentLikesInfo(comments, banUsers)
+    return filterBanCommentLikesInfo(comments, banUsers);
     // return comments;
   }
-  async getCommentsById(commentId: Types.ObjectId,filter?,banUsers?): Promise<CommentDocument | null> {
+  async findAllOwnComments(
+    skip: number,
+    pageSize: number,
+    sortBy: string,
+    sortDirection: "desc" | "asc",
+    userId: Types.ObjectId
+  ): Promise<CommentDataType[]> {
+    const getOwnComments = await this.CommentModel
+      .find({ "commentatorInfo.userId": userId })
+      .sort([[sortBy, sortDirection]])
+      .skip(skip)
+      .limit(pageSize)
+      .select(["_id", "content", "commentatorInfo", "createdAt", "postInfo"])
+    .lean()
+    const comments = getOwnComments.map(({ _id, ...rest }) => ({
+      id: _id,
+      ...rest
+    }));
+    return comments
+  }
+  async getCommentsById(commentId: Types.ObjectId, filter?, banUsers?): Promise<CommentDocument | null> {
     let query: any = { _id: commentId };
     if (filter) {
       query = { $and: [query, filter] };
     }
     const comments = await this.CommentModel
-      .findOne(query)
+      .findOne(query);
     if (comments) {
-      const filteredPosts = filterBanCommentLikesInfo(comments, banUsers)
-      return filteredPosts
+      const filteredPosts = filterBanCommentLikesInfo(comments, banUsers);
+      return filteredPosts;
     } else {
       return null;
     }
   }
-  async getMyStatusLikeInfo(commentId: Types.ObjectId, userId:Types.ObjectId | null | undefined): Promise<'None' | 'Like' | 'Dislike'> {
+  async getMyStatusLikeInfo(commentId: Types.ObjectId, userId: Types.ObjectId | null | undefined): Promise<"None" | "Like" | "Dislike"> {
     const findLike = await this.CommentModel
 
       .findOne({ _id: commentId, "likesInfo.likesData": { $elemMatch: { userId: userId } } })
-      .lean()
+      .lean();
     const findDislike = await this.CommentModel
       .findOne({ _id: commentId, "likesInfo.dislikesData": { $elemMatch: { userId: userId } } })
-      .lean()
+      .lean();
     if (findLike) {
-      return "Like"
+      return "Like";
     }
     if (findDislike) {
-      return "Dislike"
-    }
-    else {
-      return 'None';
+      return "Dislike";
+    } else {
+      return "None";
     }
   }
   async getTotalCountComments(filter: any): Promise<number> {
     const count = await this.CommentModel
       .countDocuments(filter);
     return count;
+  }
+  async getTotalOwnComments(userId: Types.ObjectId): Promise<number> {
+    return this.CommentModel.countDocuments({ "commentatorInfo.userId": userId });
   }
   async getTotalCount(postId: Types.ObjectId) {
     return this.CommentModel
@@ -87,7 +106,7 @@ export class CommentsRepository {
       .updateOne({ _id: commentId }, {
         $set:
           {
-            'likesInfo': comment.likesInfo
+            "likesInfo": comment.likesInfo
           }
       });
     if (updateComment) {
@@ -101,10 +120,10 @@ export class CommentsRepository {
       .updateOne({ _id: commentId }, {
         $set:
           {
-            'likesInfo.likesData': comment.likesInfo.likesData,
-            'likesInfo.dislikesData': comment.likesInfo.dislikesData,
-            'likesInfo.likesCount': comment!.likesInfo.likesData.length,
-            'likesInfo.dislikesCount': comment!.likesInfo.dislikesData.length,
+            "likesInfo.likesData": comment.likesInfo.likesData,
+            "likesInfo.dislikesData": comment.likesInfo.dislikesData,
+            "likesInfo.likesCount": comment!.likesInfo.likesData.length,
+            "likesInfo.dislikesCount": comment!.likesInfo.dislikesData.length
           }
       });
     if (updateComment) {
@@ -121,8 +140,8 @@ export class CommentsRepository {
   //     );
   //   return checkNewestLikes.modifiedCount > 0;
   // }
-  async checkLikes(commentId: Types.ObjectId, userId: Types.ObjectId, updateField:string): Promise<boolean> {
-    const field = `likesInfo.${updateField}`
+  async checkLikes(commentId: Types.ObjectId, userId: Types.ObjectId, updateField: string): Promise<boolean> {
+    const field = `likesInfo.${updateField}`;
     const result = await this.CommentModel
       .updateMany(
         { _id: commentId },

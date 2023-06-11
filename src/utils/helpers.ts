@@ -56,16 +56,6 @@ export const pagesCounter = (totalCount: number, pageSize: number) => Math.ceil(
 
 export const skipPage = (pageNumber: number, pageSize: number) => (pageNumber - 1) * pageSize;
 
-// export class UserHelper {
-//   static async checkIfUserExistsByEmail(email: string): Promise<boolean> {
-//     const findUserByEmail = await UserModel.findOne({
-//       'accountData.email': email,
-//     }).lean();
-//
-//     return !!findUserByEmail;
-//   }
-// }
-
 export const generateHash = async (password: string) => {
   const passwordSalt = await bcrypt.genSalt(10);
   const hash = await bcrypt.hash(password, passwordSalt);

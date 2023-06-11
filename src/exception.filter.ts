@@ -28,7 +28,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
     const status = exception.getStatus();
-
     if (status === 500 && process.env.environment !== 'production') {
       response.status(status).json(exception)
     }
@@ -41,7 +40,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
       if (responseBody.message && Array.isArray(responseBody.message)) {
         responseBody.message.forEach((m) => errorResponse.errorsMessages.push(m));
       }
-      // responseBody.message.forEach((m) => errorResponse.errors.push(m))
       response.status(status).json(errorResponse)
     } else {
       response

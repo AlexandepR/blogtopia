@@ -16,7 +16,7 @@ export class PostsRepository {
     @InjectModel(Post.name) private PostModel: PostModelType,
     @InjectModel(Comment.name) private CommentModel: CommentModelType,
     @InjectModel(User.name) private UserModel: UserModelType
-    ) {
+  ) {
   }
   async getPosts(
     skip: number,
@@ -32,7 +32,7 @@ export class PostsRepository {
       .skip(skip)
       .limit(pageSize)
       .lean();
-    const filteredPosts = filterBanPostsLikesInfo(posts, banUsers)
+    const filteredPosts = filterBanPostsLikesInfo(posts, banUsers);
     // posts.map(post => {
     //   if (post.extendedLikesInfo && post.extendedLikesInfo.newestLikes) {
     //     post.extendedLikesInfo.newestLikes = post.extendedLikesInfo.newestLikes.filter(
@@ -52,25 +52,24 @@ export class PostsRepository {
     return filteredPosts;
   }
   async createPost(createDto: CreatePostInputModelType, blog: BlogDocument, user: UserDocument): Promise<Post> {
-    const newPost = Post.create(createDto, blog, this.PostModel,user);
+    const newPost = Post.create(createDto, blog, user, this.PostModel);
     return newPost.save();
   }
-  async createComment(content: string, postId: Types.ObjectId, user: UserDocument): Promise<any> {
-    const newComment = Comment.createComment( content, postId, this.CommentModel, user);
+  // async createComment(content: string, postId: Types.ObjectId, user: UserDocument): Promise<any> {
+  async createComment(content: string, post: PostDocument, user: UserDocument): Promise<any> {
+    // const newComment = Comment.createComment(content, postId, this.CommentModel, user);
+    const newComment = Comment.createComment(content, post, this.CommentModel, user);
     return newComment.save();
   }
-  async findPostById(
+  async findPostByIdWithFilter(
     postId: Types.ObjectId,
-    filter?: any,
-    banUsers?: Array<string>,
-    ): Promise<PostDocument> {
-    let query: any = { _id: postId };
-    if (filter) {
-      query = { $and: [query, filter] };
-    }
+    filter: any,
+    banUsers: Array<string>
+  ): Promise<PostDocument> {
+      const query = { $and: [{ _id: postId }, filter] };
+    // }
     const post = await this.PostModel
       .findOne(query)
-      // .findOne({$or: [{ _id: postId, filter ]});
     const filteredPosts = filterBanPostLikesInfo(post, banUsers)
     if (filteredPosts) {
       return filteredPosts;
@@ -78,7 +77,17 @@ export class PostsRepository {
       return null;
     }
   }
-
+  async findPostById(postId: Types.ObjectId): Promise<PostDocument> {
+    const blog = await this.PostModel
+      .findOne({ _id: postId });
+    return blog;
+  }
+  async findPostByIdForBlogger(postId: Types.ObjectId, filter?): Promise<PostDocument> {
+      const query = { $and: [{ _id: postId }, filter] };
+    const post = await this.PostModel
+      .findOne(query);
+    return post;
+  }
   async save(post: PostDocument) {
     await post.save();
   }
@@ -103,7 +112,7 @@ export class PostsRepository {
     const result = await this.PostModel
       .updateMany(
         { _id: postId },
-        { $pull: { [field]: { userId: userId } } },
+        { $pull: { [field]: { userId: userId } } }
       );
     return result.modifiedCount > 0;
   }
@@ -111,37 +120,37 @@ export class PostsRepository {
     const checkNewestLikes = await this.PostModel
       .updateMany(
         { _id: postId },
-        { $pull: { 'extendedLikesInfo.newestLikes': { userId: userId } } }
+        { $pull: { "extendedLikesInfo.newestLikes": { userId: userId } } }
       );
     return checkNewestLikes.modifiedCount > 0;
   }
-  async findLikesStatus(postId: ObjectId, userId?: ObjectId | null): Promise<'None' | 'Like' | 'Dislike'> {
-    if (!userId) return 'None';
+  async findLikesStatus(postId: ObjectId, userId?: ObjectId | null): Promise<"None" | "Like" | "Dislike"> {
+    if (!userId) return "None";
     const findLikeStatus = await this.PostModel
       .findOne(
-        { _id: postId, 'extendedLikesInfo.likesData': { $elemMatch: { userId: userId } } }
+        { _id: postId, "extendedLikesInfo.likesData": { $elemMatch: { userId: userId } } }
       )
       .lean();
-    if (findLikeStatus) return 'Like';
+    if (findLikeStatus) return "Like";
     const findDislikeStatus = await this.PostModel
       .findOne(
-        { _id: postId, 'extendedLikesInfo.dislikesData': { $elemMatch: { userId: userId } } }
+        { _id: postId, "extendedLikesInfo.dislikesData": { $elemMatch: { userId: userId } } }
       )
       .lean();
-    if (findDislikeStatus) return 'Dislike';
-    return 'None';
+    if (findDislikeStatus) return "Dislike";
+    return "None";
   }
   async updateNewestLikes(postId: ObjectId, newesetLike: PostsNewestLikesType): Promise<boolean> {
     const updateNewestLike = await this.PostModel.updateOne(
       { _id: postId },
       {
         $push: {
-          'extendedLikesInfo.newestLikes': {
+          "extendedLikesInfo.newestLikes": {
             $each: [newesetLike],
-            $sort: { 'addedAt': -1 },
+            $sort: { "addedAt": -1 },
             $slice: 3
           }
-        },
+        }
       }
     );
     return updateNewestLike.modifiedCount > 0;
@@ -151,10 +160,10 @@ export class PostsRepository {
       .updateOne({ _id: postId }, {
         $set:
           {
-            'extendedLikesInfo.likesData': post.extendedLikesInfo.likesData,
-            'extendedLikesInfo.dislikesData': post.extendedLikesInfo.dislikesData,
-            'extendedLikesInfo.likesCount': post!.extendedLikesInfo.likesData.length,
-            'extendedLikesInfo.dislikesCount': post!.extendedLikesInfo.dislikesData.length,
+            "extendedLikesInfo.likesData": post.extendedLikesInfo.likesData,
+            "extendedLikesInfo.dislikesData": post.extendedLikesInfo.dislikesData,
+            "extendedLikesInfo.likesCount": post!.extendedLikesInfo.likesData.length,
+            "extendedLikesInfo.dislikesCount": post!.extendedLikesInfo.dislikesData.length
           }
       });
     return !!updatePost;

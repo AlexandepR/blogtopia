@@ -53,8 +53,8 @@ export class UsersAdminController {
     const command = new UpdateBanInfoByAdminCommand(dto, id);
     return await this.commandBus.execute(command);
   }
-  @Post()
   @UseGuards(CheckLoginOrEmailGuard)
+  @Post()
   async createUser(
     @Ip() ip,
     @Body() dto: CreateUserInputClassModel
@@ -62,8 +62,8 @@ export class UsersAdminController {
     const command = new CreateUserByAdminCommand(dto, ip);
     return await this.commandBus.execute(command);
   }
-  @Delete(":id")
   @HttpCode(HttpStatus.NO_CONTENT)
+  @Delete(":id")
   async deleteUser(
     @Param('id')
       id: string) {

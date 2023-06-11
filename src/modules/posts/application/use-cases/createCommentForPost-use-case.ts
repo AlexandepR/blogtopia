@@ -37,7 +37,8 @@ export class CreateCommentForPostUseCase implements ICommandHandler<CreateCommen
     if(!postId) throw new HttpException('', HttpStatus.NOT_FOUND)
     const findPost = await this.postsRepository.findPostById(postId)
     if(!findPost) throw new HttpException('', HttpStatus.NOT_FOUND)
-    const createComment = await this.postsRepository.createComment(command.dto.content, postId, command.user);
+    // const createComment = await this.postsRepository.createComment(command.dto.content, postId, command.user);
+    const createComment = await this.postsRepository.createComment(command.dto.content, findPost, command.user);
     if(!createComment) throw new HttpException('', HttpStatus.NOT_FOUND)
     if (createComment) {
       return {

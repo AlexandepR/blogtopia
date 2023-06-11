@@ -42,9 +42,6 @@ export class NewestLikes {
   versionKey: false,
 })
 export class ExtendedLikesInfo {
-
-  // _id: Types.ObjectId;
-
   @Prop({ type: PostLikesData })
   likesData: PostLikesData[];
   @Prop({ type: PostLikesData })
@@ -65,40 +62,30 @@ export class ExtendedLikesInfo {
   versionKey: false,
 })
 export class Post {
-
   _id: Types.ObjectId;
-  // @Prop({
-  //   required: true,
-  // })
-  // author: string
   @Prop({
     required: true,
     maxlength: 30
   })
   title: string;
-
   @Prop({
     required: true,
     maxlength: 100
   })
   shortDescription: string;
-
   @Prop({
     required: true,
     maxlength: 1000
   })
   content: string;
-
   @Prop({
     required: true
   })
   blogId: Types.ObjectId;
-
   @Prop({
     required: true
   })
   blogName: string;
-
   @Prop({
   })
   createdAt: string;
@@ -118,13 +105,10 @@ export class Post {
   static create(
     dto: CreatePostInputModelType,
     blog: BlogDocument,
+    user: UserDocument,
     PostModel: PostModelType,
-    user: UserDocument
   ): PostDocument {
-    // if (!dto) throw new Error("Bad request");
     const createNewPost = new PostModel();
-
-    // createNewPost.author = user.accountData.login;
     createNewPost.title = dto.title;
     createNewPost.shortDescription = dto.shortDescription;
     createNewPost.content = dto.content;
@@ -136,7 +120,6 @@ export class Post {
       userLogin: user.accountData.login
     };
     createNewPost.extendedLikesInfo = {
-      // _id: new Types.ObjectId,
       likesData: [],
       dislikesData: [],
       likesCount: 0,
@@ -144,11 +127,8 @@ export class Post {
       myStatus: "None",
       newestLikes: []
     };
-
-
     return createNewPost;
   }
-
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post);
@@ -163,8 +143,8 @@ export type PostModelStaticType = {
   create: (
     dto: CreatePostInputModelType,
     blog: BlogDocument,
-    PostModel: PostModelType,
     user: UserDocument,
+    PostModel: PostModelType,
     ) => PostDocument
 }
 export type PostDocument = HydratedDocument<Post>

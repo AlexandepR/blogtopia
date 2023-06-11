@@ -8,6 +8,24 @@ import { existingBlog } from "../../../pipes/validation/validate.pipe";
 //   likeStatus: "None" | "Like" | "Dislike"
 // }
 
+export class CreatePostForBlogInputClassModel {
+  @MaxLength(30)
+  @IsString()
+  @Transform(({ value }) => value.trim())
+  @IsNotEmpty()
+  title: string;
+  @MaxLength(100)
+  @IsString()
+  @IsNotEmpty()
+  @Transform(({ value }) => value.trim())
+  shortDescription: string;
+  @MaxLength(1000)
+  @IsString()
+  @IsNotEmpty()
+  @Transform(({ value }) => value.trim())
+  content: string;
+}
+
 export class CreatePostInputClassModel {
   @MaxLength(30)
   @IsString()
@@ -26,7 +44,7 @@ export class CreatePostInputClassModel {
   content: string;
   @IsString()
   @IsMongoId()
-  // @existingBlog()
+  @existingBlog()
   @IsNotEmpty()
   blogId: string;
 }

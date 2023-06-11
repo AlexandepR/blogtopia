@@ -8,60 +8,14 @@ import cookieParser from "cookie-parser";
 import { useContainer } from "class-validator";
 import { ConfigService } from "@nestjs/config";
 import { ConfigurationConfigType } from "./configuration/config.module";
+import { addSettingsApp } from "./addSettingsApp";
 
 
-export const addSettingsApp = (app: INestApplication) => {
-  useContainer(app.select(AppModule), { fallbackOnErrors: true });
-  app.enableCors();
-  app.use(cookieParser());
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-    stopAtFirstError: true,
-    // forbidUnknownValues: false,
-    transform: true,
-    exceptionFactory: (errors) => {
-      const errorsForResponse = [];
-      // errors.forEach((e) => {
-      //   const constraintsKeys = Object.keys(e.constraints);
-      //   constraintsKeys.forEach((ckey) => {
-      //     const messages = Array.isArray(e.constraints[ckey]) ? e.constraints[ckey] : [e.constraints[ckey]];
-      //     if (Array.isArray(messages)) {
-      //       messages.forEach((message) => {
-      //         errorsForResponse.push({
-      //           message,
-      //           field: e.property
-      //         });
-      //       });
-      //     } else {
-      //       errorsForResponse.push({
-      //         message: messages,
-      //         field: e.property
-      //       });
-      //     }
-      //   })
-      // })
 
-      errors.forEach((e) => {
-        const constraintsKeys = Object.keys(e.constraints);
-        constraintsKeys.forEach((ckey) => {
-          errorsForResponse.push({
-            message: e.constraints[ckey],
-            field: e.property
-          });
-        });
-      });
-      throw new BadRequestException(errorsForResponse);
-    }
-  }));
-  app.useGlobalFilters(new HttpExceptionFilter()
-    // new ErrorExceptionFilter()
-  );
-};
 
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors();
   addSettingsApp(app);
   const config = new DocumentBuilder()
     .setTitle("Blogs example")
@@ -95,16 +49,10 @@ async function bootstrap() {
   // app.useGlobalFilters(new HttpExceptionFilter(),
   //   // new ErrorExceptionFilter()
   // );
-
   const configService = app.get(ConfigService<ConfigurationConfigType>);
-  // configService.get('PORT_TEST',{infer:true}).test
-  await app.listen(
-    configService.get("PORT"),
-    // settingsEnv.PORT || 5001
-  );
+  await app.listen(configService.get("PORT")); // settingsEnv.PORT || 5001
   console.log(`Application is running on: ${await app.getUrl()}`);
-  const serverUrl = process.env.SERVER_URL;
-
+  // const serverUrl = process.env.SERVER_URL;
   // if (process.env.NODE_ENV === "development") {
   //   get(
   //     `${serverUrl}/swagger/swagger-ui-bundle.js`, function
