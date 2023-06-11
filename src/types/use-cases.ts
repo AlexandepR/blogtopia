@@ -86,7 +86,7 @@ import { JwtModule } from "@nestjs/jwt";
 import { ConfigModule } from "@nestjs/config";
 import { PassportModule } from "@nestjs/passport";
 import { MailerModule } from "@nestjs-modules/mailer";
-// import { MailerModule2 } from "../";
+// import { MailerModule2 } from "../../swagger-static";
 
 export const adminUseCases = [
   GetBlogsByAdminUseCase,
@@ -223,7 +223,7 @@ export const allMongooseModels = [
 export const moduleImports = [
   CqrsModule,
   ServeStaticModule.forRoot({
-    rootPath: join(__dirname, "..", "swagger-static"),
+    rootPath: join(__dirname, "../../", "swagger-static"),
     serveRoot: settingsEnv.NODE_ENV === "development" ? "/" : "/swagger"
   }),
   ThrottlerModule.forRoot({
