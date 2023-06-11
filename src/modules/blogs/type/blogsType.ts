@@ -1,5 +1,5 @@
 import { ObjectId } from "mongoose";
-import { IsNotEmpty, IsString, IsUrl, MaxLength } from "class-validator";
+import { IsNotEmpty, IsString, IsUrl, Length, MaxLength, MinLength, minLength } from "class-validator";
 import { Transform } from "class-transformer";
 
 
@@ -8,13 +8,11 @@ export class BlogInputClassModel {
   @IsString()
   @IsNotEmpty()
   @Transform(({ value }) => value.trim())
-    // @ValidateInputBlog()
   name: string;
   @MaxLength(500)
   @IsString()
   @IsNotEmpty()
   @Transform(({ value }) => value.trim())
-    // @ValidateInputBlog()
   description: string;
   @IsUrl()
   @IsNotEmpty()
@@ -43,37 +41,26 @@ export class updatePostForBlogInputClassModel {
   @Transform(({ value }) => value.trim())
   blogId: string
 }
-export class createPostForBlogInputClassModel {
+export class CreatePostForBlogInputClassModel {
   @MaxLength(30)
-  // @IsString()
   @Transform(({ value }) => value.trim())
-  // @IsNotEmpty()
   title: string;
   @MaxLength(100)
-  // @IsString()
-  // @IsNotEmpty()
   @Transform(({ value }) => value.trim())
   shortDescription: string;
   @MaxLength(1000)
-  // @IsString()
-  // @IsNotEmpty()
   @Transform(({ value }) => value.trim())
   content: string;
 }
-
-
-export class BlogDBType {
-  constructor(
-    public _id: ObjectId,
-    public name: string,
-    public description: string,
-    public websiteUrl: string,
-    public createdAt: string,
-    public isMembership: boolean,
-    public __v?: string,
-  ) {
-  }
+export class BanInfoInputClassModel {
+  @IsNotEmpty()
+  isBanned: boolean
+  @MinLength(20)
+  banReason: string
+  @IsNotEmpty()
+  blogId: string
 }
+
 export type BlogType = {
   id: string
   name: string
@@ -83,16 +70,7 @@ export type BlogType = {
   isMembership: boolean
 }
 export type QueryType = {
-  searchNameTerm: string,
-  pageSize: number,
-  pageNumber: number,
-  sortDirection: "asc" | "desc",
-  sortBy: string
-}
-export type QueryUsersType = {
-  // filter?: Record<string, any>,
-  // searchLoginTerm?: string,
-  // searchEmailTerm?: string,
+  searchNameTerm?: string,
   pageSize: number,
   pageNumber: number,
   sortDirection: "asc" | "desc",
@@ -117,10 +95,4 @@ export type updatePostForBlogInputModel = {
   title: string,
   shortDescription: string,
   content: string
-}
-export type FilterBlogType = {
-  name?: {
-    $regex: string | number;
-    $options: string;
-  }
 }
