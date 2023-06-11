@@ -1,10 +1,6 @@
-import { PaginationType, ParamsType } from "../../../../../types/types";
 import { UserDocument } from "../../../../users/type/users.schema";
-import { BlogDocument } from "../../../type/blogs.schema";
-import { filterByNameTermOrUserLogin, pagesCounter, parseQueryPaginator, skipPage } from "../../../../../utils/helpers";
 import { BlogsRepository } from "../../blogs.repository";
-import { ForbiddenException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
-import { CreatePostInputClassModel } from "../../../../posts/type/postsType";
+import { HttpException, HttpStatus } from "@nestjs/common";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { Types } from "mongoose";
 import { BlogType } from "../../../type/blogsType";
