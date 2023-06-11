@@ -223,7 +223,7 @@ export const allMongooseModels = [
 export const moduleImports = [
   CqrsModule,
   ServeStaticModule.forRoot({
-    rootPath: join(__dirname, "../../", "swagger-static"),
+    rootPath: join(__dirname, "../..", "swagger-static"),
     serveRoot: settingsEnv.NODE_ENV === "development" ? "/" : "/swagger"
   }),
   ThrottlerModule.forRoot({
