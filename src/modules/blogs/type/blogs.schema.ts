@@ -1,12 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import mongoose, { HydratedDocument, Model, Types, ObjectId } from "mongoose";
-import {
-  CreateBlogInputModelType,
-  createPostForBlogInputModel,
-  PutBlogDtoType,
-  updatePostForBlogInputModel
-} from "./blogsType";
-import { PostDocument, PostModelType } from "../../posts/type/posts.schema";
+import { HydratedDocument, Model, Types } from "mongoose";
+import { BanInfoInputClassModel, CreateBlogInputModelType, PutBlogDtoType } from "./blogsType";
 import { UserDocument } from "../../users/type/users.schema";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 
@@ -21,19 +15,26 @@ class BlogOwnerInfo {
   @Prop()
   userLogin: string;
 }
-
-
-class BlogEntity {
-
+@Schema({
+  _id: false,
+  versionKey: false
+})
+class BanUsersInfo {
+  @Prop()
+  isBanned: boolean;
+  @Prop()
+  date: Date;
+  @Prop()
+  banReason: string
+  @Prop()
+  login: string;
+  @Prop()
+  userId: Types.ObjectId;
 }
 
 @Schema({timestamps:true})
 export class Blog extends TimeStamps{
   _id: Types.ObjectId
-  // @Prop({
-  //   required: true
-  // })
-  // author: string;
   @Prop({
     required: true,
     maxLength: 15
@@ -51,17 +52,37 @@ export class Blog extends TimeStamps{
     match: /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/
   })
   websiteUrl: string;
-
+  @Prop()
+  banInfo: boolean
   @Prop({ type: BlogOwnerInfo })
   blogOwnerInfo: BlogOwnerInfo;
+  @Prop( {type: BanUsersInfo})
+  banUsersInfo: BanUsersInfo[];
   @Prop()
   isMembership: boolean;
+  banBlog(banInfo: boolean) {
+    this.banInfo = banInfo
+  }
+  banUser(dto: BanInfoInputClassModel, userLogin: string, userId: Types.ObjectId) {
+      this.banUsersInfo.push({
+        isBanned: dto.isBanned,
+        date: new Date(),
+        banReason: dto.banReason,
+        login: userLogin,
+        userId: userId,
+      })
+  }
+  // unBanUser(dto: BanInfoInputClassModel, userLogin: string, userId: Types.ObjectId) {
+  //   this.banUsersInfo.isBanned = dto.isBanned;
+  //   this.banUsersInfo.date = new Date();
+  //   this.banUsersInfo.banReason = dto.banReason;
+  //   this.banUsersInfo.login = userLogin;
+  //   this.banUsersInfo.userId = userId;
+  // }
   updateBlog(updateBlogInfo: PutBlogDtoType) {
     this.name = updateBlogInfo.name;
     this.description = updateBlogInfo.description;
     this.websiteUrl = updateBlogInfo.websiteUrl;
-    // this.createdAt = createdAt
-    // this.createdAt = new Date().toISOString();
   }
   bindUserToBlog(user:UserDocument) {
     this.blogOwnerInfo.userId = user._id.toString();
@@ -81,41 +102,14 @@ export class Blog extends TimeStamps{
     createNewBlog.description = dto.description;
     createNewBlog.websiteUrl = dto.websiteUrl;
     createNewBlog.isMembership = false;
-    // createNewBlog.createdAt = new Date().toISOString();
     return createNewBlog;
   }
-  // static createPost(
-  //   postDto: createPostForBlogInputModel,
-  //   getBlog: BlogDocument,
-  //   PostModel: PostModelType,
-  //   user: UserDocument
-  // ): PostDocument {
-  //   if (!postDto) throw new Error("Bad request");
-  //   const createNewPost = new PostModel();
-  //   createNewPost.title = postDto.title;
-  //   createNewPost.shortDescription = postDto.shortDescription;
-  //   createNewPost.content = postDto.content;
-  //   createNewPost.blogId = getBlog._id;
-  //   createNewPost.blogName = getBlog.name;
-  //   createNewPost.createdAt = new Date().toISOString();
-  //   createNewPost.postOwnerInfo = {
-  //     userId: user._id.toString(),
-  //     userLogin: user.accountData.login
-  //   };
-  //   createNewPost.extendedLikesInfo = {
-  //     likesData: [],
-  //     dislikesData: [],
-  //     likesCount: 0,
-  //     dislikesCount: 0,
-  //     myStatus: "None",
-  //     newestLikes: []
-  //   };
-  //   return createNewPost;
-  // }
 }
 
 export const BlogSchema = SchemaFactory.createForClass(Blog);
 BlogSchema.methods = {
+  banBlog: Blog.prototype.banBlog,
+  banUser: Blog.prototype.banUser,
   updateBlog: Blog.prototype.updateBlog,
   bindUserToBlog: Blog.prototype.bindUserToBlog
 };
