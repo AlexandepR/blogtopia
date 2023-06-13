@@ -7,6 +7,7 @@ import { pagesCounter, parseQueryPaginator, skipPage } from "../../../../../util
 import { Types } from "mongoose";
 import { NotFoundException } from "@nestjs/common";
 import { UsersRepository } from "../../../../users/application/users.repository";
+import { getPostsByBlogFilter } from "../../../../../utils/filters/post.filters";
 
 
 export class GetPostsByBlogCommand {
@@ -24,17 +25,11 @@ export class GetPostsByBlogUseCase implements ICommandHandler<GetPostsByBlogComm
               ) {
   }
   async execute(command: GetPostsByBlogCommand): Promise<PaginationType<PostsTypeFiltered[]>> {
-    const { searchNameTerm, pageSize, pageNumber, sortDirection, sortBy } = parseQueryPaginator(command.query);
+    const { pageSize, pageNumber, sortDirection, sortBy } = parseQueryPaginator(command.query);
     const blogId = new Types.ObjectId(command.id);
     const banUsers: Array<string> = await this.usersRepository.getBannedUsers()
-    // const filter = ({
-    //   $or: [
-    //     { "postOwnerInfo.userLogin": { $nin: banUsers } },
-    //     { blogId: new Types.ObjectId(command.id) },
-    //   ]
-    // });
-    const filter = { "postOwnerInfo.userLogin": { $nin: banUsers } }
-    // const blog = await this.blogsRepository.findBlogByIdForBlogger(blogId,filter);
+    const getBanBlogs = await this.blogsRepository.getArrayIdBanBlogs()
+    const filter = getPostsByBlogFilter(getBanBlogs, banUsers)
     const blog = await this.blogsRepository.findBlogByIdForBlogger(blogId,filter);;
     if (!blog) throw new NotFoundException()
     const totalCountPosts = await this.postsRepository.getTotalCountPosts(filter);
