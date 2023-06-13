@@ -24,8 +24,7 @@ export class GetBlogsByAdminUseCase implements ICommandHandler<getBlogsByAdminCo
     const getTotalCountBlogs = await this.blogsRepository.getTotalCountBlogs(filter);
     const skip = skipPage(pageNumber, pageSize);
     const pagesCount = pagesCounter(getTotalCountBlogs, pageSize);
-    const isAdmin = true
-    const getBlogs = await this.blogsRepository.getBlogs(skip, pageSize, filter, sortBy, sortDirection, isAdmin);
+    const getBlogs = await this.blogsRepository.getBlogs(skip, pageSize, filter, sortBy, sortDirection, true);
     return {
       pagesCount: pagesCount,
       page: pageNumber,
