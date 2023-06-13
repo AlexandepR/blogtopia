@@ -1,9 +1,11 @@
-import { Controller, Get, HttpCode, HttpStatus, Param, Put, Query } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Put, Query } from "@nestjs/common";
 import { CommandBus } from "@nestjs/cqrs";
 import { getBlogsByAdminCommand } from "../application/use-cases/admin/getBlogs-blogs-admin-use-case";
 import { BindUserToBlogCommand } from "../application/use-cases/admin/bindUserToBlog-blogs-admin-use-case";
 import { BasicAuth } from "../../../utils/public.decorator";
 import { ParamsType } from "../../../types/types";
+import { BanInfoBlogInputClassModel } from "../type/blogsType";
+import { UpdateBanInfoBlogCommand } from "../application/use-cases/admin/updateBanInfo-blogs-admin-use-case";
 
 
 @BasicAuth()
@@ -24,6 +26,15 @@ export class BlogsController {
     return this.commandBus.execute(command)
   }
   @HttpCode(HttpStatus.NO_CONTENT)
+  @Put(":blogId/ban")
+  async updateBanInfoForBlog(
+    @Param("blogId") blogId: string,
+    @Body() dto: BanInfoBlogInputClassModel
+  ) {
+    const command = new UpdateBanInfoBlogCommand(dto, blogId)
+    return this.commandBus.execute(command)
+  }
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Put(":blogId/bind-with-user/:userId")
   async bindUserToBlog(
     @Param("blogId") blogId: string,
@@ -31,7 +42,6 @@ export class BlogsController {
   ) {
     const command = new BindUserToBlogCommand(blogId, userId)
     return this.commandBus.execute(command)
-    // return await this.blogsService.getBlog(id);
   }
 
   // @Delete(":id")
