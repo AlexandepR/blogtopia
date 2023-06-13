@@ -27,9 +27,11 @@ export class GetBlogUseCase implements ICommandHandler<GetBlogCommand> {
 
     const blogId = new Types.ObjectId(command.id);
     const banUsers: Array<string> = await this.usersRepository.getBannedUsers();
+    const getBanBlogs = await this.blogsRepository.getArrayIdBanBlogs()
     const filter = ({
-      $or: [
-        { "blogOwnerInfo.userLogin": { $nin: banUsers } },
+      $and: [
+        getBanBlogs ? { "_id" : { $nin: getBanBlogs } } : {},
+        banUsers ? { "blogOwnerInfo.userLogin": { $nin: banUsers } } : {},
       ]
     });
     const blog = await this.blogsRepository.findBlogByIdForBlogger(blogId,filter);
