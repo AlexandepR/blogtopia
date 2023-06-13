@@ -41,16 +41,16 @@ export class updatePostForBlogInputClassModel {
   @Transform(({ value }) => value.trim())
   blogId: string
 }
-export class CreatePostForBlogInputClassModel {
+export class PostForBlogBloggerInputClassModel {
   @MaxLength(30)
   @Transform(({ value }) => value.trim())
-  title: string;
+  title: string
   @MaxLength(100)
   @Transform(({ value }) => value.trim())
-  shortDescription: string;
+  shortDescription: string
   @MaxLength(1000)
   @Transform(({ value }) => value.trim())
-  content: string;
+  content: string
 }
 export class BanInfoInputClassModel {
   @IsNotEmpty()
@@ -59,6 +59,10 @@ export class BanInfoInputClassModel {
   banReason: string
   @IsNotEmpty()
   blogId: string
+}
+export class BanInfoBlogInputClassModel {
+  @IsNotEmpty()
+  isBanned: boolean
 }
 
 export type BlogType = {
