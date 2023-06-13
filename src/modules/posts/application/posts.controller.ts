@@ -4,20 +4,19 @@ import {
   Delete,
   Get,
   HttpCode,
-  HttpStatus, NotFoundException,
+  HttpStatus,
+  NotFoundException,
   Param,
   Post,
   Put,
   Query,
-  Req,
-  ValidationPipe
+  Req
 } from "@nestjs/common";
 import { ParamsType } from "../../../types/types";
 import { CreateCommentInputClassModel, PostsService } from "./posts.service";
-import { Request } from 'express';
+import { Request } from "express";
 import { CreatePostInputClassModel, likeStatusInputClassModel } from "../type/postsType";
 import { BasicAuth, Public, UserFromRequestDecorator } from "../../../utils/public.decorator";
-import { checkObjectId } from "../../../utils/validation.helpers";
 import { UserDocument } from "../../users/type/users.schema";
 import { CommandBus } from "@nestjs/cqrs";
 import { UpdatePostLikeStatusCommand } from "./use-cases/updatePostLikeStatus-use-case";

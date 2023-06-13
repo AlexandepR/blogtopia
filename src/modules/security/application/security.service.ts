@@ -7,7 +7,7 @@ import jwt from 'jsonwebtoken';
 import { settingsEnv } from "../../../settings/settings";
 import { SecurityDocument } from "../type/security.schema";
 import { DevicesResDataType } from "../type/security.types";
-import { idParamsValidator } from "../../../utils/helpers";
+import { validateObjectId } from "../../../utils/helpers";
 
 @Injectable()
 export class SecurityService {
@@ -45,7 +45,7 @@ export class SecurityService {
   // }
 
   // async deleteDeviceById(deviceId: string, req: Request) {
-  //   // const checkDeviceId = idParamsValidator(deviceId);
+  //   // const checkDeviceId = validateObjectId(deviceId);
   //   // if(!checkDeviceId) throw new NotFoundException
   //   const session = await this.securityRepository.findSessionByDeviceId(deviceId);
   //   // const getRefreshToken: any = jwt.verify(refreshToken, settingsEnv.JWT_REFRESH_TOKEN_SECRET);

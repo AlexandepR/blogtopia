@@ -1,18 +1,13 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { validateOrRejectModel } from "../../../../utils/validation.helpers";
-import { idParamsValidator, updatePostLikesInfo } from "../../../../utils/helpers";
-import { HttpException, HttpStatus } from "@nestjs/common";
-import { Types } from "mongoose";
+import { validateObjectId } from "../../../../utils/helpers";
+import { ForbiddenException, HttpException, HttpStatus } from "@nestjs/common";
 import { UserDocument } from "../../../users/type/users.schema";
-import {
-  getCommentsByPostOutputModel,
-  likeStatusInputClassModel,
-  PostLikesType,
-  PostsNewestLikesType
-} from "../../type/postsType";
+import { getCommentsByPostOutputModel } from "../../type/postsType";
 import { UsersRepository } from "../../../users/application/users.repository";
 import { PostsRepository } from "../posts.repository";
 import { CreateCommentInputClassModel } from "../posts.service";
+import { BlogsRepository } from "../../../blogs/application/blogs.repository";
 
 
 export class CreateCommentForPostCommand {
@@ -29,16 +24,18 @@ export class CreateCommentForPostUseCase implements ICommandHandler<CreateCommen
   constructor(
     protected usersRepository: UsersRepository,
     protected postsRepository: PostsRepository,
+    protected blogsRepository: BlogsRepository,
   ) {
   }
   async execute(command: CreateCommentForPostCommand): Promise<getCommentsByPostOutputModel> {
     await validateOrRejectModel(command.dto, CreateCommentInputClassModel);
-    const postId = idParamsValidator(command.postId);
+    const postId = validateObjectId(command.postId);
     if(!postId) throw new HttpException('', HttpStatus.NOT_FOUND)
-    const findPost = await this.postsRepository.findPostById(postId)
-    if(!findPost) throw new HttpException('', HttpStatus.NOT_FOUND)
-    // const createComment = await this.postsRepository.createComment(command.dto.content, postId, command.user);
-    const createComment = await this.postsRepository.createComment(command.dto.content, findPost, command.user);
+    const post = await this.postsRepository.findPostById(postId)
+    if(!post) throw new HttpException('', HttpStatus.NOT_FOUND)
+    const blog = await this.blogsRepository.findBlogById(post.blogId)
+    if(blog.banUsersInfo.find((ban) => ban.login === command.user.accountData.login)) {throw new ForbiddenException()}
+    const createComment = await this.postsRepository.createComment(command.dto.content, post, command.user);
     if(!createComment) throw new HttpException('', HttpStatus.NOT_FOUND)
     if (createComment) {
       return {

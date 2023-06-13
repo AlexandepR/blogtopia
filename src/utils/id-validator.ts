@@ -2,7 +2,7 @@
 // import { ObjectId } from 'mongodb';
 //
 // const postsRepository = new UsersRepository()
-// export const idParamsValidator = (id: string, res: Response, text?: string) => {
+// export const validateObjectId = (id: string, res: Response, text?: string) => {
 //     try {
 //         new ObjectId(id);
 //     } catch (err) {

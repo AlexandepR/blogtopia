@@ -1,10 +1,10 @@
-import { PaginationType } from "../../../../types/types";
-import { BlogDocument } from "../../../blogs/type/blogs.schema";
-import { pagesCounter, parseQueryUsersPaginator, skipPage } from "../../../../utils/helpers";
+import { PaginationType } from "../../../../../types/types";
+import { BlogDocument } from "../../../../blogs/type/blogs.schema";
+import { pagesCounter, parseQueryUsersPaginator, skipPage } from "../../../../../utils/helpers";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { UsersRepository } from "../users.repository";
-import { GetUsersOutputModelType, ParamsUsersType } from "../../type/usersTypes";
-import { UserDocument } from "../../type/users.schema";
+import { UsersRepository } from "../../users.repository";
+import { GetUsersOutputModelType, ParamsUsersType } from "../../../type/usersTypes";
+import { UserDocument } from "../../../type/users.schema";
 
 
 export class GetUsersByAdminCommand {

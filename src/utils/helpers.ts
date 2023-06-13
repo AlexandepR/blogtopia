@@ -110,7 +110,7 @@ export const updatePostLikesInfo = (post: PostDocument, likeStatus: string, newL
   post!.extendedLikesInfo.dislikesCount = post!.extendedLikesInfo.dislikesData.length;
   return post;
 };
-export const idParamsValidator = (id: string): Types.ObjectId | null => {
+export const validateObjectId = (id: string): Types.ObjectId | null => {
   try {
     return new Types.ObjectId(id);
   } catch (err) {

@@ -2,7 +2,7 @@ import { commentContentInputClassModel } from "../../type/commentsType";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { CommentsRepository } from "../comments.repository";
 import { validateOrRejectModel } from "../../../../utils/validation.helpers";
-import { idParamsValidator } from "../../../../utils/helpers";
+import { validateObjectId } from "../../../../utils/helpers";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { Types } from "mongoose";
 import { UserDocument } from "../../../users/type/users.schema";
@@ -25,7 +25,7 @@ export class UpdateCommentUseCase implements ICommandHandler<UpdateCommentComman
   }
   async execute(command: UpdateCommentCommand): Promise<void> {
     await validateOrRejectModel(command.dto, commentContentInputClassModel);
-    const commentId = idParamsValidator(command.id);
+    const commentId = validateObjectId(command.id);
     const comment = await this.commentsRepository.getCommentsById(commentId);
     if (!comment) throw new HttpException("", HttpStatus.NOT_FOUND);
     const commentIsUpdate = await this.commentsRepository.updateCommentId(new Types.ObjectId(command.id), command.dto.content);

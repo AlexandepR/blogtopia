@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { CommentsRepository } from "./comments.repository";
 import { PaginationType } from "../../../types/types";
 import {
-  idParamsValidator,
+  validateObjectId,
   pagesCounter,
   parseQueryPaginator,
   skipPage,
@@ -52,7 +52,7 @@ export class CommentsService {
   }
   // async updateComment (id: string, dto: commentContentInputClassModel, user: UserDocument) {
   //   await validateOrRejectModel(dto, commentContentInputClassModel);
-  //   const commentId = idParamsValidator(id);
+  //   const commentId = validateObjectId(id);
   //   const comment = await this.commentsRepository.getCommentsById(commentId);
   //   if (!comment) throw new HttpException('', HttpStatus.NOT_FOUND)
   //   // const userId = await this.jwtService.findUserIdByAuthHeaders(req);
@@ -72,7 +72,7 @@ export class CommentsService {
   // async updateLikeByCommentId (dto:likeStatusInputClassModel, id:string, req:Request) {
   //   await validateOrRejectModel(dto, likeStatusInputClassModel);
   //   const likeStatus = dto.likeStatus
-  //   const commentId = idParamsValidator(id);
+  //   const commentId = validateObjectId(id);
   //   const userId = await this.jwtService.findUserIdByAuthHeaders(req);
   //   if (!userId) throw new HttpException('', HttpStatus.UNAUTHORIZED)
   //   const comment = await this.commentsRepository.getCommentsById(commentId);
@@ -124,7 +124,7 @@ export class CommentsService {
   //   throw new HttpException('', HttpStatus.BAD_REQUEST)
   // }
   // async deleteCommentById(id: string, req:Request) {
-  //   const commentId = idParamsValidator(id);
+  //   const commentId = validateObjectId(id);
   //   const userId = await this.jwtService.findUserIdByAuthHeaders(req);
   //   const getComment = await this.getComment(commentId, req);
   //   if (!getComment) {throw new HttpException('', HttpStatus.NOT_FOUND)}

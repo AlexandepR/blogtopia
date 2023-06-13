@@ -6,6 +6,8 @@ import { PostsRepository } from "../posts.repository";
 import { PaginationType, ParamsType } from "../../../../types/types";
 import { JwtService } from "../../../auth/application/jwt.service";
 import { UsersRepository } from "../../../users/application/users.repository";
+import { BlogsRepository } from "../../../blogs/application/blogs.repository";
+import { getPostsPublicFilter } from "../../../../utils/filters/post.filters";
 
 
 export class GetPostsCommand {
@@ -21,20 +23,16 @@ export class GetPostsUseCase implements ICommandHandler<GetPostsCommand> {
   constructor(
     protected jwtService: JwtService,
     protected postsRepository: PostsRepository,
+    protected blogsRepository: BlogsRepository,
     protected usersRepository: UsersRepository
   ) {
   }
   async execute(command: GetPostsCommand): Promise<PaginationType<PostsTypeFiltered[]>> {
     const userId = command.user ? command.user._id : "";
     const { searchNameTerm, pageSize, pageNumber, sortDirection, sortBy } = parseQueryPaginator(command.query);
-    // const filter = searchNameTerm ? { name: { $regex: searchNameTerm, $options: "i" } } : {};
     const banUsers: Array<string> = await this.usersRepository.getBannedUsers();
-    const filter = ({
-      $or: [
-        { "postOwnerInfo.userLogin": { $nin: banUsers } },
-        { name: { $regex: `${searchNameTerm}`, $options: "i" } },
-      ]
-    });
+    const banBlogs = await this.blogsRepository.getArrayIdBanBlogs();
+    const filter = getPostsPublicFilter(banUsers, banBlogs, searchNameTerm)
     const totalCountPosts = await this.postsRepository.getTotalCountPosts(filter);
     const skip = skipPage(pageNumber, pageSize);
     const pagesCount = pagesCounter(totalCountPosts, pageSize);
@@ -96,10 +94,8 @@ export class GetPostsUseCase implements ICommandHandler<GetPostsCommand> {
         pageSize: pageSize,
         totalCount: totalCountPosts,
         items: postsFilterId
-        // items: posts,
       };
     }
-    // return posts
     return null;
   }
 }

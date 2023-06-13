@@ -1,8 +1,7 @@
-import { commentContentInputClassModel, CommentReturnType, CommentType } from "../../type/commentsType";
+import { CommentReturnType } from "../../type/commentsType";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { CommentsRepository } from "../comments.repository";
-import { validateOrRejectModel } from "../../../../utils/validation.helpers";
-import { filterBanCommentLikesInfo, idParamsValidator } from "../../../../utils/helpers";
+import { filterBanCommentLikesInfo } from "../../../../utils/helpers";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { Types } from "mongoose";
 import { UserDocument } from "../../../users/type/users.schema";

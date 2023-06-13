@@ -14,16 +14,16 @@ import {
 } from "@nestjs/common";
 import { BasicAuth } from "../../../utils/public.decorator";
 import { CreateUserInputClassModel, InfoBanStatusClassModel, ParamsUsersType } from "../type/usersTypes";
-import { GetUsersByAdminCommand } from "../application/use-cases/getUsers-admin-use-case";
+import { GetUsersByAdminCommand } from "../application/use-cases/admin/getUsers-admin-use-case";
 import { CommandBus } from "@nestjs/cqrs";
 import {
   UpdateBanInfoByAdminCommand
-} from "../application/use-cases/updateUserBanStatus-admin-use-case";
+} from "../application/use-cases/admin/updateUserBanStatus-admin-use-case";
 import { CheckLoginOrEmailGuard } from "../../../middleware/middleware";
-import { CreateUserByAdminCommand } from "../application/use-cases/createUser-admin-use-case";
+import { CreateUserByAdminCommand } from "../application/use-cases/admin/createUser-admin-use-case";
 import { checkObjectId } from "../../../utils/validation.helpers";
-import { DeleteUserByAdminCommand } from "../application/use-cases/deleteUser-admin-use-case";
-import { DeleteAllUsersByAdminCommand } from "../application/use-cases/deleteAllUsers-admin-use-case";
+import { DeleteUserByAdminCommand } from "../application/use-cases/admin/deleteUser-admin-use-case";
+import { DeleteAllUsersByAdminCommand } from "../application/use-cases/admin/deleteAllUsers-admin-use-case";
 import { UsersRepository } from "../application/users.repository";
 
 

@@ -1,9 +1,9 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { NotFoundException } from "@nestjs/common";
-import { InfoBanStatusClassModel } from "../../type/usersTypes";
-import { UsersRepository } from "../users.repository";
+import { InfoBanStatusClassModel } from "../../../type/usersTypes";
+import { UsersRepository } from "../../users.repository";
 import { Types } from "mongoose";
-import { SecurityRepository } from "../../../security/application/security.repository";
+import { SecurityRepository } from "../../../../security/application/security.repository";
 
 export class UpdateBanInfoByAdminCommand {
   constructor(

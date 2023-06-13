@@ -1,10 +1,7 @@
-import { commentContentInputClassModel } from "../../type/commentsType";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { CommentsRepository } from "../comments.repository";
-import { validateOrRejectModel } from "../../../../utils/validation.helpers";
-import { idParamsValidator } from "../../../../utils/helpers";
+import { validateObjectId } from "../../../../utils/helpers";
 import { HttpException, HttpStatus } from "@nestjs/common";
-import { Types } from "mongoose";
 import { UserDocument } from "../../../users/type/users.schema";
 import { CommentsService } from "../comments.service";
 
@@ -24,7 +21,7 @@ export class DeleteCommentUseCase implements ICommandHandler<DeleteCommentComman
     protected commentsService: CommentsService,
   ) {}
   async execute(command: DeleteCommentCommand): Promise<void> {
-    const commentId = idParamsValidator(command.id);
+    const commentId = validateObjectId(command.id);
     const userId = command.user._id
     const getComment = await this.commentsService.getComment(commentId, userId);
     if (!getComment) {throw new HttpException('', HttpStatus.NOT_FOUND)}

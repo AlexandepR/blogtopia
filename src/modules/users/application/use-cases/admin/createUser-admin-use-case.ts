@@ -1,8 +1,8 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { CreateUserInputClassModel, GetUsersOutputModelType, UserType } from "../../type/usersTypes";
-import { UsersRepository } from "../users.repository";
-import { validateOrRejectModel } from "../../../../utils/validation.helpers";
-import { generateHash } from "../../../../utils/helpers";
+import { CreateUserInputClassModel, GetUsersOutputModelType, UserType } from "../../../type/usersTypes";
+import { UsersRepository } from "../../users.repository";
+import { validateOrRejectModel } from "../../../../../utils/validation.helpers";
+import { generateHash } from "../../../../../utils/helpers";
 
 export class CreateUserByAdminCommand {
   constructor(

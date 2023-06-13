@@ -1,33 +1,57 @@
 import { GetBlogsByAdminUseCase } from "./modules/blogs/application/use-cases/admin/getBlogs-blogs-admin-use-case";
-import { BindUserToBlogByAdminUseCase } from "./modules/blogs/application/use-cases/admin/bindUserToBlog-blogs-admin-use-case";
-import { DeleteAllUsersByAdminUseCase } from "./modules/users/application/use-cases/deleteAllUsers-admin-use-case";
-import { UpdateBanInfoByAdminUseCase } from "./modules/users/application/use-cases/updateUserBanStatus-admin-use-case";
-import { DeleteUserByAdminUseCase } from "./modules/users/application/use-cases/deleteUser-admin-use-case";
-import { GetUsersByAdminUseCase } from "./modules/users/application/use-cases/getUsers-admin-use-case";
-import { CreateUserByAdminUseCase } from "./modules/users/application/use-cases/createUser-admin-use-case";
+import {
+  BindUserToBlogByAdminUseCase
+} from "./modules/blogs/application/use-cases/admin/bindUserToBlog-blogs-admin-use-case";
+import {
+  DeleteAllUsersByAdminUseCase
+} from "./modules/users/application/use-cases/admin/deleteAllUsers-admin-use-case";
+import {
+  UpdateBanInfoByAdminUseCase
+} from "./modules/users/application/use-cases/admin/updateUserBanStatus-admin-use-case";
+import { DeleteUserByAdminUseCase } from "./modules/users/application/use-cases/admin/deleteUser-admin-use-case";
+import { GetUsersByAdminUseCase } from "./modules/users/application/use-cases/admin/getUsers-admin-use-case";
+import { CreateUserByAdminUseCase } from "./modules/users/application/use-cases/admin/createUser-admin-use-case";
 import { GetPostsByBlogUseCase } from "./modules/blogs/application/use-cases/public/getPostsByblogs-public-use-case";
 import { GetBlogUseCase } from "./modules/blogs/application/use-cases/public/getBlog-blog-public-use-case";
 import { GetBlogsByBloggerUseCase } from "./modules/blogs/application/use-cases/authUser/getBlogs-blogger-use-case";
-import { GetBlogByIdByBloggerUseCase } from "./modules/blogs/application/use-cases/authUser/getBlogById-blogger-use-case";
-import { GetAllCommentsForBloggerUseCase } from "./modules/blogs/application/use-cases/authUser/GetAllCommentsForAllPosts-blogger-use-case";
-import { CreateBlogByBloggerUseCase } from "./modules/blogs/application/use-cases/authUser/create-blog-blogger-use-case";
-import { CreatePostByBlogByBloggerUseCase } from "./modules/blogs/application/use-cases/authUser/createPostForBlog-blogger-use-case";
+import {
+  GetBlogByIdByBloggerUseCase
+} from "./modules/blogs/application/use-cases/authUser/getBlogById-blogger-use-case";
+import {
+  GetAllCommentsForBloggerUseCase
+} from "./modules/blogs/application/use-cases/authUser/getAllCommentsForAllPosts-blogger-use-case";
+import {
+  CreateBlogByBloggerUseCase
+} from "./modules/blogs/application/use-cases/authUser/create-blog-blogger-use-case";
+import {
+  CreatePostByBlogByBloggerUseCase
+} from "./modules/blogs/application/use-cases/authUser/createPostForBlog-blogger-use-case";
 import { UpdateBlogByBloggerUseCase } from "./modules/blogs/application/use-cases/authUser/updateBlog-blogger-use-case";
-import { UpdatePostByBlogByBloggerUseCase } from "./modules/blogs/application/use-cases/authUser/updatePostByBlog-blogger-use-case";
+import {
+  UpdatePostByBlogByBloggerUseCase
+} from "./modules/blogs/application/use-cases/authUser/updatePostByBlog-blogger-use-case";
 import { DeleteBlogByBloggerUseCase } from "./modules/blogs/application/use-cases/authUser/deleteBlog-blogger-use-case";
-import { DeletePostByBlogByBloggerUseCase } from "./modules/blogs/application/use-cases/authUser/deletePostByBlog-blogger-use-case";
+import {
+  DeletePostByBlogByBloggerUseCase
+} from "./modules/blogs/application/use-cases/authUser/deletePostByBlog-blogger-use-case";
 import { LoginAuthUseCase } from "./modules/auth/application/use-cases/login-auth-use-case";
 import { LogoutAuthUseCase } from "./modules/auth/application/use-cases/logout-auth-use-case";
 import { NewPasswordAuthUseCase } from "./modules/auth/application/use-cases/newPassword-auth-use-case";
 import { PasswordRecoveryAuthUseCase } from "./modules/auth/application/use-cases/passwordRecovery-auth-use-case";
 import { RegistrationAuthUseCase } from "./modules/auth/application/use-cases/registration-auth-use-case";
-import { RegistrationEmailResendAuthUseCase } from "./modules/auth/application/use-cases/registrationEmailResending-auth-use-case";
+import {
+  RegistrationEmailResendAuthUseCase
+} from "./modules/auth/application/use-cases/registrationEmailResending-auth-use-case";
 import { getOwnAccountAuthUseCase } from "./modules/auth/application/use-cases/me-auth-use-case";
-import { ConfirmRegistrationAuthUseCase } from "./modules/auth/application/use-cases/registrationConfirmation-auth-use-case";
+import {
+  ConfirmRegistrationAuthUseCase
+} from "./modules/auth/application/use-cases/registrationConfirmation-auth-use-case";
 import { RefreshTokenAuthUseCase } from "./modules/auth/application/use-cases/refreshToken-auth-use-case";
 import { GetCommentUseCase } from "./modules/comments/application/use-cases/getComments-use-case";
 import { UpdateCommentUseCase } from "./modules/comments/application/use-cases/updateComment-use-case";
-import { UpdateCommentLikeStatusUseCase } from "./modules/comments/application/use-cases/updateCommentLikeStatus-use-case";
+import {
+  UpdateCommentLikeStatusUseCase
+} from "./modules/comments/application/use-cases/updateCommentLikeStatus-use-case";
 import { DeleteCommentUseCase } from "./modules/comments/application/use-cases/deleteComment-use-case";
 import { GetPostsUseCase } from "./modules/posts/application/use-cases/getPosts-use-case";
 import { GetPostByIdUseCase } from "./modules/posts/application/use-cases/getPostById-use-case";
@@ -86,16 +110,22 @@ import { JwtModule } from "@nestjs/jwt";
 import { ConfigModule } from "@nestjs/config";
 import { PassportModule } from "@nestjs/passport";
 import { MailerModule } from "@nestjs-modules/mailer";
+import {
+  UpdateBanStatusUseCase
+} from "./modules/users/application/use-cases/authUser/updateBanStatusBlog-blogger-use-case";
+import {
+  UpdateBanInfoBlogUseCase
+} from "./modules/blogs/application/use-cases/admin/updateBanInfo-blogs-admin-use-case";
+import {
+  getBannedUsersForBlogUseCase
+} from "./modules/users/application/use-cases/authUser/getBannedUsersForBlog-blogger-use-case";
+import { UsersBloggerController } from "./modules/users/api/auth.api.user.controller";
 // import { MailerModule2 } from "../../swagger-static";
 
 export const adminUseCases = [
   GetBlogsByAdminUseCase,
   BindUserToBlogByAdminUseCase,
-  DeleteAllUsersByAdminUseCase,
   UpdateBanInfoByAdminUseCase,
-  DeleteUserByAdminUseCase,
-  GetUsersByAdminUseCase,
-  CreateUserByAdminUseCase
 ];
 export const blogsUseCases = [
   GetBlogsPublicUseCase,
@@ -106,11 +136,20 @@ export const blogsUseCases = [
   GetAllCommentsForBloggerUseCase,
   CreateBlogByBloggerUseCase,
   CreatePostByBlogByBloggerUseCase,
+  UpdateBanInfoBlogUseCase,
+  UpdateBanStatusUseCase,
   UpdateBlogByBloggerUseCase,
   UpdatePostByBlogByBloggerUseCase,
   DeleteBlogByBloggerUseCase,
   DeletePostByBlogByBloggerUseCase
 ];
+export const usersUseCases = [
+  getBannedUsersForBlogUseCase,
+  DeleteAllUsersByAdminUseCase,
+  DeleteUserByAdminUseCase,
+  GetUsersByAdminUseCase,
+  CreateUserByAdminUseCase
+]
 export const authUseCases = [
   LoginAuthUseCase,
   LogoutAuthUseCase,
@@ -145,6 +184,7 @@ export const securityUseCases = [
 ];
 export const useCases = [
   ...adminUseCases,
+  ...usersUseCases,
   ...blogsUseCases,
   ...authUseCases,
   ...commentsUseCases,
@@ -182,6 +222,7 @@ export const services = [
 export const queryRepo = [];
 export const controllers = [
   UsersAdminController,
+  UsersBloggerController,
   AuthController,
   UsersController,
   BlogsController,

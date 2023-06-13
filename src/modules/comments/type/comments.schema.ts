@@ -1,9 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument, Model, Types } from "mongoose";
-import { LikesType } from "./commentsType";
-import { Post, PostDocument, PostModelStaticType, PostModelType } from "../../posts/type/posts.schema";
-import { CreatePostInputModelType } from "../../posts/type/postsType";
-import { BlogDocument } from "../../blogs/type/blogs.schema";
+import { PostDocument } from "../../posts/type/posts.schema";
 import { UserDocument } from "../../users/type/users.schema";
 
 @Schema()
@@ -47,8 +44,6 @@ export class Comment {
   _id: Types.ObjectId;
   @Prop({ required: true })
   content: string;
-  // @Prop({ required: true })
-  // postId: string;
   @Prop({ required: true, type: CommentatorInfo })
   commentatorInfo: CommentatorInfo;
   @Prop({ required: true })
@@ -63,7 +58,6 @@ export class Comment {
   }
   static createComment(
     content: string,
-    // postId: Types.ObjectId,
     post: PostDocument,
     CommentModel: CommentModelType,
     user: UserDocument,
@@ -71,7 +65,6 @@ export class Comment {
     const createNewComment = new CommentModel();
 
     createNewComment.content = content;
-    // createNewComment.postId = postId.toString()
     createNewComment.commentatorInfo = {
       userId: user._id.toString(),
       userLogin: user.accountData.login

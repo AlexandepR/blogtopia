@@ -1,8 +1,8 @@
-import { commentContentInputClassModel, LikesType } from "../../type/commentsType";
+import { LikesType } from "../../type/commentsType";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { CommentsRepository } from "../comments.repository";
 import { validateOrRejectModel } from "../../../../utils/validation.helpers";
-import { idParamsValidator, updateCommentLikesInfo } from "../../../../utils/helpers";
+import { updateCommentLikesInfo, validateObjectId } from "../../../../utils/helpers";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { Types } from "mongoose";
 import { UserDocument } from "../../../users/type/users.schema";
@@ -26,7 +26,7 @@ export class UpdateCommentLikeStatusUseCase implements ICommandHandler<UpdateCom
   async execute(command: UpdateCommentLikeStatusCommand): Promise<void> {
     await validateOrRejectModel(command.dto, likeStatusInputClassModel);
     const likeStatus = command.dto.likeStatus
-    const commentId = idParamsValidator(command.id);
+    const commentId = validateObjectId(command.id);
     const userId = command.user._id
     if (!userId) throw new HttpException('', HttpStatus.UNAUTHORIZED)
     const comment = await this.commentsRepository.getCommentsById(commentId);

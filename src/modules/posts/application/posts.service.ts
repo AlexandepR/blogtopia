@@ -1,32 +1,10 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from "@nestjs/common";
-import { PaginationType, ParamsType } from "../../../types/types";
-import {
-  commentResData, idParamsValidator,
-  pagesCounter,
-  parseQueryPaginator,
-  skipPage,
-  sortNewestLikesForPost,
-  updatePostLikesInfo
-} from "../../../utils/helpers";
-import {
-  CreatePostInputClassModel,
-  likeStatusInputClassModel,
-  outputPostModelType,
-  PostLikesType, PostsNewestLikesType,
-  PostsTypeFiltered,
-  PutPostInputModelType
-} from "../type/postsType";
+import { Injectable } from "@nestjs/common";
 import { BlogsRepository } from "../../blogs/application/blogs.repository";
-import { Types } from "mongoose";
 import { PostsRepository } from "./posts.repository";
-import { IsMongoId, IsString, Length, MaxLength } from "class-validator";
-import { validateOrRejectModel } from "../../../utils/validation.helpers";
-import { Request } from "express";
+import { Length } from "class-validator";
 import { UsersRepository } from "../../users/application/users.repository";
 import { CommentsRepository } from "../../comments/application/comments.repository";
 import { JwtService } from "../../auth/application/jwt.service";
-import { UserDocument } from "../../users/type/users.schema";
-
 
 
 export class CreateCommentInputClassModel {
@@ -137,7 +115,7 @@ export class PostsService {
   // }
   // async createCommentForPost(id: string, dto: CreateCommentInputClassModel,user: UserDocument): Promise<any> {
   //   await validateOrRejectModel(dto, CreateCommentInputClassModel);
-  //   const postId = idParamsValidator(id);
+  //   const postId = validateObjectId(id);
   //   if(!postId) throw new HttpException('', HttpStatus.NOT_FOUND)
   //   const findPost = await this.postsRepository.findPostById(postId)
   //   if(!findPost) throw new HttpException('', HttpStatus.NOT_FOUND)
