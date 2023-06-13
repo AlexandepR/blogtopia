@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query } from "@nestjs/common";
-import { BanInfoInputClassModel, BlogInputClassModel } from "../type/blogsType";
+import { BlogInputClassModel, PostForBlogBloggerInputClassModel } from "../type/blogsType";
 
 import { UserDocument } from "../../users/type/users.schema";
 import { CreatePostForBlogInputClassModel } from "../../posts/type/postsType";
@@ -14,8 +14,9 @@ import { GetBlogsCommand } from "../application/use-cases/authUser/getBlogs-blog
 import { ParamsPaginationType, ParamsType } from "../../../types/types";
 import { UserFromRequestDecorator } from "../../../utils/public.decorator";
 import { GetBlogByIdCommand } from "../application/use-cases/authUser/getBlogById-blogger-use-case";
-import { UpdateBanStatusCommand } from "../application/use-cases/authUser/updateBanStatusBlog-blogger-use-case";
-import { GetAllCommentsForBloggerCommand } from "../application/use-cases/authUser/GetAllCommentsForAllPosts-blogger-use-case";
+import {
+  GetAllCommentsForBloggerCommand
+} from "../application/use-cases/authUser/getAllCommentsForAllPosts-blogger-use-case";
 
 
 @Controller({
@@ -34,16 +35,6 @@ export class BlogsBloggerController {
     const command = new GetBlogsCommand(query, user);
     return this.commandBus.execute(command);
   }
-  @Get(":id")
-  async getBlog(
-    @UserFromRequestDecorator()user:UserDocument,
-    @Param("id")
-      id: string
-  ) {
-    // if(!id) throw new NotFoundException()
-    const command = new GetBlogByIdCommand(id, user);
-    return this.commandBus.execute(command);
-  }
   @Get('comments')
   async getAllComments(
     @Query() query: ParamsPaginationType,
@@ -52,7 +43,15 @@ export class BlogsBloggerController {
     const command = new GetAllCommentsForBloggerCommand(query, user)
     return this.commandBus.execute(command)
   }
-
+  @Get(":id")
+  async getBlog(
+    @UserFromRequestDecorator()user:UserDocument,
+    @Param("id")
+      id: string
+  ) {
+    const command = new GetBlogByIdCommand(id, user);
+    return this.commandBus.execute(command);
+  }
   @Post('')
   async createBlog(
     @Body() dto: BlogInputClassModel,
@@ -61,14 +60,14 @@ export class BlogsBloggerController {
     const command = new CreateBlogCommand(user, dto);
     return await this.commandBus.execute(command)
   }
-  @Post(":id/posts")
+  @Post(":blogId/posts")
   async createPostForBlog(
-    @Param("id")
-     id: string,
+    @Param("blogId")
+      blogId: string,
     @UserFromRequestDecorator()user:UserDocument,
-    @Body() dto: CreatePostForBlogInputClassModel,
+    @Body() dto: PostForBlogBloggerInputClassModel,
   ) {
-    const command = new CreatePostByBlogCommand(user, dto, id);
+    const command = new CreatePostByBlogCommand(user, dto, blogId);
     return await this.commandBus.execute(command)
   }
   @Put(":id")
@@ -82,7 +81,6 @@ export class BlogsBloggerController {
     const command = new UpdateBlogCommand(id, dto, user);
     return await this.commandBus.execute(command)
   }
-
   @Put(":blogId/posts/:postId")
   @HttpCode(HttpStatus.NO_CONTENT)
   async updatePost(
@@ -94,15 +92,14 @@ export class BlogsBloggerController {
     const command = new UpdatePostByBlogCommand(blogId, postId, dto, user);
     return await this.commandBus.execute(command);
   }
-  @Put(":userId/ban")
-  async updateBanStatus(
-    @Param("userId") userId: string,
-    @Body() dto: BanInfoInputClassModel,
-  ){
-    const command = new UpdateBanStatusCommand(userId, dto)
-    return await this.commandBus.execute(command)
-  }
-
+  // @Put(":userId/ban")
+  // async updateBanStatus(
+  //   @Param("userId") userId: string,
+  //   @Body() dto: BanInfoInputClassModel,
+  // ){
+  //   const command = new UpdateBanStatusCommand(userId, dto)
+  //   return await this.commandBus.execute(command)
+  // }
   @Delete(":id")
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteBlog (
