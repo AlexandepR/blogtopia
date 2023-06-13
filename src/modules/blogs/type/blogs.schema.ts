@@ -4,6 +4,16 @@ import { BanInfoInputClassModel, CreateBlogInputModelType, PutBlogDtoType } from
 import { UserDocument } from "../../users/type/users.schema";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 
+@Schema({
+  _id: false,
+  versionKey: false
+})
+class banInfo {
+  @Prop({ default: false })
+  isBanned: boolean;
+  @Prop()
+  banDate: Date;
+}
 
 @Schema({
   _id: false,
@@ -15,26 +25,37 @@ class BlogOwnerInfo {
   @Prop()
   userLogin: string;
 }
+
+@Schema({
+  _id: false,
+  versionKey: false
+})
+class BanUserInfo {
+  @Prop()
+  isBanned: boolean;
+  @Prop()
+  banDate: Date;
+  @Prop()
+  banReason: string;
+}
+
 @Schema({
   _id: false,
   versionKey: false
 })
 class BanUsersInfo {
   @Prop()
-  isBanned: boolean;
-  @Prop()
-  date: Date;
-  @Prop()
-  banReason: string
+  id: Types.ObjectId;
   @Prop()
   login: string;
-  @Prop()
-  userId: Types.ObjectId;
+  @Prop({ type: BanUserInfo })
+  banInfo: BanUserInfo;
 }
+export const BanUsersInfoSchema = SchemaFactory.createForClass(BanUsersInfo);
 
-@Schema({timestamps:true})
-export class Blog extends TimeStamps{
-  _id: Types.ObjectId
+@Schema({ timestamps: true })
+export class Blog extends TimeStamps {
+  _id: Types.ObjectId;
   @Prop({
     required: true,
     maxLength: 15
@@ -52,39 +73,41 @@ export class Blog extends TimeStamps{
     match: /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/
   })
   websiteUrl: string;
-  @Prop()
-  banInfo: boolean
+  @Prop({ type: banInfo })
+  banInfo: banInfo;
   @Prop({ type: BlogOwnerInfo })
   blogOwnerInfo: BlogOwnerInfo;
-  @Prop( {type: BanUsersInfo})
+  @Prop({ type: [BanUsersInfoSchema] })
   banUsersInfo: BanUsersInfo[];
   @Prop()
   isMembership: boolean;
   banBlog(banInfo: boolean) {
-    this.banInfo = banInfo
+    this.banInfo = {
+      isBanned: banInfo,
+      banDate: new Date()
+    };
   }
-  banUser(dto: BanInfoInputClassModel, userLogin: string, userId: Types.ObjectId) {
-      this.banUsersInfo.push({
-        isBanned: dto.isBanned,
-        date: new Date(),
-        banReason: dto.banReason,
-        login: userLogin,
-        userId: userId,
-      })
+  banUser(
+    dto: BanInfoInputClassModel,
+    userLogin: string,
+    userId: Types.ObjectId
+  ) {
+    const banUsersInfo = new BanUsersInfo();
+    banUsersInfo.id = userId;
+    banUsersInfo.login = userLogin;
+    banUsersInfo.banInfo = {
+      isBanned: dto.isBanned,
+      banDate: new Date(),
+      banReason: dto.banReason
+    };
+    this.banUsersInfo.push(banUsersInfo);
   }
-  // unBanUser(dto: BanInfoInputClassModel, userLogin: string, userId: Types.ObjectId) {
-  //   this.banUsersInfo.isBanned = dto.isBanned;
-  //   this.banUsersInfo.date = new Date();
-  //   this.banUsersInfo.banReason = dto.banReason;
-  //   this.banUsersInfo.login = userLogin;
-  //   this.banUsersInfo.userId = userId;
-  // }
   updateBlog(updateBlogInfo: PutBlogDtoType) {
     this.name = updateBlogInfo.name;
     this.description = updateBlogInfo.description;
     this.websiteUrl = updateBlogInfo.websiteUrl;
   }
-  bindUserToBlog(user:UserDocument) {
+  bindUserToBlog(user: UserDocument) {
     this.blogOwnerInfo.userId = user._id.toString();
     this.blogOwnerInfo.userLogin = user.accountData.login;
   }
@@ -93,16 +116,22 @@ export class Blog extends TimeStamps{
     BlogModel: BlogModelType,
     user: UserDocument
   ): BlogDocument {
-    const createNewBlog = new BlogModel();
-    createNewBlog.blogOwnerInfo = {
+    const blog = new BlogModel();
+    // blog.banUsersInfo = new BanUsersInfo();
+    blog.blogOwnerInfo = {
       userId: user._id.toString(),
       userLogin: user.accountData.login
     };
-    createNewBlog.name = dto.name;
-    createNewBlog.description = dto.description;
-    createNewBlog.websiteUrl = dto.websiteUrl;
-    createNewBlog.isMembership = false;
-    return createNewBlog;
+    blog.name = dto.name;
+    blog.description = dto.description;
+    blog.websiteUrl = dto.websiteUrl;
+    blog.isMembership = false;
+    blog.banUsersInfo = [];
+    blog.banInfo = {
+      isBanned: false,
+      banDate: null
+    };
+    return blog;
   }
 }
 
