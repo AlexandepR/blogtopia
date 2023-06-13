@@ -1,7 +1,7 @@
 import { UserDocument } from "../../../../users/type/users.schema";
 import { BlogsRepository } from "../../blogs.repository";
-import { ForbiddenException, HttpException, HttpStatus, NotFoundException } from "@nestjs/common";
-import { CreatePostForBlogInputClassModel } from "../../../type/blogsType";
+import { ForbiddenException, NotFoundException } from "@nestjs/common";
+import { PostForBlogBloggerInputClassModel } from "../../../type/blogsType";
 import { outputPostModelType } from "../../../../posts/type/postsType";
 import { validateOrRejectModel } from "../../../../../utils/validation.helpers";
 import { Types } from "mongoose";
@@ -12,7 +12,7 @@ import { PostsRepository } from "../../../../posts/application/posts.repository"
 export class CreatePostByBlogCommand {
   constructor(
     public user: UserDocument,
-    public dto: CreatePostForBlogInputClassModel,
+    public dto: PostForBlogBloggerInputClassModel,
     public blogId: string
   ) {}
 }
@@ -25,7 +25,7 @@ export class CreatePostByBlogByBloggerUseCase implements ICommandHandler<CreateP
   }
   async execute(command: CreatePostByBlogCommand)
     : Promise<outputPostModelType | null> {
-    await validateOrRejectModel(command.dto, CreatePostForBlogInputClassModel);
+    await validateOrRejectModel(command.dto, PostForBlogBloggerInputClassModel);
     if(!Types.ObjectId.isValid(command.blogId)) {throw new NotFoundException()}
     const blogId = new Types.ObjectId(command.blogId)
     const getBlog = await this.blogsRepository.findBlogById(blogId);

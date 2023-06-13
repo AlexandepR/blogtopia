@@ -31,21 +31,22 @@ export class UpdateBanStatusUseCase implements ICommandHandler<UpdateBanStatusCo
     const blog = await this.blogsRepository.findBlogById(new Types.ObjectId(command.dto.blogId))
     if(!blog) throw new NotFoundException()
     if(blog.blogOwnerInfo.userLogin !== command.user.accountData.login) throw new ForbiddenException()
-    // const getUser = this.usersRepository.findUserById(getUserId)
-    // if(blog.banUsersInfo.find((ban) => ban.login === command.user.accountData.login)) { throw new HttpException('',HttpStatus.NO_CONTENT)}
     const getUser = await  this.usersRepository.findUserById(getUserId)
     if(!getUser) {throw new NotFoundException()}
-    // if(blog.banUsersInfo.find((ban) => ban.login === )) { throw new HttpException('',HttpStatus.NO_CONTENT)}
     const findUser = blog.banUsersInfo
       .find((ban) => ban.login === getUser.accountData.login
-        && ban.banInfo.isBanned === command.dto.isBanned)
-    if(findUser)throw new HttpException('',HttpStatus.NO_CONTENT)
-    if(command.dto.isBanned ) {
+        // && ban.banInfo.isBanned === command.dto.isBanned
+      )
+    // if(findUser) {
+    //   await this.blogsRepository.banUser(new Types.ObjectId(command.dto.blogId), getUser.accountData.login)
+    // }
+    // if(command.dto.isBanned) {
+    if(!findUser) {
     blog.banUser(command.dto, getUser.accountData.login, new Types.ObjectId(command.userId))
     return await this.blogsRepository.save(blog)
     } else {
-      await this.blogsRepository.unBanUser(new Types.ObjectId(command.dto.blogId), command.user.accountData.login);
-      return await this.blogsRepository.save(blog)
+      return await this.blogsRepository.unBanUser(new Types.ObjectId(command.dto.blogId), getUser.accountData.login, command.dto.isBanned);
+      // return await this.blogsRepository.save(blog)
     }
   }
 }
