@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { NotFoundException } from "@nestjs/common";
 import { InfoBanStatusClassModel } from "../../../type/usersTypes";
-import { UsersRepository } from "../../users.repository";
+import { UsersRepository } from "../../../infrastructure/users.repository";
 import { Types } from "mongoose";
 import { SecurityRepository } from "../../../../security/application/security.repository";
 

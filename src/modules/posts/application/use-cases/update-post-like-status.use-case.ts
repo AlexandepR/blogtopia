@@ -3,9 +3,9 @@ import { validateOrRejectModel } from "../../../../utils/validation.helpers";
 import { updatePostLikesInfo } from "../../../../utils/helpers";
 import { HttpException, HttpStatus, NotFoundException } from "@nestjs/common";
 import { Types } from "mongoose";
-import { UserDocument } from "../../../users/type/users.schema";
+import { UserDocument } from "../../../users/domain/entities/users.schema";
 import { likeStatusInputClassModel, PostLikesType, PostsNewestLikesType } from "../../type/postsType";
-import { UsersRepository } from "../../../users/application/users.repository";
+import { UsersRepository } from "../../../users/infrastructure/users.repository";
 import { PostsRepository } from "../posts.repository";
 
 

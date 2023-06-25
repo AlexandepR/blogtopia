@@ -1,5 +1,5 @@
-import { UserDocument } from "../../../../users/type/users.schema";
-import { BlogsRepository } from "../../blogs.repository";
+import { UserDocument } from "../../../../users/domain/entities/users.schema";
+import { BlogsRepository } from "../../../infrastructure/blogs.repository";
 import {
   BadRequestException,
   HttpException,

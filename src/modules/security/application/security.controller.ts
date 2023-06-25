@@ -2,11 +2,11 @@ import { Request } from "express";
 import { SecurityService } from "./security.service";
 import { Controller, Delete, Get, Param, Req } from "@nestjs/common";
 import { RefreshTokenAuthGuard, UserFromRequestDecorator } from "../../../utils/public.decorator";
-import { UserDocument } from "../../users/type/users.schema";
-import { GetDevicesCommand } from "./use-cases/getDevices-use-case";
+import { UserDocument } from "../../users/domain/entities/users.schema";
+import { GetDevicesCommand } from "./use-cases/get-devices.use-case";
 import { CommandBus } from "@nestjs/cqrs";
-import { DeleteDeviceByIdCommand } from "./use-cases/deleteDevicesById-use-case";
-import { DeleteAllDevicesCommand } from "./use-cases/deleteAllDevices-use-case";
+import { DeleteDeviceByIdCommand } from "./use-cases/delete-devices-by-Id.use-case";
+import { DeleteAllDevicesCommand } from "./use-cases/delete-all-devices.use-case";
 
 @Controller("security")
 export class SecurityController {

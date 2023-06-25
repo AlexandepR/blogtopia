@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
-import { BlogsRepository } from "../../blogs/application/blogs.repository";
+import { BlogsRepository } from "../../blogs/infrastructure/blogs.repository";
 import { PostsRepository } from "./posts.repository";
 import { Length } from "class-validator";
-import { UsersRepository } from "../../users/application/users.repository";
+import { UsersRepository } from "../../users/infrastructure/users.repository";
 import { CommentsRepository } from "../../comments/application/comments.repository";
 import { JwtService } from "../../auth/application/jwt.service";
 

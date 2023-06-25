@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
-import { UsersRepository } from "../../users/application/users.repository";
+import { UsersRepository } from "../../users/infrastructure/users.repository";
 import { settingsEnv } from "../../../settings/settings";
 import * as jwt from 'jsonwebtoken';
-import { UserDocument } from "../../users/type/users.schema";
+import { UserDocument } from "../../users/domain/entities/users.schema";
 import { Types } from "mongoose";
 import { Request } from "express";
 

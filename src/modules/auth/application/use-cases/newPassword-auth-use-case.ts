@@ -1,12 +1,8 @@
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { CreateUserInputClassModel } from "../../../users/type/usersTypes";
 import { generateHash } from "../../../../utils/helpers";
-import { JwtService } from "../jwt.service";
-import { EmailService } from "../../../mail/application/managers/email.service";
-import { UsersRepository } from "../../../users/application/users.repository";
+import { UsersRepository } from "../../../users/infrastructure/users.repository";
 import { validateOrRejectModel } from "../../../../utils/validation.helpers";
-import { UserDocument } from "../../../users/type/users.schema";
 import { newPasswordInputModel } from "../../types/auth.types";
 
 export class NewPasswordAuthCommand {

@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
-import { UsersRepository } from "../../users/application/users.repository";
+import { UsersRepository } from "../../users/infrastructure/users.repository";
 import { SecurityRepository } from "./security.repository";
 import { Types } from "mongoose";
 import { Request } from "express";

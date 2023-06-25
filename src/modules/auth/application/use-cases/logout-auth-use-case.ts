@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, UnauthorizedException } from "@nestjs/common";
+import { HttpException, HttpStatus } from "@nestjs/common";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { JwtService } from "../jwt.service";
 import { SecurityService } from "../../../security/application/security.service";

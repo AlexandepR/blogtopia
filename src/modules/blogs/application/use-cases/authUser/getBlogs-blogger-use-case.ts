@@ -1,11 +1,12 @@
 import { PaginationType, ParamsType } from "../../../../../types/types";
-import { UserDocument } from "../../../../users/type/users.schema";
-import { BlogDocument } from "../../../type/blogs.schema";
+import { UserDocument } from "../../../../users/domain/entities/users.schema";
+import { BlogDocument } from "../../../domain/entities/blogs.schema";
 import { filterByNameTermOrUserLogin, pagesCounter, parseQueryPaginator, skipPage } from "../../../../../utils/helpers";
-import { BlogsRepository } from "../../blogs.repository";
+import { BlogsRepository } from "../../../infrastructure/blogs.repository";
 import { Injectable } from "@nestjs/common";
 import { CreatePostInputClassModel } from "../../../../posts/type/postsType";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
+import { BlogsQueryRepository } from "../../../infrastructure/blogs.query-repository";
 
 
 export class GetBlogsCommand {
@@ -17,16 +18,19 @@ export class GetBlogsCommand {
 
 @CommandHandler(GetBlogsCommand)
 export class GetBlogsByBloggerUseCase implements ICommandHandler<GetBlogsCommand>{
-  constructor(protected blogsRepository: BlogsRepository,) {
+  constructor(
+    protected blogsRepository: BlogsRepository,
+    protected blogsQueryRepository: BlogsQueryRepository,
+    ) {
   }
   async execute(command: GetBlogsCommand): Promise<PaginationType<BlogDocument[]>> {
     const { searchNameTerm, pageSize, pageNumber, sortDirection, sortBy } = parseQueryPaginator(command.query);
     const userLogin = command.user ? command.user.accountData.login : ''
     const filter = filterByNameTermOrUserLogin(searchNameTerm,"blogOwnerInfo", userLogin)
-    const getTotalCountBlogs = await this.blogsRepository.getTotalCountBlogs(filter);
+    const getTotalCountBlogs = await this.blogsQueryRepository.getTotalCountBlogs(filter);
     const skip = skipPage(pageNumber, pageSize);
     const pagesCount = pagesCounter(getTotalCountBlogs, pageSize);
-    const getBlogs = await this.blogsRepository.getBlogs(skip, pageSize, filter, sortBy, sortDirection);
+    const getBlogs = await this.blogsQueryRepository.getBlogs(skip, pageSize, filter, sortBy, sortDirection);
     return {
       pagesCount: pagesCount,
       page: pageNumber,

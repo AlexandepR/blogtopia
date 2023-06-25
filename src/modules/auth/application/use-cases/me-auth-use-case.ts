@@ -1,9 +1,7 @@
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { JwtService } from "../jwt.service";
-import { SecurityService } from "../../../security/application/security.service";
 import { Request } from "express";
-import { UsersRepository } from "../../../users/application/users.repository";
+import { UsersRepository } from "../../../users/infrastructure/users.repository";
 
 export class getOwnAccountAuthCommand {
   constructor(

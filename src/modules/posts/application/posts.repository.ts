@@ -1,13 +1,13 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Post, PostDocument, PostModelType } from "../type/posts.schema";
-import { BlogDocument } from "../../blogs/type/blogs.schema";
+import { BlogDocument } from "../../blogs/domain/entities/blogs.schema";
 import { CreatePostInputModelType, PostsNewestLikesType, PostsType } from "../type/postsType";
 import { ObjectId } from "mongodb";
 import { CreateCommentInputClassModel } from "./posts.service";
 import { Comment, CommentModelType } from "../../comments/type/comments.schema";
 import { Types } from "mongoose";
-import { User, UserDocument, UserModelType } from "../../users/type/users.schema";
+import { User, UserDocument, UserModelType } from "../../users/domain/entities/users.schema";
 import { filterBanPostLikesInfo, filterBanPostsLikesInfo } from "../../../utils/helpers";
 
 @Injectable()
@@ -51,13 +51,18 @@ export class PostsRepository {
     // });
     return filteredPosts;
   }
+  async getArrayIdOwnPosts(userId: Types.ObjectId) {
+    console.log(userId, 'post----userId');
+    const posts = await this.PostModel
+      .find({ "postOwnerInfo.userId": userId });
+    const arrPostsId = posts.map((post) => post._id);
+    return arrPostsId;
+  }
   async createPost(createDto: CreatePostInputModelType, blog: BlogDocument, user: UserDocument): Promise<Post> {
     const newPost = Post.create(createDto, blog, user, this.PostModel);
     return newPost.save();
   }
-  // async createComment(content: string, postId: Types.ObjectId, user: UserDocument): Promise<any> {
   async createComment(content: string, post: PostDocument, user: UserDocument): Promise<any> {
-    // const newComment = Comment.createComment(content, postId, this.CommentModel, user);
     const newComment = Comment.createComment(content, post, this.CommentModel, user);
     return newComment.save();
   }
@@ -124,22 +129,22 @@ export class PostsRepository {
       );
     return checkNewestLikes.modifiedCount > 0;
   }
-  async findLikesStatus(postId: ObjectId, userId?: ObjectId | null): Promise<"None" | "Like" | "Dislike"> {
-    if (!userId) return "None";
-    const findLikeStatus = await this.PostModel
-      .findOne(
-        { _id: postId, "extendedLikesInfo.likesData": { $elemMatch: { userId: userId } } }
-      )
-      .lean();
-    if (findLikeStatus) return "Like";
-    const findDislikeStatus = await this.PostModel
-      .findOne(
-        { _id: postId, "extendedLikesInfo.dislikesData": { $elemMatch: { userId: userId } } }
-      )
-      .lean();
-    if (findDislikeStatus) return "Dislike";
-    return "None";
-  }
+  // async findLikesStatus(postId: ObjectId, userId?: ObjectId | null): Promise<"None" | "Like" | "Dislike"> {
+  //   if (!userId) return "None";
+  //   const findLikeStatus = await this.PostModel
+  //     .findOne(
+  //       { _id: postId, "extendedLikesInfo.likesData": { $elemMatch: { userId: userId } } }
+  //     )
+  //     .lean();
+  //   if (findLikeStatus) return "Like";
+  //   const findDislikeStatus = await this.PostModel
+  //     .findOne(
+  //       { _id: postId, "extendedLikesInfo.dislikesData": { $elemMatch: { userId: userId } } }
+  //     )
+  //     .lean();
+  //   if (findDislikeStatus) return "Dislike";
+  //   return "None";
+  // }
   async updateNewestLikes(postId: ObjectId, newesetLike: PostsNewestLikesType): Promise<boolean> {
     const updateNewestLike = await this.PostModel.updateOne(
       { _id: postId },

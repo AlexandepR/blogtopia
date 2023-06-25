@@ -1,7 +1,6 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query } from "@nestjs/common";
 import { BlogInputClassModel, PostForBlogBloggerInputClassModel } from "../type/blogsType";
-
-import { UserDocument } from "../../users/type/users.schema";
+import { UserDocument } from "../../users/domain/entities/users.schema";
 import { CreatePostForBlogInputClassModel } from "../../posts/type/postsType";
 import { CommandBus } from "@nestjs/cqrs";
 import { UpdateBlogCommand } from "../application/use-cases/authUser/updateBlog-blogger-use-case";
@@ -92,14 +91,6 @@ export class BlogsBloggerController {
     const command = new UpdatePostByBlogCommand(blogId, postId, dto, user);
     return await this.commandBus.execute(command);
   }
-  // @Put(":userId/ban")
-  // async updateBanStatus(
-  //   @Param("userId") userId: string,
-  //   @Body() dto: BanInfoInputClassModel,
-  // ){
-  //   const command = new UpdateBanStatusCommand(userId, dto)
-  //   return await this.commandBus.execute(command)
-  // }
   @Delete(":id")
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteBlog (

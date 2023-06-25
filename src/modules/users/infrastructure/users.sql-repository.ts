@@ -3,10 +3,10 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
 import { Post, PostDocument, PostModelStaticType, PostModelType } from "../../posts/type/posts.schema";
 import { CreateBlogInputModelType } from "../../blogs/type/blogsType";
-import { Blog, BlogDocument } from "../../blogs/type/blogs.schema";
+import { Blog, BlogDocument } from "../../blogs/domain/entities/blogs.schema";
 import { CreatePostInputModelType } from "../../posts/type/postsType";
 import { ObjectId } from "mongodb";
-import { User, UserDocument, UserModelType } from "../type/users.schema";
+import { User, UserDocument, UserModelType } from "../domain/entities/users.schema";
 import { CreateUserInputModelType } from "../type/usersTypes";
 
 @Injectable()
@@ -25,7 +25,6 @@ export class UsersRepository {
   ): Promise<UserDocument[]> {
     const sortedUsers = `accountData.${sortBy}`;
     const users = await this.UserModel
-      // .find({ banFilterStatus })
       .find({ ...banFilterStatus, ...filter })
       // , {
       // .find({ or: [banFilterStatus, filter] }, {
@@ -40,7 +39,6 @@ export class UsersRepository {
       .sort([[sortedUsers, sortDirection]])
       .skip(skip)
       .limit(pageSize);
-    // .lean();
     return users;
   }
   async getTotalCountUsers(filter: any,banStatus?: any): Promise<number> {

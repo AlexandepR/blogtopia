@@ -2,13 +2,14 @@ import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { filterBanPostLikesInfo, findLikeStatusForPost, sortNewestLikesForPost } from "../../../../utils/helpers";
 import { HttpException, HttpStatus, NotFoundException } from "@nestjs/common";
 import { Types } from "mongoose";
-import { UserDocument } from "../../../users/type/users.schema";
+import { UserDocument } from "../../../users/domain/entities/users.schema";
 import { outputPostModelType } from "../../type/postsType";
-import { UsersRepository } from "../../../users/application/users.repository";
+import { UsersRepository } from "../../../users/infrastructure/users.repository";
 import { PostsRepository } from "../posts.repository";
 import { JwtService } from "../../../auth/application/jwt.service";
-import { BlogsRepository } from "../../../blogs/application/blogs.repository";
+import { BlogsRepository } from "../../../blogs/infrastructure/blogs.repository";
 import { getPostByIdFilter } from "../../../../utils/filters/post.filters";
+import { BlogsQueryRepository } from "../../../blogs/infrastructure/blogs.query-repository";
 
 export class GetPostByIdCommand {
   constructor(
@@ -24,13 +25,14 @@ export class GetPostByIdUseCase implements ICommandHandler<GetPostByIdCommand> {
     protected jwtService: JwtService,
     protected postsRepository: PostsRepository,
     protected blogsRepository: BlogsRepository,
+    protected blogsQueryRepository: BlogsQueryRepository,
     protected usersRepository: UsersRepository,
   ) {
   }
   async execute(command: GetPostByIdCommand): Promise<outputPostModelType> {
     const postId = new Types.ObjectId(command.id);
     const banUsers: Array<string> = await this.usersRepository.getBannedUsers();
-    const getBanBlogs = await this.blogsRepository.getArrayIdBanBlogs()
+    const getBanBlogs = await this.blogsQueryRepository.getArrayIdBanBlogs()
     const filter = getPostByIdFilter(banUsers, getBanBlogs)
     const post = await this.postsRepository.findPostByIdForBlogger(postId,filter);
     if (!post) throw new HttpException("", HttpStatus.NOT_FOUND);

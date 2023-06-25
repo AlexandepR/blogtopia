@@ -4,8 +4,8 @@ import { CommentsRepository } from "../comments.repository";
 import { filterBanCommentLikesInfo } from "../../../../utils/helpers";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { Types } from "mongoose";
-import { UserDocument } from "../../../users/type/users.schema";
-import { UsersRepository } from "../../../users/application/users.repository";
+import { UserDocument } from "../../../users/domain/entities/users.schema";
+import { UsersRepository } from "../../../users/infrastructure/users.repository";
 
 
 export class GetCommentCommand {

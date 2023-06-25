@@ -74,6 +74,7 @@
     "@nestjs/serve-static": "^3.0.1",
     "@nestjs/swagger": "6.3.0",
     "@nestjs/throttler": "^4.0.0",
+    "@nestjs/typeorm": "^10.0.0",
     "@typegoose/typegoose": "^11.2.0",
     "@types/": "nestjs/config",
     "@types/bcrypt": "^5.0.0",
@@ -97,9 +98,11 @@
     "nodemailer-mock": "^2.0.1",
     "passport": "^0.6.0",
     "passport-http": "^0.3.0",
+    "pg": "^8.11.0",
     "reflect-metadata": "0.1.12",
     "rxjs": "7.1.0",
     "typegoose": "^5.9.1",
+    "typeorm": "^0.3.16",
     "uuid": "^9.0.0",
     "webpack": "5.0.0"
   }

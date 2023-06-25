@@ -7,8 +7,8 @@ import {
   PostsNewestLikesType,
   PutPostInputModelType
 } from "./postsType";
-import { BlogDocument } from "../../blogs/type/blogs.schema";
-import { UserDocument } from "../../users/type/users.schema";
+import { BlogDocument } from "../../blogs/domain/entities/blogs.schema";
+import { UserDocument } from "../../users/domain/entities/users.schema";
 
 
 @Schema({

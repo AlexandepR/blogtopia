@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { HttpException, HttpStatus, NotFoundException, UnauthorizedException } from "@nestjs/common";
-import { UserDocument } from "../../../users/type/users.schema";
+import { UserDocument } from "../../../users/domain/entities/users.schema";
 import { DevicesResDataType } from "../../type/security.types";
 import { SecurityRepository } from "../security.repository";
 

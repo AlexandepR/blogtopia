@@ -1,13 +1,14 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { pagesCounter, parseQueryPaginator, skipPage } from "../../../../utils/helpers";
-import { UserDocument } from "../../../users/type/users.schema";
+import { UserDocument } from "../../../users/domain/entities/users.schema";
 import { PostsTypeFiltered } from "../../type/postsType";
 import { PostsRepository } from "../posts.repository";
 import { PaginationType, ParamsType } from "../../../../types/types";
 import { JwtService } from "../../../auth/application/jwt.service";
-import { UsersRepository } from "../../../users/application/users.repository";
-import { BlogsRepository } from "../../../blogs/application/blogs.repository";
+import { UsersRepository } from "../../../users/infrastructure/users.repository";
+import { BlogsRepository } from "../../../blogs/infrastructure/blogs.repository";
 import { getPostsPublicFilter } from "../../../../utils/filters/post.filters";
+import { BlogsQueryRepository } from "../../../blogs/infrastructure/blogs.query-repository";
 
 
 export class GetPostsCommand {
@@ -24,6 +25,7 @@ export class GetPostsUseCase implements ICommandHandler<GetPostsCommand> {
     protected jwtService: JwtService,
     protected postsRepository: PostsRepository,
     protected blogsRepository: BlogsRepository,
+    protected blogsQueryRepository: BlogsQueryRepository,
     protected usersRepository: UsersRepository
   ) {
   }
@@ -31,7 +33,7 @@ export class GetPostsUseCase implements ICommandHandler<GetPostsCommand> {
     const userId = command.user ? command.user._id : "";
     const { searchNameTerm, pageSize, pageNumber, sortDirection, sortBy } = parseQueryPaginator(command.query);
     const banUsers: Array<string> = await this.usersRepository.getBannedUsers();
-    const banBlogs = await this.blogsRepository.getArrayIdBanBlogs();
+    const banBlogs = await this.blogsQueryRepository.getArrayIdBanBlogs();
     const filter = getPostsPublicFilter(banUsers, banBlogs, searchNameTerm)
     const totalCountPosts = await this.postsRepository.getTotalCountPosts(filter);
     const skip = skipPage(pageNumber, pageSize);

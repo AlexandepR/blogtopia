@@ -5,43 +5,11 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface
 } from "class-validator";
-import { UsersRepository } from "../../modules/users/application/users.repository";
-import { NotFoundException } from "@nestjs/common";
-import { BlogsRepository } from "../../modules/blogs/application/blogs.repository";
+import { UsersRepository } from "../../modules/users/infrastructure/users.repository";
+import { BlogsRepository } from "../../modules/blogs/infrastructure/blogs.repository";
 import { Types } from "mongoose";
+import { BlogsQueryRepository } from "../../modules/blogs/infrastructure/blogs.query-repository";
 
-// @ValidatorConstraint({ name: "IsLoginOrEmailAlreadyExistsPipe", async: true })
-// export class IsLoginOrEmailAlreadyExistsPipe implements ValidatorConstraintInterface {
-//   constructor(protected usersRepository: UsersRepository) {
-//   }
-//   async validate(loginOrEmail: string, args: ValidationArguments) {
-//     try {
-//       const user = await this.usersRepository.findByLoginOrEmail(loginOrEmail);
-//       if (user) return false
-//         // new NotFoundException();
-//       return true;
-//     } catch (e) {
-//       return false
-//       // throw new NotFoundException();
-//     }
-//
-//   }
-//   defaultMessage(args: ValidationArguments) {
-//     // here you can provide default error message if validation failed
-//     return "User with this login or email already exists";
-//   }
-// }
-// export function IsLoginOrEmailAlreadyExists(validationOptions?: ValidationOptions) {
-//   return function (object: Object, propertyName: string) {
-//     registerDecorator({
-//       name: 'IsLoginOrEmailAlreadyExistsPipe',
-//       target: object.constructor,
-//       propertyName: propertyName,
-//       options: validationOptions,
-//       validator: IsLoginOrEmailAlreadyExistsPipe,
-//     });
-//   };
-// }
 
 @ValidatorConstraint({ name: "IsLoginOrEmailNotExistsPipe", async: true })
 export class IsLoginOrEmailNotExistsPipe implements ValidatorConstraintInterface {
@@ -122,105 +90,22 @@ export function CheckConfirmData(validationOptions?: ValidationOptions) {
   };
 }
 
-
-// @ValidatorConstraint({ name: "validateInputBlogPipe", async: true })
-// export class validateInputBlogPipe implements ValidatorConstraintInterface {
-//   constructor() {}
-//   async validate(dto: string, args: ValidationArguments) {
-//     const {value} = args
-//     if (!value || value.trim().length <= 0) return false
-//     if( typeof value !== 'string') return false
-//     return true
-//   }
-//   defaultMessage(args: ValidationArguments) {
-//     const {property} = args
-//     // here you can provide default error message if validation failed
-//     return `${property} is empty`;
-//   }
-// }
-// //   }
-// //   async validate(dto: string, args: ValidationArguments) {
-// //     const { value, property } = args;
-// //     if (!value || value.trim().length <= 0) return false;
-// //     if (typeof value !== "string") return false;
-// //     if (property === "name") {
-// //       if(value.trim().length > 15) return false
-// //       return true
-// //     }
-// //     if (property === "description" && value.trim().length > 500) {
-// //       if(value.trim().length > 500) return false
-// //       return true
-// //     }
-// //     // if (property === "websiteUrl") {
-// //     //
-// //     // }
-// //
-// //
-// //     return false;
-// //   }
-// //   defaultMessage(args: ValidationArguments) {
-// //     const { property } = args;
-// //     // here you can provide default error message if validation failed
-// //     return `${property} is empty`;
-// //   }
-// // }
-//
-// export function ValidateInputBlog(validationOptions?: ValidationOptions) {
-//   return function(object: Object, propertyName: string) {
-//     registerDecorator({
-//       name: "validateInputBlog",
-//       target: object.constructor,
-//       propertyName: propertyName,
-//       options: validationOptions,
-//       validator: validateInputBlogPipe
-//     });
-//   };
-// }
-
-
 @ValidatorConstraint({ name: "existingBlogPipe", async: true })
 export class existingBlogPipe implements ValidatorConstraintInterface {
   constructor(
-    protected blogsRepository: BlogsRepository
+    protected blogsRepository: BlogsRepository,
+    protected blogsQueryRepository: BlogsQueryRepository,
   ) {}
   async validate(dto: string, args: ValidationArguments) {
-    const findBlog = await this.blogsRepository.findBlogById(new Types.ObjectId(dto));
+    const findBlog = await this.blogsQueryRepository.findBlogById(new Types.ObjectId(dto));
     if(!findBlog) return false
     return true
   }
   defaultMessage(args: ValidationArguments) {
     const {property} = args
-    // here you can provide default error message if validation failed
     return `blog doesn't exist`;
   }
 }
-//   }
-//   async validate(dto: string, args: ValidationArguments) {
-//     const { value, property } = args;
-//     if (!value || value.trim().length <= 0) return false;
-//     if (typeof value !== "string") return false;
-//     if (property === "name") {
-//       if(value.trim().length > 15) return false
-//       return true
-//     }
-//     if (property === "description" && value.trim().length > 500) {
-//       if(value.trim().length > 500) return false
-//       return true
-//     }
-//     // if (property === "websiteUrl") {
-//     //
-//     // }
-//
-//
-//     return false;
-//   }
-//   defaultMessage(args: ValidationArguments) {
-//     const { property } = args;
-//     // here you can provide default error message if validation failed
-//     return `${property} is empty`;
-//   }
-// }
-
 export function existingBlog(validationOptions?: ValidationOptions) {
   return function(object: Object, propertyName: string) {
     registerDecorator({

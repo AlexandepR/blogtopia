@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument, Model, Types } from "mongoose";
 import { PostDocument } from "../../posts/type/posts.schema";
-import { UserDocument } from "../../users/type/users.schema";
+import { UserDocument } from "../../users/domain/entities/users.schema";
 
 @Schema()
 export class CommentLikesData {
@@ -17,7 +17,10 @@ class PostInfo {
   blogId: Types.ObjectId;
   blogName: string;
 }
-@Schema()
+@Schema({
+  _id: false,
+  versionKey: false
+})
 class CommentatorInfo {
   @Prop({ required: true })
   userId: string;

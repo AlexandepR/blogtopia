@@ -2,14 +2,14 @@ import { Body, Controller, Delete, Get, Param, Put, Req } from "@nestjs/common";
 import { Request } from "express";
 import { likeStatusInputClassModel } from "../../posts/type/postsType";
 import { BasicAuth, Public, UserFromRequestDecorator } from "../../../utils/public.decorator";
-import { UserDocument } from "../../users/type/users.schema";
+import { UserDocument } from "../../users/domain/entities/users.schema";
 import { commentContentInputClassModel } from "../type/commentsType";
 import { Types } from "mongoose";
 import { CommandBus } from "@nestjs/cqrs";
-import { UpdateCommentLikeStatusCommand } from "./use-cases/updateCommentLikeStatus-use-case";
-import { DeleteCommentCommand } from "./use-cases/deleteComment-use-case";
-import { UpdateCommentCommand } from "./use-cases/updateComment-use-case";
-import { GetCommentCommand } from "./use-cases/getComments-use-case";
+import { UpdateCommentLikeStatusCommand } from "./use-cases/update-сomment-like-status.use-case";
+import { DeleteCommentCommand } from "./use-cases/delete-comment.use-case";
+import { UpdateCommentCommand } from "./use-cases/update-comment.use-case";
+import { GetCommentCommand } from "./use-cases/get-comments.use-case";
 
 @Controller("comments")
 export class CommentsController {

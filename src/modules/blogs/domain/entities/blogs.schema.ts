@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument, Model, Types } from "mongoose";
-import { BanInfoInputClassModel, CreateBlogInputModelType, PutBlogDtoType } from "./blogsType";
-import { UserDocument } from "../../users/type/users.schema";
+import { BanInfoInputClassModel, CreateBlogInputModelType, PutBlogDtoType } from "../../type/blogsType";
+import { UserDocument } from "../../../users/domain/entities/users.schema";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 
 @Schema({

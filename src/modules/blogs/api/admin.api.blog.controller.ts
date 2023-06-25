@@ -1,11 +1,11 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Put, Query } from "@nestjs/common";
 import { CommandBus } from "@nestjs/cqrs";
-import { getBlogsByAdminCommand } from "../application/use-cases/admin/getBlogs-blogs-admin-use-case";
-import { BindUserToBlogCommand } from "../application/use-cases/admin/bindUserToBlog-blogs-admin-use-case";
+import { getBlogsByAdminCommand } from "../application/use-cases/admin/get-blogs.use-case";
+import { BindUserToBlogCommand } from "../application/use-cases/admin/bind-user-to-blog.use-case";
 import { BasicAuth } from "../../../utils/public.decorator";
 import { ParamsType } from "../../../types/types";
 import { BanInfoBlogInputClassModel } from "../type/blogsType";
-import { UpdateBanInfoBlogCommand } from "../application/use-cases/admin/updateBanInfo-blogs-admin-use-case";
+import { UpdateBanInfoBlogCommand } from "../application/use-cases/admin/update-ban-info.use-case";
 
 
 @BasicAuth()

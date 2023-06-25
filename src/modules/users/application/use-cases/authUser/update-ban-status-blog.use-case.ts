@@ -1,12 +1,13 @@
-import { BlogsRepository } from "../../../../blogs/application/blogs.repository";
+import { BlogsRepository } from "../../../../blogs/infrastructure/blogs.repository";
 import { BanInfoInputClassModel } from "../../../../blogs/type/blogsType";
 import { validateOrRejectModel } from "../../../../../utils/validation.helpers";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { UserDocument } from "../../../type/users.schema";
+import { UserDocument } from "../../../domain/entities/users.schema";
 import { Types } from "mongoose";
 import { ForbiddenException, HttpException, HttpStatus, NotFoundException } from "@nestjs/common";
-import { UsersRepository } from "../../users.repository";
+import { UsersRepository } from "../../../infrastructure/users.repository";
 import { validateObjectId } from "../../../../../utils/helpers";
+import { BlogsQueryRepository } from "../../../../blogs/infrastructure/blogs.query-repository";
 
 
 export class UpdateBanStatusCommand {
@@ -22,13 +23,14 @@ export class UpdateBanStatusCommand {
 export class UpdateBanStatusUseCase implements ICommandHandler<UpdateBanStatusCommand>{
   constructor(
     protected blogsRepository: BlogsRepository,
+    protected blogsQueryRepository: BlogsQueryRepository,
     protected usersRepository: UsersRepository,
   ) {
   }
   async execute(command: UpdateBanStatusCommand): Promise<any> {
     await validateOrRejectModel(command.dto, BanInfoInputClassModel)
     const getUserId = validateObjectId(command.userId)
-    const blog = await this.blogsRepository.findBlogById(new Types.ObjectId(command.dto.blogId))
+    const blog = await this.blogsQueryRepository.findBlogById(new Types.ObjectId(command.dto.blogId))
     if(!blog) throw new NotFoundException()
     if(blog.blogOwnerInfo.userLogin !== command.user.accountData.login) throw new ForbiddenException()
     const getUser = await  this.usersRepository.findUserById(getUserId)

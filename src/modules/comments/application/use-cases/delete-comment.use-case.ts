@@ -2,7 +2,7 @@ import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { CommentsRepository } from "../comments.repository";
 import { validateObjectId } from "../../../../utils/helpers";
 import { HttpException, HttpStatus } from "@nestjs/common";
-import { UserDocument } from "../../../users/type/users.schema";
+import { UserDocument } from "../../../users/domain/entities/users.schema";
 import { CommentsService } from "../comments.service";
 
 

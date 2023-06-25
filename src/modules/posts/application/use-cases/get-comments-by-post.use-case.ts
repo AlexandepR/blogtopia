@@ -6,7 +6,7 @@ import { getCommentsByPostOutputModel } from "../../type/postsType";
 import { PostsRepository } from "../posts.repository";
 import { PaginationType, ParamsType } from "../../../../types/types";
 import { CommentsRepository } from "../../../comments/application/comments.repository";
-import { UsersRepository } from "../../../users/application/users.repository";
+import { UsersRepository } from "../../../users/infrastructure/users.repository";
 
 
 export class GetCommentsByPostCommand {

@@ -1,9 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { PaginationType } from "../../../types/types";
-import { UsersRepository } from "./users.repository";
+import { UsersRepository } from "../infrastructure/users.repository";
 import { Types } from "mongoose";
 import { CreateUserInputClassModel, ParamsUsersType, UserType } from "../type/usersTypes";
-import { User, UserDocument } from "../type/users.schema";
+import { User, UserDocument } from "../domain/entities/users.schema";
 import { generateHash, pagesCounter, parseQueryUsersPaginator, skipPage } from "../../../utils/helpers";
 import { validateOrRejectModel } from "../../../utils/validation.helpers";
 

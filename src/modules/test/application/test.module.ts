@@ -6,8 +6,8 @@ import { TestingController } from "./testing.controller";
 import { TestingService } from "./testing.service";
 import { TestingRepository } from "./testing.repository";
 import { Security, SecuritySchema } from "../../security/type/security.schema";
-import { User, UserSchema } from "../../users/type/users.schema";
-import { Blog, BlogSchema } from "../../blogs/type/blogs.schema";
+import { User, UserSchema } from "../../users/domain/entities/users.schema";
+import { Blog, BlogSchema } from "../../blogs/domain/entities/blogs.schema";
 
 
 @Module({

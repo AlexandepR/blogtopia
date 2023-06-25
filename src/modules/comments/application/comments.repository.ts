@@ -27,28 +27,27 @@ export class CommentsRepository {
       .skip(skip)
       .limit(pageSize);
     return filterBanCommentLikesInfo(comments, banUsers);
-    // return comments;
   }
-  async findAllOwnComments(
-    skip: number,
-    pageSize: number,
-    sortBy: string,
-    sortDirection: "desc" | "asc",
-    userId: Types.ObjectId
-  ): Promise<CommentDataType[]> {
-    const getOwnComments = await this.CommentModel
-      .find({ "commentatorInfo.userId": userId })
-      .sort([[sortBy, sortDirection]])
-      .skip(skip)
-      .limit(pageSize)
-      .select(["_id", "content", "commentatorInfo", "createdAt", "postInfo"])
-    .lean()
-    const comments = getOwnComments.map(({ _id, ...rest }) => ({
-      id: _id,
-      ...rest
-    }));
-    return comments
-  }
+  // async findAllOwnComments(
+  //   skip: number,
+  //   pageSize: number,
+  //   sortBy: string,
+  //   sortDirection: "desc" | "asc",
+  //   userId: Types.ObjectId
+  // ): Promise<CommentDataType[]> {
+  //   const getOwnComments = await this.CommentModel
+  //     .find({ "commentatorInfo.userId": userId })
+  //     .sort([[sortBy, sortDirection]])
+  //     .skip(skip)
+  //     .limit(pageSize)
+  //     .select(["_id", "content", "commentatorInfo", "createdAt", "postInfo"])
+  //     .lean();
+  //   const comments = getOwnComments.map(({ _id, ...rest }) => ({
+  //     id: _id,
+  //     ...rest
+  //   }));
+  //   return comments;
+  // }
   async getCommentsById(commentId: Types.ObjectId, filter?, banUsers?): Promise<CommentDocument | null> {
     let query: any = { _id: commentId };
     if (filter) {
@@ -80,13 +79,42 @@ export class CommentsRepository {
       return "None";
     }
   }
-  async getTotalCountComments(filter: any): Promise<number> {
-    const count = await this.CommentModel
-      .countDocuments(filter);
-    return count;
+  async getTotalCommentsForBlogs(
+    skip: number,
+    pageSize: number,
+    sortBy: string,
+    sortDirection: "desc" | "asc",
+    allOwnPostId: Array<Types.ObjectId>
+  ): Promise<any> {
+    const allComments = await this.CommentModel
+      .find(
+        allOwnPostId ? { "postInfo.id": { $in: allOwnPostId } } : {}
+      )
+      .sort([[sortBy, sortDirection]])
+      .skip(skip)
+      .limit(pageSize)
+      .lean()
+      .select(["_id", "content", "createdAt", "commentatorInfo", "likesInfo", "postInfo"]);
+    return allComments.map((
+      {
+        _id,
+        content,
+        createdAt,
+        commentatorInfo,
+        likesInfo: {likesData,dislikesData, likesCount, dislikesCount, myStatus},
+        postInfo,
+      }) => (
+        { id: _id,
+          content,
+          createdAt,
+          commentatorInfo,
+          likesInfo:{likesCount,dislikesCount,myStatus},
+          postInfo
+        }
+    ));
   }
-  async getTotalOwnComments(userId: Types.ObjectId): Promise<number> {
-    return this.CommentModel.countDocuments({ "commentatorInfo.userId": userId });
+  async getTotalCommentsForBlog(allOwnPostId): Promise<number> {
+    return this.CommentModel.countDocuments(allOwnPostId ? { "postInfo.id": { $in: allOwnPostId } } : {});
   }
   async getTotalCount(postId: Types.ObjectId) {
     return this.CommentModel

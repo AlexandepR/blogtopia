@@ -7,7 +7,7 @@ import { BASIC_AUTH_KEY, IS_PUBLIC_KEY, REFRESH_TOKEN_AUTH_KEY } from "../../uti
 import { BasicAuthGuard } from "./basic.auth.guard";
 import { settingsEnv } from "../../settings/settings";
 import { Types } from "mongoose";
-import { UsersRepository } from "../../modules/users/application/users.repository";
+import { UsersRepository } from "../../modules/users/infrastructure/users.repository";
 
 @Injectable()
 export class AuthGuard implements CanActivate {

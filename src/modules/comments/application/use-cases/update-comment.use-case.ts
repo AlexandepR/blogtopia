@@ -5,7 +5,7 @@ import { validateOrRejectModel } from "../../../../utils/validation.helpers";
 import { validateObjectId } from "../../../../utils/helpers";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { Types } from "mongoose";
-import { UserDocument } from "../../../users/type/users.schema";
+import { UserDocument } from "../../../users/domain/entities/users.schema";
 
 
 export class UpdateCommentCommand {

@@ -1,11 +1,12 @@
-import { BlogDocument } from "../../../type/blogs.schema";
-import { BlogsRepository } from "../../blogs.repository";
+import { BlogDocument } from "../../../domain/entities/blogs.schema";
+import { BlogsRepository } from "../../../infrastructure/blogs.repository";
 import { ForbiddenException, HttpException, HttpStatus, NotFoundException } from "@nestjs/common";
 import { Types } from "mongoose";
 import { BlogInputClassModel } from "../../../type/blogsType";
 import { validateOrRejectModel } from "../../../../../utils/validation.helpers";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { UserDocument } from "../../../../users/type/users.schema";
+import { UserDocument } from "../../../../users/domain/entities/users.schema";
+import { BlogsQueryRepository } from "../../../infrastructure/blogs.query-repository";
 
 
 export class UpdateBlogCommand {
@@ -19,7 +20,9 @@ export class UpdateBlogCommand {
 
 @CommandHandler(UpdateBlogCommand)
 export class UpdateBlogByBloggerUseCase implements ICommandHandler<UpdateBlogCommand>{
-  constructor(protected blogsRepository: BlogsRepository,
+  constructor(
+    protected blogsRepository: BlogsRepository,
+    protected blogsQueryRepository: BlogsQueryRepository,
   ) {
   }
   async execute(command: UpdateBlogCommand): Promise<BlogDocument> {
@@ -27,7 +30,7 @@ export class UpdateBlogByBloggerUseCase implements ICommandHandler<UpdateBlogCom
     if(!Types.ObjectId.isValid(command.blogId)) {throw new NotFoundException()}
     const blogId = new Types.ObjectId(command.blogId);
     // const filterIsOwn = ({'blogOwnerInfo.userLogin': command.user.accountData.login})
-    const blog = await this.blogsRepository.findBlogById(blogId);
+    const blog = await this.blogsQueryRepository.findBlogById(blogId);
     if (!blog) throw new HttpException("", HttpStatus.NOT_FOUND);
     if(blog.blogOwnerInfo.userLogin !== command.user.accountData.login) throw new ForbiddenException()
     console.log(blog.blogOwnerInfo.userLogin, '1');

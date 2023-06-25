@@ -1,6 +1,6 @@
 import { ParamsUsersType, QueryUsersPaginator } from "../modules/users/type/usersTypes";
 import * as bcrypt from "bcrypt";
-import { User } from "../modules/users/type/users.schema";
+import { User } from "../modules/users/domain/entities/users.schema";
 import { PostLikesType } from "../modules/posts/type/postsType";
 import { PostDocument } from "../modules/posts/type/posts.schema";
 import { Types } from "mongoose";

@@ -1,16 +1,15 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
   HttpCode,
   HttpStatus,
-  Ip, NotFoundException,
+  Ip,
   Param,
   Post,
-  Query, UseGuards,
-  UseInterceptors,
+  Query,
+  UseGuards,
   ValidationPipe
 } from "@nestjs/common";
 import { UsersService } from "./users.service";

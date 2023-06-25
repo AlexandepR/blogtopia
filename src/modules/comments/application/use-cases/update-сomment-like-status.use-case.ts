@@ -5,7 +5,7 @@ import { validateOrRejectModel } from "../../../../utils/validation.helpers";
 import { updateCommentLikesInfo, validateObjectId } from "../../../../utils/helpers";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { Types } from "mongoose";
-import { UserDocument } from "../../../users/type/users.schema";
+import { UserDocument } from "../../../users/domain/entities/users.schema";
 import { likeStatusInputClassModel } from "../../../posts/type/postsType";
 
 
@@ -19,7 +19,7 @@ export class UpdateCommentLikeStatusCommand {
 }
 
 @CommandHandler(UpdateCommentLikeStatusCommand)
-export class UpdateCommentLikeStatusUseCase implements ICommandHandler<UpdateCommentLikeStatusCommand> {
+export class UpdateOmmentLikeStatusUseCase implements ICommandHandler<UpdateCommentLikeStatusCommand> {
   constructor(
     protected commentsRepository: CommentsRepository,
   ) {}

@@ -1,4 +1,4 @@
-import { UserDocument } from "../type/users.schema";
+import { UserDocument } from "../domain/entities/users.schema";
 
 
 declare global {

@@ -17,17 +17,17 @@ import { CreateCommentInputClassModel, PostsService } from "./posts.service";
 import { Request } from "express";
 import { CreatePostInputClassModel, likeStatusInputClassModel } from "../type/postsType";
 import { BasicAuth, Public, UserFromRequestDecorator } from "../../../utils/public.decorator";
-import { UserDocument } from "../../users/type/users.schema";
+import { UserDocument } from "../../users/domain/entities/users.schema";
 import { CommandBus } from "@nestjs/cqrs";
-import { UpdatePostLikeStatusCommand } from "./use-cases/updatePostLikeStatus-use-case";
-import { GetCommentsByPostCommand } from "./use-cases/getCommentsByPost-use-case";
-import { CreateCommentForPostCommand } from "./use-cases/createCommentForPost-use-case";
-import { GetPostsCommand } from "./use-cases/getPosts-use-case";
-import { GetPostByIdCommand } from "./use-cases/getPostById-use-case";
-import { CreatePostCommand } from "./use-cases/createPost-use-case";
-import { UpdatePostCommand } from "./use-cases/updatePost-use-case";
-import { DeletePostByIdCommand } from "./use-cases/deletePostById-use-case";
-import { DeleteAllPostsCommand } from "./use-cases/deleteAllPost-use-case";
+import { UpdatePostLikeStatusCommand } from "./use-cases/update-post-like-status.use-case";
+import { GetCommentsByPostCommand } from "./use-cases/get-comments-by-post.use-case";
+import { CreateCommentForPostCommand } from "./use-cases/create-comment-for-post.use-case";
+import { GetPostsCommand } from "./use-cases/get-posts.use-case";
+import { GetPostByIdCommand } from "./use-cases/get-post-by-id.use-case";
+import { CreatePostCommand } from "./use-cases/create-post.use-case";
+import { UpdatePostCommand } from "./use-cases/update-post.use-case";
+import { DeletePostByIdCommand } from "./use-cases/delete-post-by-id.use-case";
+import { DeleteAllPostsCommand } from "./use-cases/delete-all-post.use-case";
 
 @Controller("posts")
 export class PostsController {

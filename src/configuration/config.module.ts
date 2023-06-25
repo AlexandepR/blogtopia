@@ -50,6 +50,3 @@ export const configModule = ConfigModule.forRoot({
     PORT: Joi.number().default(5005),
   }),
 });
-
-// private configService: ConfigService<ConfigType>
-// this.configService.get('PORT', {infer: true}).PORT

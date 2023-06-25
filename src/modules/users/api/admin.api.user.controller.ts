@@ -6,25 +6,22 @@ import {
   HttpCode,
   HttpStatus,
   Ip,
-  Param, Post,
+  Param,
+  Post,
   Put,
   Query,
-  UseGuards,
-  ValidationPipe
+  UseGuards
 } from "@nestjs/common";
 import { BasicAuth } from "../../../utils/public.decorator";
 import { CreateUserInputClassModel, InfoBanStatusClassModel, ParamsUsersType } from "../type/usersTypes";
-import { GetUsersByAdminCommand } from "../application/use-cases/admin/getUsers-admin-use-case";
+import { GetUsersByAdminCommand } from "../application/use-cases/admin/get-users.use-case";
 import { CommandBus } from "@nestjs/cqrs";
-import {
-  UpdateBanInfoByAdminCommand
-} from "../application/use-cases/admin/updateUserBanStatus-admin-use-case";
+import { UpdateBanInfoByAdminCommand } from "../application/use-cases/admin/update-ban-status.use-case";
 import { CheckLoginOrEmailGuard } from "../../../middleware/middleware";
-import { CreateUserByAdminCommand } from "../application/use-cases/admin/createUser-admin-use-case";
-import { checkObjectId } from "../../../utils/validation.helpers";
-import { DeleteUserByAdminCommand } from "../application/use-cases/admin/deleteUser-admin-use-case";
-import { DeleteAllUsersByAdminCommand } from "../application/use-cases/admin/deleteAllUsers-admin-use-case";
-import { UsersRepository } from "../application/users.repository";
+import { CreateUserByAdminCommand } from "../application/use-cases/admin/create-user.use-case";
+import { DeleteUserByAdminCommand } from "../application/use-cases/admin/delete-user.use-case";
+import { DeleteAllUsersByAdminCommand } from "../application/use-cases/admin/delete-all.use-case";
+import { UsersRepository } from "../infrastructure/users.repository";
 
 
 @BasicAuth()

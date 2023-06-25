@@ -1,9 +1,10 @@
-import { UserDocument } from "../../../../users/type/users.schema";
-import { BlogsRepository } from "../../blogs.repository";
+import { UserDocument } from "../../../../users/domain/entities/users.schema";
+import { BlogsRepository } from "../../../infrastructure/blogs.repository";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { Types } from "mongoose";
 import { BlogType } from "../../../type/blogsType";
+import { BlogsQueryRepository } from "../../../infrastructure/blogs.query-repository";
 
 
 export class GetBlogByIdCommand {
@@ -15,11 +16,14 @@ export class GetBlogByIdCommand {
 
 @CommandHandler(GetBlogByIdCommand)
 export class GetBlogByIdByBloggerUseCase implements ICommandHandler<GetBlogByIdCommand>{
-  constructor(protected blogsRepository: BlogsRepository,) {
+  constructor(
+    protected blogsRepository: BlogsRepository,
+    protected blogsQueryRepository: BlogsQueryRepository,
+    ) {
   }
   async execute(command: GetBlogByIdCommand): Promise<BlogType> {
     const blogId = new Types.ObjectId(command.id);
-    const blog = await this.blogsRepository.findBlogById(blogId);
+    const blog = await this.blogsQueryRepository.findBlogById(blogId);
     // if(blog.blogOwnerInfo.userLogin !== command.user.accountData.login) throw new ForbiddenException()
     if (!blog) throw new HttpException("", HttpStatus.NOT_FOUND);
     return {

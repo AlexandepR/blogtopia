@@ -1,19 +1,10 @@
-import {
-  ForbiddenException,
-  HttpException,
-  HttpStatus,
-  NotFoundException,
-  UnauthorizedException
-} from "@nestjs/common";
+import { HttpException, HttpStatus, UnauthorizedException } from "@nestjs/common";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { CreateUserInputClassModel } from "../../../users/type/usersTypes";
-import { generateHash, isPasswordCorrect } from "../../../../utils/helpers";
+import { isPasswordCorrect } from "../../../../utils/helpers";
 import { JwtService } from "../jwt.service";
-import { EmailService } from "../../../mail/application/managers/email.service";
-import { UsersRepository } from "../../../users/application/users.repository";
+import { UsersRepository } from "../../../users/infrastructure/users.repository";
 import { validateOrRejectModel } from "../../../../utils/validation.helpers";
-import { UserDocument } from "../../../users/type/users.schema";
-import { loginInputClassModel, newPasswordInputModel } from "../../types/auth.types";
+import { loginInputClassModel } from "../../types/auth.types";
 import { UsersService } from "../../../users/application/users.service";
 import { SecurityService } from "../../../security/application/security.service";
 

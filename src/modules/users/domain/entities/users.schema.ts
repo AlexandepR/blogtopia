@@ -1,9 +1,9 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument, Model, Types } from "mongoose";
-import { CreateUserInputModelType, InfoBanStatusClassModel } from "./usersTypes";
+import { CreateUserInputModelType, InfoBanStatusClassModel } from "../../type/usersTypes";
 import { v4 as uuidv4 } from "uuid";
 import { add } from "date-fns";
-import { Blog, BlogSchema } from "../../blogs/type/blogs.schema";
+import { Blog, BlogSchema } from "../../../blogs/domain/entities/blogs.schema";
 
 
 @Schema({
@@ -119,7 +119,7 @@ export class User {
     UserModel: UserModelType,
     passwordHash: string,
     ip: any,
-    confirmEmail: boolean,
+    isConfirmEmail: boolean,
   ): UserDocument {
     const user = new UserModel();
     user.accountData = new UserAccount();
@@ -138,7 +138,7 @@ export class User {
       hours: 1,
       minutes: 3
     });
-    user.emailConfirmation.isConfirmed = confirmEmail;
+    user.emailConfirmation.isConfirmed = isConfirmEmail;
     user.emailConfirmation.passwordRecoveryCode = '';
     user.registrationData.ip = [ip]
     user.registrationData.infoDateIp = [];

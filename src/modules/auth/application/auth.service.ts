@@ -6,7 +6,7 @@ import {
   NotFoundException,
   UnauthorizedException
 } from "@nestjs/common";
-import { UsersRepository } from "../../users/application/users.repository";
+import { UsersRepository } from "../../users/infrastructure/users.repository";
 import { v4 as uuidv4 } from "uuid";
 import { UsersService } from "../../users/application/users.service";
 import { CreateUserInputClassModel } from "../../users/type/usersTypes";
@@ -25,7 +25,7 @@ import { JwtService } from "./jwt.service";
 import { Request } from "express";
 import { settingsEnv } from "../../../settings/settings";
 import * as jwt from "jsonwebtoken";
-import { UserDocument } from "../../users/type/users.schema";
+import { UserDocument } from "../../users/domain/entities/users.schema";
 
 @Injectable()
 export class AuthService {

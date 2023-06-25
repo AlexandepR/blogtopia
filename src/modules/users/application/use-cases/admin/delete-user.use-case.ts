@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { CreateUserInputClassModel, UserType } from "../../../type/usersTypes";
-import { UsersRepository } from "../../users.repository";
+import { UsersRepository } from "../../../infrastructure/users.repository";
 import { validateOrRejectModel } from "../../../../../utils/validation.helpers";
 import { generateHash } from "../../../../../utils/helpers";
 import { Types } from "mongoose";

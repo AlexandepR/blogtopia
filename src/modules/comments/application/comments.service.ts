@@ -8,13 +8,13 @@ import {
   skipPage,
   updateCommentLikesInfo
 } from "../../../utils/helpers";
-import { UsersRepository } from "../../users/application/users.repository";
+import { UsersRepository } from "../../users/infrastructure/users.repository";
 import { commentContentInputClassModel, CommentType, LikesType } from "../type/commentsType";
 import { JwtService } from "../../auth/application/jwt.service";
 import { Request } from 'express';
 import { Types } from "mongoose";
 import { likeStatusInputClassModel } from "../../posts/type/postsType";
-import { UserDocument } from "../../users/type/users.schema";
+import { UserDocument } from "../../users/domain/entities/users.schema";
 import { validateOrRejectModel } from "../../../utils/validation.helpers";
 
 

@@ -21,9 +21,6 @@ import { RegistrationEmailResendAuthCommand } from "./use-cases/registrationEmai
 import { LogoutAuthCommand } from "./use-cases/logout-auth-use-case";
 
 
-// @UseGuards(CheckLoginOrEmailGuard)
-// @UserFromRequestDecorator()user:UserDocument,
-
 @Controller("auth")
 export class AuthController {
   constructor(
@@ -48,24 +45,19 @@ export class AuthController {
   ) {
     const command = new RegistrationEmailResendAuthCommand(dto);
     return await this.commandBus.execute(command);
-    // return await this.authService.emailResend(dto);
   }
   @Public()
-  // @UseGuards(recoveryCodeGuard)
   @Throttle(5, 10)
   @Post("/registration-confirmation")
   async confirmRegistration(
-    //   @Param('postId')
-    //     postId: string,
     @Body() dto:codeInputClassModel
   ) {
     const command = new ConfirmRegistrationAuthCommand(dto);
     return await this.commandBus.execute(command);
-    // return await this.authService.confirmRegistration(dto);
   }
 
   @Public()
-  @Throttle(5, 10)
+  // @Throttle(5, 10)
   @HttpCode(HttpStatus.OK)
   @Post("/login")
   async login(
@@ -75,7 +67,6 @@ export class AuthController {
     @Body() signInDto: loginInputClassModel
   ) {
     const deviceName = req.headers["user-agent"];
-    // const { refreshTokenCookie, token } = await this.authService.login(signInDto, userAgent, ip);
     const command = new LoginAuthCommand(signInDto, deviceName, ip);
     const { refreshTokenCookie, token } = await this.commandBus.execute(command);
     response.setHeader("Set-Cookie", refreshTokenCookie);
@@ -89,7 +80,6 @@ export class AuthController {
   ) {
     const command = new PasswordRecoveryAuthCommand(dto)
     return await this.commandBus.execute(command);
-    // return await this.authService.passwordRecovery(email);
   }
   @Public()
   @UseGuards(
@@ -111,7 +101,6 @@ export class AuthController {
     @Res() response: Response,
     @Req() req: Request
   ) {
-    // const { refreshTokenCookie, token } = await this.authService.refreshToken(req);
     const command = new RefreshTokenAuthCommand(req);
     const { refreshTokenCookie, token } = await this.commandBus.execute(command);
     response.setHeader("Set-Cookie", refreshTokenCookie);
@@ -126,7 +115,6 @@ export class AuthController {
     const command = new LogoutAuthCommand(req)
     return await this.commandBus.execute(command);
   }
-  // @RefreshTokenAuthGuard()
   @Get("/me")
   async getOwnAccount(
     @Req() req: Request
