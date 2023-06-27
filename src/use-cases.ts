@@ -124,6 +124,9 @@ import { BlogsQueryRepository } from "./modules/blogs/infrastructure/blogs.query
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersSqlRepository } from './modules/users/infrastructure/users.sql-repository';
 import { SecuritySqlRepository } from './modules/security/infrastructure/security.sql-repository';
+import { BanUserInfo } from './modules/users/domain/entities/banUser.entity';
+import { UsersDevicesSessions } from './modules/users/domain/entities/usersDevices.entity';
+import { Users } from './modules/users/domain/entities/user.entity';
 // import { MailerModule2 } from "../../swagger-static";
 
 export const adminUseCases = [
@@ -275,9 +278,10 @@ export const moduleImports = [
     entities: [
       // "src/entity/**/*.ts"
     ],
-    autoLoadEntities: false,
-    synchronize: false,
+    autoLoadEntities: true,
+    synchronize: true,
   }),
+  TypeOrmModule.forFeature([Users, BanUserInfo, UsersDevicesSessions]),
   MongooseModule.forRoot(settingsEnv.MONGO_URL),
   MongooseModule.forFeature(allMongooseModels),
   JwtModule.register({

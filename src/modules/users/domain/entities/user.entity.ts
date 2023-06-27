@@ -1,37 +1,37 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('Users')
-export class User {
+export class Users {
     @PrimaryGeneratedColumn('uuid')
     ID: string;
 
-    @Column({ type: 'varchar' })
+    @Column()
     login: string;
 
-    @Column({ type: 'varchar' })
+    @Column()
     email: string;
 
-    @Column({ type: 'timestamp with time zone', nullable: true })
+    @Column({ type: 'timestamp with time zone' })
     created_at: Date;
 
-    @Column({ type: 'varchar' })
+    @Column({ default: ""})
     passwordHash: string;
 
-    @Column({ type: 'boolean' })
+    @Column({ default: false })
     isConfirmed: boolean;
 
-    @Column({ type: 'varchar' })
+    @Column({ default: ""})
     confirmationCode: string;
 
-    @Column({ type: 'varchar' })
+    @Column({ default: ""})
     expConfirmCodeDate: string;
 
-    @Column({ type: 'varchar' })
+    @Column({ default: ""})
     passRecoveryCode: string;
 
-    @Column({ type: 'date', array: true })
+    @Column('date', { array: true, default: [] })
     sendEmails: string[];
 
-    @Column({ type: 'varchar', nullable: true })
-    expRefreshToken: string;
+    @Column('varchar', { array: true, default: [] })
+    expRefreshToken: string[];
 }
