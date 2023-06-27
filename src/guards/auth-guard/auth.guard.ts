@@ -8,6 +8,7 @@ import { BasicAuthGuard } from "./basic.auth.guard";
 import { settingsEnv } from "../../settings/settings";
 import { Types } from "mongoose";
 import { UsersRepository } from "../../modules/users/infrastructure/users.repository";
+import { UsersSqlRepository } from '../../modules/users/infrastructure/users.sql-repository';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -15,7 +16,7 @@ export class AuthGuard implements CanActivate {
     private jwtService: JwtService,
     private reflector: Reflector,
     private basicAuthGuard: BasicAuthGuard,
-    private usersRepository: UsersRepository
+    private usersSqlRepository: UsersSqlRepository
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -69,7 +70,7 @@ export class AuthGuard implements CanActivate {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: settingsEnv.JWT_SECRET,
       });
-      const user = await this.usersRepository.findUserById(new Types.ObjectId(payload.userId))
+      const user = await this.usersSqlRepository.findUserById(payload.userId)
       request.requestUser = user;
     } catch {
       throw new UnauthorizedException();
@@ -96,8 +97,8 @@ export class AuthGuard implements CanActivate {
     if(!refreshToken) return false
      try {
     const getRefreshToken: any = jwt.verify(refreshToken, settingsEnv.JWT_REFRESH_TOKEN_SECRET)
-       const user = await this.usersRepository.findUserById(new Types.ObjectId(getRefreshToken.userId))
-       for (const token of user.authData.expirationRefreshToken) {
+       const user = await this.usersSqlRepository.findUserById(getRefreshToken.userId)
+       for (const token of user.expRefreshToken) {
          if (token === refreshToken) return false
        }
        request.requestUser = user;
