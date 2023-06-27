@@ -1,5 +1,5 @@
-import { IsEmail, IsNotEmpty, IsString, Length } from "class-validator";
-import { CheckConfirmData, IsLoginOrEmailNotExists } from "../../../pipes/validation/validate.pipe";
+import { IsEmail, IsNotEmpty, IsString, Length } from 'class-validator';
+import { CheckConfirmData, IsLoginOrEmailNotExists } from '../../../pipes/validation/validate.pipe';
 
 
 export class checkEmailInputClassModel {
@@ -16,22 +16,16 @@ export class codeInputClassModel {
   @IsString()
   code: string
 }
-export type checkEmailInputModel = {
-  email: string
-}
 export class newPasswordInputModel {
-  // @Type()
-  @IsNotEmpty()
-  recoveryCode: string
   @Length(6,20)
   newPassword: string
+  @IsNotEmpty()
+  recoveryCode: string
 }
 
 export class loginInputClassModel {
-  // @Type()
   @IsNotEmpty()
   loginOrEmail: string
-  // @Type()
   @IsNotEmpty()
   password: string
 }

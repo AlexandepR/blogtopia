@@ -1,13 +1,12 @@
-import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { HttpException, HttpStatus, NotFoundException, UnauthorizedException } from "@nestjs/common";
-import { UserDocument } from "../../../users/domain/entities/users.schema";
-import { DevicesResDataType } from "../../type/security.types";
-import { SecurityRepository } from "../security.repository";
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
+import { SecuritySqlRepository } from '../../infrastructure/security.sql-repository';
+import { FindUserType } from '../../../users/type/usersTypes';
 
 
 export class DeleteDeviceByIdCommand {
   constructor(
-    public user: UserDocument,
+    public user: FindUserType,
     public deviceId: string,
   ) {
   }
@@ -16,15 +15,15 @@ export class DeleteDeviceByIdCommand {
 @CommandHandler(DeleteDeviceByIdCommand)
 export class DeleteDeviceByIdUseCase implements ICommandHandler<DeleteDeviceByIdCommand> {
   constructor(
-    protected securityRepository: SecurityRepository,
+    protected securitySqlRepository: SecuritySqlRepository,
   ) {
   }
   async execute(command: DeleteDeviceByIdCommand) {
-    const session = await this.securityRepository.findSessionByDeviceId(command.deviceId);
+    const session = await this.securitySqlRepository.findSessionByDeviceId(command.deviceId);
     if(!session) throw new NotFoundException()
-    if (command.user._id.toString() !== session.userId.toString()) {
+    if (command.user.ID !== session.userId) {
       throw new HttpException('', HttpStatus.FORBIDDEN);}
-    const terminateSession = await this.securityRepository.terminateSessionByDeviceId(command.deviceId);
+    const terminateSession = await this.securitySqlRepository.terminateSessionByDeviceId(command.deviceId, command.user.ID);
     if (terminateSession) {throw new HttpException('', HttpStatus.NO_CONTENT)}
     throw new HttpException('', HttpStatus.NOT_FOUND);
   }

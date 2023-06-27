@@ -5,6 +5,7 @@ import { UsersRepository } from "../../../users/infrastructure/users.repository"
 import { validateOrRejectModel } from "../../../../utils/validation.helpers";
 import { codeInputClassModel } from "../../types/auth.types";
 import { UsersService } from "../../../users/application/users.service";
+import { UsersSqlRepository } from '../../../users/infrastructure/users.sql-repository';
 
 export class ConfirmRegistrationAuthCommand {
   constructor(
@@ -17,20 +18,22 @@ export class ConfirmRegistrationAuthUseCase implements ICommandHandler<ConfirmRe
   constructor(
     protected usersRepository: UsersRepository,
     protected usersService: UsersService,
+    protected UsersSqlRepository: UsersSqlRepository,
   ) {
   }
   async execute(command: ConfirmRegistrationAuthCommand) {
     await validateOrRejectModel(command.dto, codeInputClassModel);
-    const user = await this.usersService.findByConfirmationCode(command.dto.code);
-    if (!user || user.emailConfirmation.isConfirmed === true) throw new BadRequestException()
+    const user = await this.UsersSqlRepository.findByConfirmationCode(command.dto.code);
+    if (!user || user.isConfirmed === true) throw new BadRequestException();
+    const expConfirmCodeDate = new Date(user.expConfirmCodeDate)
     const dateNow = new Date();
-    if (user.emailConfirmation.expirationDate.getTime() - dateNow.getTime() <= 0) {
-      await this.usersRepository.deleteUser(user._id);
+    if (expConfirmCodeDate.getTime() - dateNow.getTime() <= 0) {
+      await this.UsersSqlRepository.deleteUser(user.ID);
       throw new HttpException("", HttpStatus.BAD_REQUEST);
     }
     if (updateConfirmInfo(user, command.dto.code)) {
-      user.emailConfirmation.isConfirmed = true;
-      const createUser = await this.usersRepository.save(user)
+      const isConfirmed = user.isConfirmed = true;
+      const createUser = await this.UsersSqlRepository.updateConfirmStatus(user.ID, isConfirmed)
       if (createUser) throw new HttpException("", HttpStatus.NO_CONTENT);
     }
     throw new HttpException("", HttpStatus.BAD_REQUEST);

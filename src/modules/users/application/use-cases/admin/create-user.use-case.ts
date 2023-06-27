@@ -16,7 +16,6 @@ export class CreateUserByAdminCommand {
 @CommandHandler(CreateUserByAdminCommand)
 export class CreateUserByAdminUseCase implements ICommandHandler<CreateUserByAdminCommand> {
   constructor(
-    // protected usersRepository: UsersRepository,
     protected UsersSqlRepository: UsersSqlRepository,
   ) {
   }
@@ -28,17 +27,16 @@ export class CreateUserByAdminUseCase implements ICommandHandler<CreateUserByAdm
     const findUserByLogin = await this.UsersSqlRepository.findByLoginOrEmail(command.dto.login);
     if (findUserByLogin || findUserByEmail) throw new HttpException('', HttpStatus.BAD_REQUEST);
     const createUser = await this.UsersSqlRepository.createUser(command.dto, passwordHash, command.ip, confirmEmail);
-    return createUser
-    // return {
-    //   id: createUser._id.toString(),
-    //   login: createUser.accountData.login,
-    //   email: createUser.accountData.email,
-    //   createdAt: createUser.accountData.createdAt,
-    //   banInfo: {
-    //     isBanned: createUser.accountData.banInfo.isBanned,
-    //     banDate: createUser.accountData.banInfo.banDate,
-    //     banReason: createUser.accountData.banInfo.banReason,
-    //   }
-    // };
+    return {
+      id: createUser.ID,
+      login: createUser.login,
+      email: createUser.email,
+      createdAt: createUser.createdAt,
+      banInfo: {
+        isBanned: createUser.banInfo.isBanned,
+        banDate: createUser.banInfo.banDate,
+        banReason: createUser.banInfo.banReason,
+      }
+    };
   }
 }

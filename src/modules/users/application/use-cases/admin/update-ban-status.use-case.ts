@@ -1,9 +1,11 @@
-import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { NotFoundException } from "@nestjs/common";
-import { InfoBanStatusClassModel } from "../../../type/usersTypes";
-import { UsersRepository } from "../../../infrastructure/users.repository";
-import { Types } from "mongoose";
-import { SecurityRepository } from "../../../../security/application/security.repository";
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { HttpException, HttpStatus } from '@nestjs/common';
+import { InfoBanStatusClassModel } from '../../../type/usersTypes';
+import { UsersRepository } from '../../../infrastructure/users.repository';
+import { SecurityRepository } from '../../../../security/infrastructure/security.repository';
+import { UsersSqlRepository } from '../../../infrastructure/users.sql-repository';
+import { validateIdByUUID } from '../../../../../utils/helpers';
+import { SecuritySqlRepository } from '../../../../security/infrastructure/security.sql-repository';
 
 export class UpdateBanInfoByAdminCommand {
   constructor(
@@ -17,19 +19,23 @@ export class UpdateBanInfoByAdminCommand {
 export class UpdateBanInfoByAdminUseCase implements ICommandHandler<UpdateBanInfoByAdminCommand> {
   constructor(
     protected usersRepository: UsersRepository,
-    protected securityRepository: SecurityRepository
+    protected securityRepository: SecurityRepository,
+    protected securitySqlRepository: SecuritySqlRepository,
+    protected usersSqlRepository: UsersSqlRepository
   ) {
   }
   async execute(command: UpdateBanInfoByAdminCommand) {
-    const user = await this.usersRepository.findUserById(new Types.ObjectId(command.userId));
-    if (!user) throw new NotFoundException();
+    const userId = validateIdByUUID(command.userId)
+    if(!userId) throw new HttpException("", HttpStatus.NOT_FOUND);
+    const findUser = await this.usersSqlRepository.findUserById(userId);
+    if (!findUser) throw new HttpException("", HttpStatus.NOT_FOUND);
     if (command.dto.isBanned) {
-      user.banUser(command.dto);
-      await this.securityRepository.terminateAllSessions(new Types.ObjectId(command.userId));
-      return await this.usersRepository.save(user);
+      const updateBanStatus = await this.usersSqlRepository.updateBanStatus(command.dto, userId)
+      await this.securitySqlRepository.terminateAllSessions(userId);
+      return updateBanStatus
     } else {
-      user.unBanUser();
-      return await this.usersRepository.save(user);
+      const updateBanStatus = await this.usersSqlRepository.updateBanStatus(command.dto, userId)
+      return updateBanStatus
     }
   }
 }

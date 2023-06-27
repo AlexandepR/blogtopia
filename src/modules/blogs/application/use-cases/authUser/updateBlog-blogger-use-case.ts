@@ -33,8 +33,6 @@ export class UpdateBlogByBloggerUseCase implements ICommandHandler<UpdateBlogCom
     const blog = await this.blogsQueryRepository.findBlogById(blogId);
     if (!blog) throw new HttpException("", HttpStatus.NOT_FOUND);
     if(blog.blogOwnerInfo.userLogin !== command.user.accountData.login) throw new ForbiddenException()
-    console.log(blog.blogOwnerInfo.userLogin, '1');
-    console.log(command.user.accountData.login, '2');
     blog.updateBlog(command.UpdateBlogDto);
     return await blog.save();
   }

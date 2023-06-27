@@ -5,25 +5,28 @@ import * as jwt from 'jsonwebtoken';
 import { UserDocument } from "../../users/domain/entities/users.schema";
 import { Types } from "mongoose";
 import { Request } from "express";
+import { FindUserType } from '../../users/type/usersTypes';
+import { UsersSqlRepository } from '../../users/infrastructure/users.sql-repository';
 
 @Injectable()
 export class JwtService {
   constructor(
-    protected usersRepository: UsersRepository
+    protected usersRepository: UsersRepository,
+    protected usersSqlRepository: UsersSqlRepository
   ) {
   }
-  async сreateJWT(user: UserDocument) {
+  async сreateJWT(user: FindUserType) {
     const token = jwt.sign(
-      {userId: user._id},
+      {userId: user.ID},
       settingsEnv.JWT_SECRET,
       {expiresIn: settingsEnv.JWT_TOKEN_LIFE})
     return {
       token: token
     }
   }
-  async createRefreshToken(user: UserDocument, deviceId: string) {
+  async createRefreshToken(user: FindUserType, deviceId: string) {
     const refreshToken = jwt.sign(
-      {userId: user._id, deviceId},
+      {userId: user.ID, deviceId},
       settingsEnv.JWT_REFRESH_TOKEN_SECRET,
       {expiresIn: settingsEnv.JWT_REFRESH_TOKEN_LIFE}
     )
@@ -59,11 +62,11 @@ export class JwtService {
   async updateRefreshToken(refreshToken: string) {
     try {
       const getRefreshToken: any = await jwt.verify(refreshToken, settingsEnv.JWT_REFRESH_TOKEN_SECRET)
-      const user = await this.usersRepository.findUserById(new Types.ObjectId(getRefreshToken.userId))
+      const user = await this.usersSqlRepository.findUserById(getRefreshToken.userId)
       const oldDeviceId = getRefreshToken.deviceId
       if (user) {
         const refreshToken = jwt.sign(
-          {userId: user._id, deviceId: oldDeviceId},
+          {userId: user.ID, deviceId: oldDeviceId},
           settingsEnv.JWT_REFRESH_TOKEN_SECRET,
           {expiresIn: settingsEnv.JWT_REFRESH_TOKEN_LIFE}
         )
@@ -73,10 +76,10 @@ export class JwtService {
       return null
     }
   }
-  async refreshTokenToDeprecated(user: UserDocument, refreshToken: string):Promise<boolean> {
+  async refreshTokenToDeprecated(user: FindUserType, refreshToken: string):Promise<boolean> {
     try {
-      const userId: Types.ObjectId = user._id
-      await this.usersRepository.addExpiredRefreshToken(userId, refreshToken)
+      const userId: string = user.ID
+      await this.usersSqlRepository.addExpiredRefreshToken(userId, refreshToken)
       return true
     } catch (error) {
       return false

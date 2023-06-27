@@ -52,7 +52,6 @@ export class PostsRepository {
     return filteredPosts;
   }
   async getArrayIdOwnPosts(userId: Types.ObjectId) {
-    console.log(userId, 'post----userId');
     const posts = await this.PostModel
       .find({ "postOwnerInfo.userId": userId });
     const arrPostsId = posts.map((post) => post._id);

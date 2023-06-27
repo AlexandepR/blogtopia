@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { UsersRepository } from "../../users/infrastructure/users.repository";
-import { SecurityRepository } from "./security.repository";
+import { SecurityRepository } from "../infrastructure/security.repository";
 import { Types } from "mongoose";
 import { Request } from "express";
 import jwt from 'jsonwebtoken';

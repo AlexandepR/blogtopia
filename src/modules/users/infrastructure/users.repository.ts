@@ -22,40 +22,24 @@ export class UsersRepository {
         sortBy: string,
         sortDirection: 'asc' | 'desc',
         banFilterStatus?: any,
-    )
-    // : Promise<UserDocument[]>
-    {
-        // const selectQuery = `
-        //     SELECT "ID" as id, "login", "email", "created_at" as createdAt
-        //     FROM public."Users" u
-        //     ORDER BY "ID" desc / asc
-        //     LIMIT 2
-        //     OFFSET
-        //     WHERE u."ID" = ${createUser[0].ID}
-        //     LEFT JOIN public."BanUserInfo" banU
-        //     ON banU."userId" = u.${createUser[0].ID}
-        // `;
-        return this.dataSource.query(`
-            SELECT *
-           FROM public."Users"
-`);
-//     const sortedUsers = `accountData.${sortBy}`;
-//     const users = await this.UserModel
-//       .find({ ...banFilterStatus, ...filter })
-//       // , {
-//       // .find({ or: [banFilterStatus, filter] }, {
-//           // _id: 0,
-//           // id: "$_id",
-//           // "login": 1,
-//           // "email": 1,
-//           // "createdAt": 1
-//           // 'password': 0,
-//         // }
-//       // )
-//       .sort([[sortedUsers, sortDirection]])
-//       .skip(skip)
-//       .limit(pageSize);
-//     return users;
+    ): Promise<UserDocument[]> {
+        const sortedUsers = `accountData.${sortBy}`;
+        const users = await this.UserModel
+            .find({ ...banFilterStatus, ...filter })
+            // , {
+            // .find({ or: [banFilterStatus, filter] }, {
+            // _id: 0,
+            // id: "$_id",
+            // "login": 1,
+            // "email": 1,
+            // "createdAt": 1
+            // 'password': 0,
+            // }
+            // )
+            .sort([[sortedUsers, sortDirection]])
+            .skip(skip)
+            .limit(pageSize);
+        return users;
     }
     async getTotalCountUsers(filter: any, banStatus?: any): Promise<number> {
         const count = await this.UserModel
@@ -73,45 +57,10 @@ export class UsersRepository {
         userDto: CreateUserInputModelType,
         passwordHash: string,
         ip: any,
-        isConfirmEmail: boolean
-    )
-        : Promise<UserDocument> {
-        const date = new Date().toISOString()
-        const insertQuery = `
-            WITH inserted_user AS (
-            INSERT INTO public."Users" (login, email, created_at, "passwordHash", "isConfirmed")
-            VALUES ('${userDto.login}', '${userDto.email}', '${date}', '${passwordHash}', '${isConfirmEmail}')
-            RETURNING *
-        ),
-            inserted_ban_user AS (
-            INSERT INTO public."BanUserInfo" ("userId", "banDate")
-            SELECT "ID", '${date}' as "banDate"
-            FROM inserted_user
-            RETURNING * 
-        ),  
-            inserted_user_device_session AS (
-            INSERT INTO public."UsersDevicesSessions" ("userId")
-            SELECT "ID"
-            FROM inserted_user
-            RETURNING *
-            )
-              SELECT
-            inserted_user."ID" as "id",
-            inserted_user.login,
-            inserted_user.email,
-            inserted_user.created_at as "createdAt",
-            json_build_object(
-                'isBanned', inserted_ban_user."isBanned",
-                'banDate', TO_CHAR(inserted_ban_user."banDate", 'YYYY-MM-DD"T"HH24:MI:SS.MSZ'),
-                'banReason', inserted_ban_user."banReason"
-            ) as "banInfo"
-            FROM inserted_user
-            LEFT JOIN inserted_ban_user ON inserted_user."ID" = inserted_ban_user."userId";
-  `;
-        const createUser = await this.dataSource.query(insertQuery);
-        return createUser;
-        // const user = User.create(userDto, this.UserModel, passwordHash, ip, isConfirmEmail);
-        // await user.save();
+        confirmEmail: boolean
+    ): Promise<UserDocument> {
+        const user = User.create(userDto, this.UserModel, passwordHash, ip, confirmEmail);
+        return user.save();
     }
     async findUserById(id: Types.ObjectId): Promise<UserDocument> {
         return this.UserModel

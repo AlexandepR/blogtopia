@@ -12,7 +12,7 @@ import {
   Query,
   UseGuards
 } from "@nestjs/common";
-import { BasicAuth } from "../../../utils/public.decorator";
+import { BasicAuth, Public } from '../../../utils/public.decorator';
 import { CreateUserInputClassModel, InfoBanStatusClassModel, ParamsUsersType } from "../type/usersTypes";
 import { GetUsersByAdminCommand } from "../application/use-cases/admin/get-users.use-case";
 import { CommandBus } from "@nestjs/cqrs";

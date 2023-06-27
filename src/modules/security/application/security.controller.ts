@@ -7,11 +7,11 @@ import { GetDevicesCommand } from "./use-cases/get-devices.use-case";
 import { CommandBus } from "@nestjs/cqrs";
 import { DeleteDeviceByIdCommand } from "./use-cases/delete-devices-by-Id.use-case";
 import { DeleteAllDevicesCommand } from "./use-cases/delete-all-devices.use-case";
+import { FindUserType } from '../../users/type/usersTypes';
 
 @Controller("security")
 export class SecurityController {
   constructor(
-    protected securityService: SecurityService,
     protected commandBus: CommandBus,
   ) {
   }
@@ -19,23 +19,21 @@ export class SecurityController {
   @Get("/devices")
   async getDevices(
     // @Req() req: Request
-    @UserFromRequestDecorator() user: UserDocument,
+    @UserFromRequestDecorator() user: FindUserType,
   ) {
     const command = new GetDevicesCommand(user)
     return await this.commandBus.execute(command)
-    // return await this.securityService.getDevices(req);
   }
   @RefreshTokenAuthGuard()
   @Delete("/devices/:deviceId")
   async deleteDeviceById(
     // @Req() req: Request,
-    @UserFromRequestDecorator() user: UserDocument,
+    @UserFromRequestDecorator() user: FindUserType,
     @Param("deviceId")
       deviceId: string
   ) {
     const command = new DeleteDeviceByIdCommand(user,deviceId)
     return await this.commandBus.execute(command)
-    // return await this.securityService.deleteDeviceById(deviceId, req);
   }
   @RefreshTokenAuthGuard()
   @Delete('/devices')
@@ -44,6 +42,5 @@ export class SecurityController {
   ) {
     const command = new DeleteAllDevicesCommand(req.cookies.refreshToken)
     return await this.commandBus.execute(command)
-    // return await this.securityService.deleteAllDevices(req.cookies.refreshToken)
   }
 }

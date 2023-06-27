@@ -1,6 +1,7 @@
 import { UsersService } from "../modules/users/application/users.service";
 import { CanActivate, ExecutionContext, HttpException, HttpStatus, Injectable, NestMiddleware } from "@nestjs/common";
 import { UsersRepository } from "../modules/users/infrastructure/users.repository";
+import { UsersSqlRepository } from '../modules/users/infrastructure/users.sql-repository';
 
 // @Injectable()
 // export class EmailConfirmMiddleware implements NestMiddleware {
@@ -84,12 +85,12 @@ export class CheckLoginOrEmailGuard implements CanActivate {
 @Injectable()
 export class recoveryCodeGuard implements CanActivate{
   constructor(
-    protected usersRepository: UsersRepository
+    protected usersSqlRepository: UsersSqlRepository
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean>{
     const req = context.switchToHttp().getRequest()
     const recoveryCode = req.body.recoveryCode
-      const checkCode = await this.usersRepository.checkRecoveryCode(recoveryCode);
+      const checkCode = await this.usersSqlRepository.checkRecoveryCode(recoveryCode);
       if (!checkCode || recoveryCode === '') {
         throw new HttpException('', HttpStatus.FORBIDDEN);
       }

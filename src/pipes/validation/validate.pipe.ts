@@ -4,21 +4,21 @@ import {
   ValidationOptions,
   ValidatorConstraint,
   ValidatorConstraintInterface
-} from "class-validator";
-import { UsersRepository } from "../../modules/users/infrastructure/users.repository";
-import { BlogsRepository } from "../../modules/blogs/infrastructure/blogs.repository";
-import { Types } from "mongoose";
-import { BlogsQueryRepository } from "../../modules/blogs/infrastructure/blogs.query-repository";
+} from 'class-validator';
+import { BlogsRepository } from '../../modules/blogs/infrastructure/blogs.repository';
+import { Types } from 'mongoose';
+import { BlogsQueryRepository } from '../../modules/blogs/infrastructure/blogs.query-repository';
+import { UsersSqlRepository } from '../../modules/users/infrastructure/users.sql-repository';
 
 
 @ValidatorConstraint({ name: "IsLoginOrEmailNotExistsPipe", async: true })
 export class IsLoginOrEmailNotExistsPipe implements ValidatorConstraintInterface {
-  constructor(protected usersRepository: UsersRepository) {
+  constructor(protected usersSqlRepository: UsersSqlRepository) {
   }
   async validate(email: string, args: ValidationArguments) {
     try {
-      const user = await this.usersRepository.findByLoginOrEmail(email);
-      if (!user || user.emailConfirmation.isConfirmed === true) return false;
+      const user = await this.usersSqlRepository.findByLoginOrEmail(email);
+      if (!user || user.isConfirmed === true) return false;
       return true;
     } catch (e) {
       return false;
@@ -26,8 +26,7 @@ export class IsLoginOrEmailNotExistsPipe implements ValidatorConstraintInterface
 
   }
   defaultMessage(args: ValidationArguments) {
-    // here you can provide default error message if validation failed
-    return "User with this email doesnt exists oe already confirmed";
+    return "User with this email doesnt exists or already confirmed";
   }
 }
 
@@ -46,13 +45,13 @@ export function IsLoginOrEmailNotExists(validationOptions?: ValidationOptions) {
 
 @ValidatorConstraint({ name: "CheckConfirmDataPipe", async: true })
 export class CheckConfirmDataPipe implements ValidatorConstraintInterface {
-  constructor(protected usersRepository: UsersRepository) {
+  constructor(protected usersSqlRepository: UsersSqlRepository) {
   }
   async validate(data: string, args: ValidationArguments) {
     const { property } = args;
     if (property === "email" || property === "login") {
       try {
-        const user = await this.usersRepository.findByLoginOrEmail(data);
+        const user = await this.usersSqlRepository.findByLoginOrEmail(data);
         if (user) return false;
         return true;
       } catch (e) {
@@ -61,9 +60,9 @@ export class CheckConfirmDataPipe implements ValidatorConstraintInterface {
     }
     if (property === "code") {
       try {
-        const user = await this.usersRepository.findByConfirmationCode(data);
+        const user = await this.usersSqlRepository.findByConfirmationCode(data);
         if (!user) return false;
-        if (user.emailConfirmation.isConfirmed === true) return false;
+        if (user.isConfirmed === true) return false;
         return true;
       } catch (e) {
         return false;

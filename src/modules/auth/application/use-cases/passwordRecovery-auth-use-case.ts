@@ -5,6 +5,7 @@ import { UsersRepository } from "../../../users/infrastructure/users.repository"
 import { validateOrRejectModel } from "../../../../utils/validation.helpers";
 import { checkEmailInputClassModel } from "../../types/auth.types";
 import { v4 as uuidv4 } from "uuid";
+import { UsersSqlRepository } from '../../../users/infrastructure/users.sql-repository';
 
 export class PasswordRecoveryAuthCommand {
   constructor(
@@ -16,13 +17,13 @@ export class PasswordRecoveryAuthCommand {
 @CommandHandler(PasswordRecoveryAuthCommand)
 export class PasswordRecoveryAuthUseCase implements ICommandHandler<PasswordRecoveryAuthCommand> {
   constructor(
-    protected usersRepository: UsersRepository,
+    protected usersSqlRepository: UsersSqlRepository,
     protected emailService: EmailService
   ) {}
   async execute(command: PasswordRecoveryAuthCommand) {
-    await validateOrRejectModel(command.dto.email, checkEmailInputClassModel);
+    await validateOrRejectModel(command.dto, checkEmailInputClassModel);
     const newCode = uuidv4();
-    const updatePassRecoveryCode = await this.usersRepository.updatePassRecoveryCode(command.dto.email, newCode);
+    const updatePassRecoveryCode = await this.usersSqlRepository.updatePassRecoveryCode(command.dto.email, newCode);
     if (!updatePassRecoveryCode) throw new HttpException("", HttpStatus.BAD_REQUEST);
     const sendCode = await this.emailService.sendEmailRecoveryPassCode(command.dto.email, newCode);
     if (!sendCode) throw new HttpException("", HttpStatus.BAD_REQUEST);

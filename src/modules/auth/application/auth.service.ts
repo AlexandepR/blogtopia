@@ -70,23 +70,23 @@ export class AuthService {
   //     return null;
   //   }
   // }
-  async confirmRegistration(dto: codeInputClassModel) {
-    await validateOrRejectModel(dto, codeInputClassModel);
-    const user = await this.usersService.findByConfirmationCode(dto.code);
-    if (!user || user.emailConfirmation.isConfirmed === true) throw new BadRequestException()
-
-    const dateNow = new Date();
-    if (user.emailConfirmation.expirationDate.getTime() - dateNow.getTime() <= 0) {
-      await this.usersRepository.deleteUser(user._id);
-      throw new HttpException("", HttpStatus.BAD_REQUEST);
-    }
-    if(updateConfirmInfo(user,dto.code)) {
-      user.emailConfirmation.isConfirmed = true;
-      const createUser = await this.usersRepository.save(user)
-      if (createUser) throw new HttpException("", HttpStatus.NO_CONTENT);
-    }
-    throw new HttpException("", HttpStatus.BAD_REQUEST);
-  }
+  // async confirmRegistration(dto: codeInputClassModel) {
+  //   await validateOrRejectModel(dto, codeInputClassModel);
+  //   const user = await this.usersService.findByConfirmationCode(dto.code);
+  //   if (!user || user.emailConfirmation.isConfirmed === true) throw new BadRequestException()
+  //
+  //   const dateNow = new Date();
+  //   if (user.emailConfirmation.expirationDate.getTime() - dateNow.getTime() <= 0) {
+  //     await this.usersRepository.deleteUser(user._id);
+  //     throw new HttpException("", HttpStatus.BAD_REQUEST);
+  //   }
+  //   if(updateConfirmInfo(user,dto.code)) {
+  //     user.emailConfirmation.isConfirmed = true;
+  //     const createUser = await this.usersRepository.save(user)
+  //     if (createUser) throw new HttpException("", HttpStatus.NO_CONTENT);
+  //   }
+  //   throw new HttpException("", HttpStatus.BAD_REQUEST);
+  // }
   // async login(signInDto: loginInputClassModel,deviceName: string, ip:string) {
   //   await validateOrRejectModel(signInDto, loginInputClassModel);
   //   const user = await this.usersService.findUserByLoginOrEmail(signInDto.loginOrEmail);
@@ -163,20 +163,20 @@ export class AuthService {
   //     // }
   //   }
   // }
-  async getOwnAccount(req: Request) {
-    const userId = req.requestUser._id;
-    if(!userId) throw new HttpException("", HttpStatus.UNAUTHORIZED);
-    // const userId = await this.jwtService.findUserIdByAuthHeaders(req);
-    const findUser = await this.usersRepository.findUserById(userId);
-    if(!findUser) throw new HttpException("", HttpStatus.UNAUTHORIZED);
-    if (findUser) {
-        return{
-          'email': findUser.accountData.email,
-          'login': findUser.accountData.login,
-          'userId': findUser._id.toString(),
-        };
-    } else {
-      throw new HttpException("", HttpStatus.BAD_REQUEST);
-    }
-  }
+  // async getOwnAccount(req: Request) {
+  //   const userId = req.requestUser._id;
+  //   if(!userId) throw new HttpException("", HttpStatus.UNAUTHORIZED);
+  //   // const userId = await this.jwtService.findUserIdByAuthHeaders(req);
+  //   const findUser = await this.usersRepository.findUserById(userId);
+  //   if(!findUser) throw new HttpException("", HttpStatus.UNAUTHORIZED);
+  //   if (findUser) {
+  //       return{
+  //         'email': findUser.accountData.email,
+  //         'login': findUser.accountData.login,
+  //         'userId': findUser._id.toString(),
+  //       };
+  //   } else {
+  //     throw new HttpException("", HttpStatus.BAD_REQUEST);
+  //   }
+  // }
 }

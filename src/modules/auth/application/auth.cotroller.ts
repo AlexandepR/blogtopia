@@ -19,6 +19,7 @@ import { ConfirmRegistrationAuthCommand } from "./use-cases/registrationConfirma
 import { PasswordRecoveryAuthCommand } from "./use-cases/passwordRecovery-auth-use-case";
 import { RegistrationEmailResendAuthCommand } from "./use-cases/registrationEmailResending-auth-use-case";
 import { LogoutAuthCommand } from "./use-cases/logout-auth-use-case";
+import { getOwnAccountAuthCommand } from './use-cases/me-auth-use-case';
 
 
 @Controller("auth")
@@ -50,7 +51,7 @@ export class AuthController {
   @Throttle(5, 10)
   @Post("/registration-confirmation")
   async confirmRegistration(
-    @Body() dto:codeInputClassModel
+    @Body() dto: codeInputClassModel
   ) {
     const command = new ConfirmRegistrationAuthCommand(dto);
     return await this.commandBus.execute(command);
@@ -119,7 +120,7 @@ export class AuthController {
   async getOwnAccount(
     @Req() req: Request
   ) {
-    const command = new LogoutAuthCommand(req)
+    const command = new getOwnAccountAuthCommand(req)
     return await this.commandBus.execute(command);
   }
 }

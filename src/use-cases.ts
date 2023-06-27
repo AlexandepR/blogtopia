@@ -94,7 +94,7 @@ import { PostsRepository } from "./modules/posts/application/posts.repository";
 import { UsersRepository } from "./modules/users/infrastructure/users.repository";
 import { CommentsRepository } from "./modules/comments/application/comments.repository";
 import { TestingRepository } from "./modules/test/application/testing.repository";
-import { SecurityRepository } from "./modules/security/application/security.repository";
+import { SecurityRepository } from "./modules/security/infrastructure/security.repository";
 import { GetBlogsPublicUseCase } from "./modules/blogs/application/use-cases/public/get-blogs-public-use-case";
 import { Blog, BlogSchema } from "./modules/blogs/domain/entities/blogs.schema";
 import { Post, PostSchema } from "./modules/posts/type/posts.schema";
@@ -122,6 +122,8 @@ import {
 import { UsersBloggerController } from "./modules/users/api/auth.api.user.controller";
 import { BlogsQueryRepository } from "./modules/blogs/infrastructure/blogs.query-repository";
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersSqlRepository } from './modules/users/infrastructure/users.sql-repository';
+import { SecuritySqlRepository } from './modules/security/infrastructure/security.sql-repository';
 // import { MailerModule2 } from "../../swagger-static";
 
 export const adminUseCases = [
@@ -242,7 +244,9 @@ export const repo = [
   UsersRepository,
   CommentsRepository,
   TestingRepository,
-  SecurityRepository
+  SecurityRepository,
+  UsersSqlRepository,
+  SecuritySqlRepository,
 ];
 export const allMongooseModels = [
   { name: Blog.name, schema: BlogSchema },
@@ -271,6 +275,7 @@ export const moduleImports = [
     entities: [
       // "src/entity/**/*.ts"
     ],
+    autoLoadEntities: false,
     synchronize: false,
   }),
   MongooseModule.forRoot(settingsEnv.MONGO_URL),

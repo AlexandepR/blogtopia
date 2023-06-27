@@ -5,6 +5,7 @@ import { SecurityService } from "../../../security/application/security.service"
 import { Request } from "express";
 import * as jwt from "jsonwebtoken";
 import { settingsEnv } from "../../../../settings/settings";
+import { SecuritySqlRepository } from '../../../security/infrastructure/security.sql-repository';
 
 export class LogoutAuthCommand {
   constructor(
@@ -16,14 +17,14 @@ export class LogoutAuthCommand {
 export class LogoutAuthUseCase implements ICommandHandler<LogoutAuthCommand> {
   constructor(
     protected jwtService: JwtService,
-    protected securityService: SecurityService
+    protected securitySqlRepository: SecuritySqlRepository
   ) {
   }
   async execute(command: LogoutAuthCommand) {
     const refreshToken = command.req.cookies.refreshToken;
     const user = command.req.requestUser;
     const getRefreshToken: any = jwt.verify(refreshToken, settingsEnv.JWT_REFRESH_TOKEN_SECRET);
-    const terminateSessions = await this.securityService.terminateSessionByDeviceId(getRefreshToken.deviceId);
+    const terminateSessions = await this.securitySqlRepository.terminateSessionByDeviceId(getRefreshToken.deviceId, user.ID);
     if (terminateSessions) {
       const expiredRefreshToken = await this.jwtService.refreshTokenToDeprecated(user, refreshToken);
       throw new HttpException("", HttpStatus.NO_CONTENT);

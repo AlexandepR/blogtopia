@@ -71,13 +71,55 @@ export type CreateUserInputModelType = {
 }
 
 export type GetUsersOutputModelType = {
-  id: string,
+  ID: string,
   login: string,
   email: string,
-  createdAt: string,
+  createdAt: Date | string,
+  confirmationCode: string | null
   banInfo: {
     isBanned: boolean,
-    banDate: Date,
+    banDate: Date | string,
     banReason: string
   }
+}
+export type InfoBanStatusType = {
+  isBanned: boolean;
+  banReason: string
+}
+export type FindUserType = {
+  ID: string;
+  login: string;
+  email: string;
+  created_at: Date;
+  passwordHash: string;
+  isConfirmed: boolean;
+  confirmationCode: string | null;
+  expConfirmCodeDate: string | null;
+  passRecoveryCode: string | null;
+  sendEmails: string[] | null;
+  expRefreshToken: string | null;
+  banInfo: {
+    isBanned: boolean;
+    banDate: string;
+    banReason: string | null;
+  };
+  devicesSession: {
+    ip: string | null;
+    deviceId: string | null;
+    title: string | null;
+    lastActiveDate: string | null;
+    expirationTokenDate: string | null;
+  };
+}
+export type UserOutputModelType = {
+  ID: string;
+  login: string;
+  email: string;
+  created_at: Date;
+  passwordHash: string;
+  isConfirmed: boolean;
+  confirmationCode: string;
+  expConfirmCodeDate: Date;
+  passRecoveryCode: string | null;
+  sendEmails: string | null;
 }

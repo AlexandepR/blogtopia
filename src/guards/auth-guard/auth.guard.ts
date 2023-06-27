@@ -1,13 +1,11 @@
-import { CanActivate, ExecutionContext, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
-import { Reflector } from "@nestjs/core";
-import { JwtService } from "@nestjs/jwt";
-import { Request } from "express";
-import * as jwt from "jsonwebtoken";
-import { BASIC_AUTH_KEY, IS_PUBLIC_KEY, REFRESH_TOKEN_AUTH_KEY } from "../../utils/public.decorator";
-import { BasicAuthGuard } from "./basic.auth.guard";
-import { settingsEnv } from "../../settings/settings";
-import { Types } from "mongoose";
-import { UsersRepository } from "../../modules/users/infrastructure/users.repository";
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import { JwtService } from '@nestjs/jwt';
+import { Request } from 'express';
+import * as jwt from 'jsonwebtoken';
+import { BASIC_AUTH_KEY, IS_PUBLIC_KEY, REFRESH_TOKEN_AUTH_KEY } from '../../utils/public.decorator';
+import { BasicAuthGuard } from './basic.auth.guard';
+import { settingsEnv } from '../../settings/settings';
 import { UsersSqlRepository } from '../../modules/users/infrastructure/users.sql-repository';
 
 @Injectable()

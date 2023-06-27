@@ -6,6 +6,7 @@ import { validateOrRejectModel } from "../../../../utils/validation.helpers";
 import { checkEmailInputClassModel } from "../../types/auth.types";
 import { v4 as uuidv4 } from "uuid";
 import { Types } from "mongoose";
+import { UsersSqlRepository } from '../../../users/infrastructure/users.sql-repository';
 
 export class RegistrationEmailResendAuthCommand {
   constructor(
@@ -17,7 +18,7 @@ export class RegistrationEmailResendAuthCommand {
 @CommandHandler(RegistrationEmailResendAuthCommand)
 export class RegistrationEmailResendAuthUseCase implements ICommandHandler<RegistrationEmailResendAuthCommand> {
   constructor(
-    protected usersRepository: UsersRepository,
+    protected usersSqlRepository: UsersSqlRepository,
     protected emailService: EmailService
   ) {
   }
@@ -25,16 +26,15 @@ export class RegistrationEmailResendAuthUseCase implements ICommandHandler<Regis
     await validateOrRejectModel(command.dto, checkEmailInputClassModel);
     const email = command.dto.email;
     const newCode = uuidv4();
-    const findUser = await this.usersRepository.findByLoginOrEmail(email);
-    // if (!findUser || findUser.emailConfirmation.isConfirmed === true) throw new BadRequestException()
-    const userId = new Types.ObjectId(findUser._id.toString());
-    const userUpdateCode = await this.usersRepository.updateConfirmCode(userId, newCode);
+    const findUser = await this.usersSqlRepository.findByLoginOrEmail(email);
+    const userId = findUser.ID.toString();
+    const userUpdateCode = await this.usersSqlRepository.updateConfirmCode(userId, newCode);
     if (!userUpdateCode) throw new HttpException("", HttpStatus.BAD_REQUEST);
-    const sendEmail = await this.emailService.sendEmailConfirmationMessage(userUpdateCode);
+    const sendEmail = await this.emailService.sendEmailConfirmationMessage(findUser);
     if (sendEmail) {
       throw new HttpException("", HttpStatus.NO_CONTENT);
     } else {
-      await this.usersRepository.deleteUser(userId);
+      await this.usersSqlRepository.deleteUser(userId);
       return null;
     }
   }

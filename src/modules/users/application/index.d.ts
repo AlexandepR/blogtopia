@@ -1,10 +1,10 @@
-import { UserDocument } from "../domain/entities/users.schema";
+import { FindUserType } from '../type/usersTypes';
 
 
 declare global {
     declare namespace Express {
         export interface Request {
-            requestUser: UserDocument | null
+            requestUser: FindUserType | null
         }
     }
 }

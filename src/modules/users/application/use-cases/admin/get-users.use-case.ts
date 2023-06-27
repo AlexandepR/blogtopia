@@ -6,25 +6,21 @@ import { UsersSqlRepository } from '../../../infrastructure/users.sql-repository
 
 
 export class GetUsersByAdminCommand {
-    constructor(
-        public query: ParamsUsersType
-    ) {
+    constructor(public query: ParamsUsersType) {
     }
 }
 
 @CommandHandler(GetUsersByAdminCommand)
 export class GetUsersByAdminUseCase implements ICommandHandler<GetUsersByAdminCommand> {
-    constructor(
-        protected usersSqlRepository: UsersSqlRepository
-    ) {
+    constructor(protected usersSqlRepository: UsersSqlRepository) {
     }
     async execute(command: GetUsersByAdminCommand): Promise<PaginationType<GetUsersOutputModelType[] | null>> {
         const filter = filterGetUsers(command.query);
-        const { pageSize, pageNumber, sortDirection, sortBy, banStatus } = parseQueryUsersPaginator(command.query);
-        const totalCountUsers = await this.usersSqlRepository.getTotalCountUsers(filter, banStatus);
+        const { pageSize, pageNumber, sortDirection, sortBy } = parseQueryUsersPaginator(command.query);
+        const totalCountUsers = await this.usersSqlRepository.getTotalCountUsers(filter);
         const skip = skipPage(pageNumber, pageSize);
         const pagesCount = pagesCounter(totalCountUsers, pageSize);
-        const allUsers = await this.usersSqlRepository.getUsers(skip, pageSize, filter, sortBy, sortDirection, banStatus);
+        const allUsers = await this.usersSqlRepository.getUsers(skip, pageSize, filter, sortBy, sortDirection);
         return {
             pagesCount: pagesCount,
             page: pageNumber,
