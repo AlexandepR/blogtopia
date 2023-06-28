@@ -5,6 +5,8 @@ export const settingsEnv = {
   PORT: process.env.PORT,
   PORT_PG: process.env.PORT_PG,
   MONGO_URL: process.env.MONGO_URL,
+  DATABASE_URL: process.env.DATABASE_URL,
+  DATABASE_PASS: process.env.DATABASE_PASS,
   DB_NAME: process.env.DB_NAME,
   EMAIL_LOG: process.env.EMAIL_LOG,
   EMAIL_PASS: process.env.EMAIL_PASS,

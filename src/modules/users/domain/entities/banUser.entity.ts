@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn } from 'ty
 import { Users } from './user.entity';
 
 
-@Entity()
+@Entity("BanUserInfo")
 export class BanUserInfo {
     @PrimaryGeneratedColumn('uuid')
     ID: string;
