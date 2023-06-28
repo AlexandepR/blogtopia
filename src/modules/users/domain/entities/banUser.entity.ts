@@ -13,7 +13,7 @@ export class BanUserInfo {
     @Column({ type: 'timestamp with time zone', nullable: true })
     banDate: Date;
 
-    @Column({ default: '', nullable: true })
+    @Column({ nullable: true })
     banReason: string;
 
     @OneToOne(() => Users, { onDelete: 'CASCADE' })

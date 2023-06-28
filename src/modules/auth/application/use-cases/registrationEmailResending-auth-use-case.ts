@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus } from "@nestjs/common";
+import { HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { EmailService } from "../../../mail/application/managers/email.service";
 import { UsersRepository } from "../../../users/infrastructure/users.repository";
@@ -27,10 +27,12 @@ export class RegistrationEmailResendAuthUseCase implements ICommandHandler<Regis
     const email = command.dto.email;
     const newCode = uuidv4();
     const findUser = await this.usersSqlRepository.findByLoginOrEmail(email);
+    if(findUser.isConfirmed) throw new NotFoundException()
     const userId = findUser.ID.toString();
-    const userUpdateCode = await this.usersSqlRepository.updateConfirmCode(userId, newCode);
-    if (!userUpdateCode) throw new HttpException("", HttpStatus.BAD_REQUEST);
-    const sendEmail = await this.emailService.sendEmailConfirmationMessage(findUser);
+    const updateCode = await this.usersSqlRepository.updateConfirmCode(userId, newCode);
+    if (!updateCode) throw new HttpException("", HttpStatus.BAD_REQUEST);
+    const user = await this.usersSqlRepository.findByLoginOrEmail(email);
+    const sendEmail = await this.emailService.sendEmailConfirmationMessage(user);
     if (sendEmail) {
       throw new HttpException("", HttpStatus.NO_CONTENT);
     } else {

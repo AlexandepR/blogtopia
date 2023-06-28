@@ -41,7 +41,7 @@ export class UsersSqlRepository {
             LEFT JOIN public."BanUserInfo" b
             ON b."userId" = u."ID"
             ${filter}
-            ORDER BY "${sortBy}" ${sortDirection}
+            ORDER BY ${sortBy === 'created_at' ? 'u."created_at"' : `"${sortBy}" COLLATE "C"`} ${sortDirection}
             LIMIT ${pageSize}
             OFFSET ${skip}
         `;
@@ -86,17 +86,11 @@ export class UsersSqlRepository {
             RETURNING "ID", login, email, created_at, "confirmationCode"
         ),
             inserted_ban_user AS (
-            INSERT INTO public."BanUserInfo" ("userId", "banDate")
-            SELECT "ID", '${date}' as "banDate"
-            FROM inserted_user
-            RETURNING * 
-        ),  
-            inserted_user_device_session AS (
-            INSERT INTO public."UsersDevicesSessions" ("userId")
+            INSERT INTO public."BanUserInfo" ("userId")
             SELECT "ID"
             FROM inserted_user
-            RETURNING *
-            )
+            RETURNING * 
+        )
               SELECT
             inserted_user."ID",
             inserted_user.login,
@@ -105,7 +99,7 @@ export class UsersSqlRepository {
             inserted_user."confirmationCode",
             json_build_object(
                 'isBanned', inserted_ban_user."isBanned",
-                'banDate', TO_CHAR(inserted_ban_user."banDate", 'YYYY-MM-DD"T"HH24:MI:SS.MSZ'),
+                'banDate', inserted_ban_user."banDate",
                 'banReason', inserted_ban_user."banReason"
             ) as "banInfo"
             FROM inserted_user
@@ -113,6 +107,12 @@ export class UsersSqlRepository {
   `;
         const user = await this.dataSource.query(insertQuery);
         return user[0];
+    //     inserted_user_device_session AS (
+    //         INSERT INTO public."UsersDevicesSessions" ("userId")
+    //     SELECT "ID"
+    //     FROM inserted_user
+    //     RETURNING *
+    // )
     }
     async findUserById(id: string): Promise<FindUserType> {
         const selectQuery = `
@@ -183,7 +183,9 @@ export class UsersSqlRepository {
         const date = new Date().toISOString();
         const updateQuery = `
             UPDATE public."BanUserInfo" b
-            SET "isBanned"='${banInfo.isBanned}', "banDate"='${date}', "banReason"='${banInfo.banReason}'
+            SET "isBanned"='${banInfo.isBanned}',
+            "banDate" = ${banInfo.isBanned ? `'${date}'` : null},
+            "banReason" = ${banInfo.isBanned ? `'${banInfo.banReason}'` : null}
             WHERE b."userId" = '${userId}'
          `;
         const result = await this.dataSource.query(updateQuery);

@@ -10,7 +10,7 @@ export class EmailAdapter {
   }
   async sendEmail(email: string, subject: string, message: string): Promise<boolean> {
     const transport = nodemailer.createTransport({
-      service: 'gmail', // if you will write 'gmail', settings below not needed
+      service: 'gmail',
       auth: {
         user: settingsEnv.EMAIL_LOG,
         pass: settingsEnv.EMAIL_PASS,

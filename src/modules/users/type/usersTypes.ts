@@ -108,7 +108,7 @@ export type FindUserType = {
     deviceId: string | null;
     title: string | null;
     lastActiveDate: string | null;
-    expirationTokenDate: string | null;
+    expirationTokenDate?: string | null;
   };
 }
 export type UserOutputModelType = {

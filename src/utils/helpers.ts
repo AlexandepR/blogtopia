@@ -19,22 +19,50 @@ export const parseQueryPaginator = (query: QueryType): QueryType => {
         sortDirection: query.sortDirection === 'asc' ? 'asc' : 'desc'
     };
 };
-export const filterGetUsers = (query, isBanned: boolean = false) => {
-    let whereCondition = `WHERE b."isBanned" = ${isBanned ? 'true' : 'false'}`;
-    // if (query.searchEmailTerm || query.searchLoginTerm) {
-    //     whereCondition += ` AND (
-    //         u."login" ILIKE '%${query.searchLoginTerm}%'
-    //         OR u."email" ILIKE '%${query.searchEmailTerm}%'
-    //         )`;
-    // }
-    if (query.searchLoginTerm) {
-        whereCondition += ` AND u."login" ILIKE '%${query.searchLoginTerm}%'`;
+export const filterGetUsers = (query) => {
+    const banStatus = query.banStatus;
+    let whereCondition = '';
+    if (banStatus === 'banned') {
+        whereCondition = 'WHERE b."isBanned" = true';
+    } else if (banStatus === 'notBanned') {
+        whereCondition = 'WHERE b."isBanned" = false';
+    } else if (banStatus === 'all' || !banStatus) {
+    } else {
+        throw new Error('Invalid banStatus value');
     }
 
-    if (query.searchEmailTerm) {
-        whereCondition += ` AND u."email" ILIKE '%${query.searchEmailTerm}%'`;
+    if (query.searchEmailTerm || query.searchLoginTerm) {
+        if (whereCondition === '') {
+            whereCondition = 'WHERE ';
+        } else {
+            whereCondition += ' AND ';
+        }
+
+        whereCondition += `(
+            LOWER(u."login") ILIKE LOWER('%${query.searchLoginTerm}%')
+            OR LOWER(u."email") ILIKE LOWER('%${query.searchEmailTerm}%')
+        )`;
     }
-    return whereCondition
+
+    return whereCondition;
+    // console.log(query.banStatus,'-------------------');
+    // const banStatus = query.banStatus === 'banned' ? true : query.banStatus === 'notBanned' ? false : '';
+    // let whereCondition = '';
+    // if (banStatus !== '') {
+    //     whereCondition += `WHERE b."isBanned" = ${banStatus}`;
+    // }
+    // if (query.searchEmailTerm || query.searchLoginTerm) {
+    //     if (whereCondition === '') {
+    //         whereCondition += 'WHERE ';
+    //     } else {
+    //         whereCondition += ' AND ';
+    //     }
+    //     whereCondition += `(
+    //         LOWER(u."login") ILIKE LOWER('%${query.searchLoginTerm}%')
+    //         OR LOWER(u."email") ILIKE LOWER('%${query.searchEmailTerm}%')
+    //     )`;
+    // }
+    // return whereCondition
 };
 export const parseQueryUsersPaginator = (query: ParamsUsersType): QueryUsersPaginator => {
     let filter = {};
@@ -58,7 +86,7 @@ export const parseQueryUsersPaginator = (query: ParamsUsersType): QueryUsersPagi
         filter: filter,
         pageNumber: query.pageNumber ? +query.pageNumber : 1,
         pageSize: query.pageSize ? +query.pageSize : 10,
-        sortBy: (query.sortBy || 'createdAt') as string,
+        sortBy: (query.sortBy || 'created_at') as string,
         sortDirection: query.sortDirection === 'asc' ? 'asc' : 'desc',
         banStatus: banfilter
     };

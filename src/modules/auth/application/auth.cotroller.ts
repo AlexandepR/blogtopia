@@ -1,4 +1,16 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Ip, Post, Req, Res, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Ip,
+  Post,
+  Req,
+  Res,
+  UnauthorizedException,
+  UseGuards
+} from '@nestjs/common';
 import { Request, Response } from "express";
 import { CreateUserInputClassModel } from "../../users/type/usersTypes";
 import { recoveryCodeGuard } from "../../../middleware/middleware";
@@ -20,12 +32,16 @@ import { PasswordRecoveryAuthCommand } from "./use-cases/passwordRecovery-auth-u
 import { RegistrationEmailResendAuthCommand } from "./use-cases/registrationEmailResending-auth-use-case";
 import { LogoutAuthCommand } from "./use-cases/logout-auth-use-case";
 import { getOwnAccountAuthCommand } from './use-cases/me-auth-use-case';
+import * as jwt from 'jsonwebtoken';
+import { settingsEnv } from '../../../settings/settings';
+import { JwtService } from '@nestjs/jwt';
 
 
 @Controller("auth")
 export class AuthController {
   constructor(
     private commandBus: CommandBus,
+    private jwtService: JwtService,
   ) {
   }
   @Public()
@@ -58,7 +74,7 @@ export class AuthController {
   }
 
   @Public()
-  // @Throttle(5, 10)
+  @Throttle(5, 10)
   @HttpCode(HttpStatus.OK)
   @Post("/login")
   async login(

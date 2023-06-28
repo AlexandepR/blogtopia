@@ -59,6 +59,14 @@ export class JwtService {
       return null
     }
   }
+  async deviceIdByRefreshToken(refreshToken: string) {
+    try {
+      const getRefreshToken: any = await jwt.verify(refreshToken, settingsEnv.JWT_REFRESH_TOKEN_SECRET)
+      return getRefreshToken.deviceId
+    } catch (error) {
+      return null
+    }
+  }
   async updateRefreshToken(refreshToken: string) {
     try {
       const getRefreshToken: any = await jwt.verify(refreshToken, settingsEnv.JWT_REFRESH_TOKEN_SECRET)

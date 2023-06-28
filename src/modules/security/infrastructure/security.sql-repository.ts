@@ -33,11 +33,11 @@ export class SecuritySqlRepository {
         const createSession = await this.dataSource.query(setSessionQuery);
         return createSession[0];
     }
-    async updateDateSession(issuedDate: string, userId: string): Promise<boolean> {
+    async updateDateSession(issuedDate: string, deviceId: string): Promise<boolean> {
         const updateQuery = `
         UPDATE public."UsersDevicesSessions" u
         SET "lastActiveDate" = '${issuedDate}'
-        WHERE u."ID" = '${userId}'
+        WHERE u."deviceId" = '${deviceId}'
         `;
         const result = await this.dataSource.query(updateQuery);
         if (result && result[1] > 0) {
@@ -68,10 +68,9 @@ export class SecuritySqlRepository {
         const delQuery = `
         UPDATE public."UsersDevicesSessions" ud
         SET 
-        "deviceId"=null,
-        "title"=null,
-        "lastActiveDate"=null,
-        "expirationTokenDate"=null
+        "deviceId"='',
+        "title"='',
+        "lastActiveDate"=''
         WHERE ud."userId" = '${userId}'
         `;
         return await this.dataSource.query(delQuery);

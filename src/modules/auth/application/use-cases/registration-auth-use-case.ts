@@ -34,7 +34,7 @@ export class RegistrationAuthUseCase implements ICommandHandler<RegistrationAuth
         if (findUserByLogin || findUserByEmail) throw new HttpException('', HttpStatus.BAD_REQUEST);
         const user = await this.usersSqlRepository.createUser(command.dto, passwordHash, command.ip, confirmEmail);
         try {
-            console.log(await this.emailService.sendEmailConfirmationMessage(user));
+            await this.emailService.sendEmailConfirmationMessage(user);
         } catch (error) {
                 await this.usersSqlRepository.deleteUser(user.ID);
             throw new HttpException('', HttpStatus.BAD_REQUEST);

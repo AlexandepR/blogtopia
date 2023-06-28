@@ -19,19 +19,14 @@ export class EmailService {
   }
 
   async sendEmailConfirmationMessage(user: FindUserType | GetUsersOutputModelType) {
-  // async sendEmailConfirmationMessage(user) {
-    // const emailConfirmationLink = `https://l1bloggers.vercel.app/confirm-email?code=${user.emailConfirmation.confirmationCode}`;
-
     const sendEmail = await this.emailAdapter.sendEmail(
       user.email,
       "Confirmation code",
       `
-        <div>
           <h1>Thank for your registration</h1>
           <p>To finish registration please follow the link below:
           <a href="https://l1bloggers.vercel.app/confirm-email?code=${user.confirmationCode}">Complete registration</a>
         </p>
-        </div>
       `
     );
     return !!sendEmail

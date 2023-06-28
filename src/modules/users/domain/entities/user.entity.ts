@@ -5,10 +5,10 @@ export class Users {
     @PrimaryGeneratedColumn('uuid')
     ID: string;
 
-    @Column()
+    @Column({ collation: 'C' })
     login: string;
 
-    @Column()
+    @Column({ collation: 'C' })
     email: string;
 
     @Column({ type: 'timestamp with time zone' })
