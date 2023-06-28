@@ -281,14 +281,14 @@ export const moduleImports = [
     autoLoadEntities: true,
     synchronize: true,
   }),
-  TypeOrmModule.forRoot({
-    type: 'postgres',
-    url: settingsEnv.DATABASE_URL,
-    password: settingsEnv.DATABASE_PASS,
-    entities: [],
-    autoLoadEntities: true,
-    synchronize: true,
-  }),
+  // TypeOrmModule.forRoot({
+  //   type: 'postgres',
+  //   url: settingsEnv.DATABASE_URL,
+  //   password: settingsEnv.DATABASE_PASS,
+  //   entities: [],
+  //   autoLoadEntities: true,
+  //   synchronize: true,
+  // }),
   TypeOrmModule.forRoot({
     type: 'postgres',
     url: process.env.POSTGRES_URL,
