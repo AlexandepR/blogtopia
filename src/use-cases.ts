@@ -288,7 +288,7 @@ export const moduleImports = [
     entities: [],
     autoLoadEntities: true,
     synchronize: true,
-    poolSize: 5,
+    poolSize: 4,
   }),
   // TypeOrmModule.forRoot({
   //   type: 'postgres',
