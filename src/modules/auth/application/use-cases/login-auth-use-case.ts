@@ -37,8 +37,8 @@ export class LoginAuthUseCase implements ICommandHandler<LoginAuthCommand>{
       if (!createSession) throw new HttpException("", HttpStatus.UNAUTHORIZED);
       const token = await this.jwtService.сreateJWT(user);
       const refreshToken = await this.jwtService.createRefreshToken(user, createSession.deviceId);
-      // const refreshTokenCookie = `refreshToken=${refreshToken}; HttpOnly; Secure`;
-      const refreshTokenCookie = `refreshToken=${refreshToken}`;
+      const refreshTokenCookie = `refreshToken=${refreshToken}; HttpOnly; Secure`;
+      // const refreshTokenCookie = `refreshToken=${refreshToken}`;
       if (!token || !refreshToken || !refreshTokenCookie) throw new HttpException("", HttpStatus.UNAUTHORIZED);
       return { refreshTokenCookie, token };
     }

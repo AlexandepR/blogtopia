@@ -27,8 +27,8 @@ export class RefreshTokenAuthUseCase implements ICommandHandler<RefreshTokenAuth
       await this.securitySqlRepository.updateDateSession(date, user.ID.toString());
       await this.jwtService.refreshTokenToDeprecated(user, refreshToken);
       const token = await this.jwtService.сreateJWT(user);
-      // const refreshTokenCookie = `refreshToken=${updateRefreshToken}; HttpOnly; Secure`;
-      const refreshTokenCookie = `refreshToken=${updateRefreshToken}`;
+      const refreshTokenCookie = `refreshToken=${updateRefreshToken}; HttpOnly; Secure`;
+      // const refreshTokenCookie = `refreshToken=${updateRefreshToken}`;
       return { refreshTokenCookie, token };
     }
     throw new UnauthorizedException()
