@@ -36,7 +36,7 @@ export class TestingRepository {
       .deleteMany({});
     const delSecurity = await this.SecurityModel
       .deleteMany({});
-    this.dataSource.query(`
+    await this.dataSource.query(`
         DELETE FROM public."Users"
     `)
     return delBlogs.deletedCount >= 1 &&
