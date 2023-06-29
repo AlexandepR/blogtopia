@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument, Model, Types } from "mongoose";
-import { PostDocument } from "../../posts/type/posts.schema";
+import { PostDocument } from "../../posts/domain/entities/posts.schema";
 import { UserDocument } from "../../users/domain/entities/users.schema";
 
 @Schema()
