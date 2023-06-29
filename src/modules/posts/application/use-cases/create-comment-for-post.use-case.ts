@@ -5,7 +5,7 @@ import { ForbiddenException, HttpException, HttpStatus } from "@nestjs/common";
 import { UserDocument } from "../../../users/domain/entities/users.schema";
 import { getCommentsByPostOutputModel } from "../../type/postsType";
 import { UsersRepository } from "../../../users/infrastructure/users.repository";
-import { PostsRepository } from "../posts.repository";
+import { PostsRepository } from "../../infrastructure/posts.repository";
 import { CreateCommentInputClassModel } from "../posts.service";
 import { BlogsRepository } from "../../../blogs/infrastructure/blogs.repository";
 import { BlogsQueryRepository } from "../../../blogs/infrastructure/blogs.query-repository";

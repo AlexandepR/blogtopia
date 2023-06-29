@@ -5,7 +5,7 @@ import { Types } from "mongoose";
 import { UserDocument } from "../../../users/domain/entities/users.schema";
 import { outputPostModelType } from "../../type/postsType";
 import { UsersRepository } from "../../../users/infrastructure/users.repository";
-import { PostsRepository } from "../posts.repository";
+import { PostsRepository } from "../../infrastructure/posts.repository";
 import { JwtService } from "../../../auth/application/jwt.service";
 import { BlogsRepository } from "../../../blogs/infrastructure/blogs.repository";
 import { getPostByIdFilter } from "../../../../utils/filters/post.filters";

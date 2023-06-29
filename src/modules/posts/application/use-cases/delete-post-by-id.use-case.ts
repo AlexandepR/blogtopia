@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { Types } from "mongoose";
-import { PostsRepository } from "../posts.repository";
+import { PostsRepository } from "../../infrastructure/posts.repository";
 
 
 export class DeletePostByIdCommand {

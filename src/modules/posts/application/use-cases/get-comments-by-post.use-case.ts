@@ -3,7 +3,7 @@ import { pagesCounter, parseQueryPaginator, skipPage } from "../../../../utils/h
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { Types } from "mongoose";
 import { getCommentsByPostOutputModel } from "../../type/postsType";
-import { PostsRepository } from "../posts.repository";
+import { PostsRepository } from "../../infrastructure/posts.repository";
 import { PaginationType, ParamsType } from "../../../../types/types";
 import { CommentsRepository } from "../../../comments/application/comments.repository";
 import { UsersRepository } from "../../../users/infrastructure/users.repository";

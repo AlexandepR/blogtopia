@@ -3,7 +3,7 @@ import { validateOrRejectModel } from "../../../../utils/validation.helpers";
 import { Types } from "mongoose";
 import { UserDocument } from "../../../users/domain/entities/users.schema";
 import { CreatePostInputClassModel, outputPostModelType } from "../../type/postsType";
-import { PostsRepository } from "../posts.repository";
+import { PostsRepository } from "../../infrastructure/posts.repository";
 import { BlogsRepository } from "../../../blogs/infrastructure/blogs.repository";
 import { BlogsQueryRepository } from "../../../blogs/infrastructure/blogs.query-repository";
 
