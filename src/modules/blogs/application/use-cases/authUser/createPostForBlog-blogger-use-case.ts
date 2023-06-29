@@ -6,7 +6,7 @@ import { outputPostModelType } from "../../../../posts/type/postsType";
 import { validateOrRejectModel } from "../../../../../utils/validation.helpers";
 import { Types } from "mongoose";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { PostsRepository } from "../../../../posts/application/posts.repository";
+import { PostsRepository } from "../../../../posts/infrastructure/posts.repository";
 import { BlogsQueryRepository } from "../../../infrastructure/blogs.query-repository";
 
 

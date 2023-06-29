@@ -4,7 +4,7 @@ import { pagesCounter, parseQueryPaginator, skipPage, validateObjectId } from ".
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { CommentsRepository } from "../../../../comments/application/comments.repository";
 import { BlogsRepository } from "../../../infrastructure/blogs.repository";
-import { PostsRepository } from "../../../../posts/application/posts.repository";
+import { PostsRepository } from "../../../../posts/infrastructure/posts.repository";
 
 
 export class GetAllCommentsForBloggerCommand {

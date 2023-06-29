@@ -2,7 +2,7 @@ import { ForbiddenException, NotFoundException } from "@nestjs/common";
 import { BlogsRepository } from "../../../infrastructure/blogs.repository";
 import { Types } from "mongoose";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { PostsRepository } from "../../../../posts/application/posts.repository";
+import { PostsRepository } from "../../../../posts/infrastructure/posts.repository";
 import { UserDocument } from "../../../../users/domain/entities/users.schema";
 import { BlogsQueryRepository } from "../../../infrastructure/blogs.query-repository";
 
