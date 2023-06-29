@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { BlogsRepository } from "../../../infrastructure/blogs.repository";
-import { PostsRepository } from "../../../../posts/application/posts.repository";
+import { PostsRepository } from "../../../../posts/infrastructure/posts.repository";
 import { PaginationType, ParamsType } from "../../../../../types/types";
 import { PostsTypeFiltered } from "../../../../posts/type/postsType";
 import { pagesCounter, parseQueryPaginator, skipPage } from "../../../../../utils/helpers";

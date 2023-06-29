@@ -2,7 +2,7 @@ import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { pagesCounter, parseQueryPaginator, skipPage } from "../../../../utils/helpers";
 import { UserDocument } from "../../../users/domain/entities/users.schema";
 import { PostsTypeFiltered } from "../../type/postsType";
-import { PostsRepository } from "../posts.repository";
+import { PostsRepository } from "../../infrastructure/posts.repository";
 import { PaginationType, ParamsType } from "../../../../types/types";
 import { JwtService } from "../../../auth/application/jwt.service";
 import { UsersRepository } from "../../../users/infrastructure/users.repository";

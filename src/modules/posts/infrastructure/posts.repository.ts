@@ -1,10 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Post, PostDocument, PostModelType } from "../type/posts.schema";
+import { Post, PostDocument, PostModelType } from "../domain/entities/posts.schema";
 import { BlogDocument } from "../../blogs/domain/entities/blogs.schema";
 import { CreatePostInputModelType, PostsNewestLikesType, PostsType } from "../type/postsType";
 import { ObjectId } from "mongodb";
-import { CreateCommentInputClassModel } from "./posts.service";
+import { CreateCommentInputClassModel } from "../application/posts.service";
 import { Comment, CommentModelType } from "../../comments/type/comments.schema";
 import { Types } from "mongoose";
 import { User, UserDocument, UserModelType } from "../../users/domain/entities/users.schema";

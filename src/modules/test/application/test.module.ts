@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
-import { Post, PostSchema } from "../../posts/type/posts.schema";
+import { Post, PostSchema } from "../../posts/domain/entities/posts.schema";
 import { Comment, CommentSchema } from "../../comments/type/comments.schema";
 import { TestingController } from "./testing.controller";
 import { TestingService } from "./testing.service";

@@ -6,7 +6,7 @@ import { Types } from "mongoose";
 import { UserDocument } from "../../../users/domain/entities/users.schema";
 import { likeStatusInputClassModel, PostLikesType, PostsNewestLikesType } from "../../type/postsType";
 import { UsersRepository } from "../../../users/infrastructure/users.repository";
-import { PostsRepository } from "../posts.repository";
+import { PostsRepository } from "../../infrastructure/posts.repository";
 
 
 export class UpdatePostLikeStatusCommand {

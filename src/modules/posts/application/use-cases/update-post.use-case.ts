@@ -3,8 +3,8 @@ import { validateOrRejectModel } from "../../../../utils/validation.helpers";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { Types } from "mongoose";
 import { CreatePostInputClassModel } from "../../type/postsType";
-import { PostsRepository } from "../posts.repository";
-import { PostDocument } from "../../type/posts.schema";
+import { PostsRepository } from "../../infrastructure/posts.repository";
+import { PostDocument } from "../../domain/entities/posts.schema";
 
 
 export class UpdatePostCommand {
