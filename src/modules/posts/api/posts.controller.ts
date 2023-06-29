@@ -13,21 +13,21 @@ import {
   Req
 } from "@nestjs/common";
 import { ParamsType } from "../../../types/types";
-import { CreateCommentInputClassModel, PostsService } from "./posts.service";
+import { CreateCommentInputClassModel, PostsService } from "../application/posts.service";
 import { Request } from "express";
 import { CreatePostInputClassModel, likeStatusInputClassModel } from "../type/postsType";
 import { BasicAuth, Public, UserFromRequestDecorator } from "../../../utils/public.decorator";
 import { UserDocument } from "../../users/domain/entities/users.schema";
 import { CommandBus } from "@nestjs/cqrs";
-import { UpdatePostLikeStatusCommand } from "./use-cases/update-post-like-status.use-case";
-import { GetCommentsByPostCommand } from "./use-cases/get-comments-by-post.use-case";
-import { CreateCommentForPostCommand } from "./use-cases/create-comment-for-post.use-case";
-import { GetPostsCommand } from "./use-cases/get-posts.use-case";
-import { GetPostByIdCommand } from "./use-cases/get-post-by-id.use-case";
-import { CreatePostCommand } from "./use-cases/create-post.use-case";
-import { UpdatePostCommand } from "./use-cases/update-post.use-case";
-import { DeletePostByIdCommand } from "./use-cases/delete-post-by-id.use-case";
-import { DeleteAllPostsCommand } from "./use-cases/delete-all-post.use-case";
+import { UpdatePostLikeStatusCommand } from "../application/use-cases/update-post-like-status.use-case";
+import { GetCommentsByPostCommand } from "../application/use-cases/get-comments-by-post.use-case";
+import { CreateCommentForPostCommand } from "../application/use-cases/create-comment-for-post.use-case";
+import { GetPostsCommand } from "../application/use-cases/get-posts.use-case";
+import { GetPostByIdCommand } from "../application/use-cases/get-post-by-id.use-case";
+import { CreatePostCommand } from "../application/use-cases/create-post.use-case";
+import { UpdatePostCommand } from "../application/use-cases/update-post.use-case";
+import { DeletePostByIdCommand } from "../application/use-cases/delete-post-by-id.use-case";
+import { DeleteAllPostsCommand } from "../application/use-cases/delete-all-post.use-case";
 
 @Controller("posts")
 export class PostsController {

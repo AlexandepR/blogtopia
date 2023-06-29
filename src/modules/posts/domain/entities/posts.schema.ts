@@ -1,14 +1,8 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { HydratedDocument, Model, ObjectId, Types } from "mongoose";
-import {
-  CreatePostInputModelType,
-  PostExtendedLikesInfoType,
-  PostLikesType,
-  PostsNewestLikesType,
-  PutPostInputModelType
-} from "./postsType";
-import { BlogDocument } from "../../blogs/domain/entities/blogs.schema";
-import { UserDocument } from "../../users/domain/entities/users.schema";
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument, Model, Types } from 'mongoose';
+import { CreatePostInputModelType, PutPostInputModelType } from '../../type/postsType';
+import { BlogDocument } from '../../../blogs/domain/entities/blogs.schema';
+import { UserDocument } from '../../../users/domain/entities/users.schema';
 
 
 @Schema({
