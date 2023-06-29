@@ -85,19 +85,19 @@ import { UsersController } from "./modules/users/application/users.controller";
 import { BlogsController } from "./modules/blogs/api/admin.api.blog.controller";
 import { BlogsBloggerController } from "./modules/blogs/api/auth.api.blog.controller";
 import { BlogsPublicController } from "./modules/blogs/api/public.api.blog.controller";
-import { PostsController } from "./modules/posts/application/posts.controller";
+import { PostsController } from "./modules/posts/api/posts.controller";
 import { SecurityController } from "./modules/security/application/security.controller";
 import { CommentsController } from "./modules/comments/application/comments.controller";
 import { TestingController } from "./modules/test/application/testing.controller";
 import { BlogsRepository } from "./modules/blogs/infrastructure/blogs.repository";
-import { PostsRepository } from "./modules/posts/application/posts.repository";
+import { PostsRepository } from "./modules/posts/infrastructure/posts.repository";
 import { UsersRepository } from "./modules/users/infrastructure/users.repository";
 import { CommentsRepository } from "./modules/comments/application/comments.repository";
 import { TestingRepository } from "./modules/test/application/testing.repository";
 import { SecurityRepository } from "./modules/security/infrastructure/security.repository";
 import { GetBlogsPublicUseCase } from "./modules/blogs/application/use-cases/public/get-blogs-public-use-case";
 import { Blog, BlogSchema } from "./modules/blogs/domain/entities/blogs.schema";
-import { Post, PostSchema } from "./modules/posts/type/posts.schema";
+import { Post, PostSchema } from "./modules/posts/domain/entities/posts.schema";
 import { Comment, CommentSchema } from "./modules/comments/type/comments.schema";
 import { User, UserSchema } from "./modules/users/domain/entities/users.schema";
 import { Security, SecuritySchema } from "./modules/security/type/security.schema";
@@ -127,6 +127,9 @@ import { SecuritySqlRepository } from './modules/security/infrastructure/securit
 import { BanUserInfo } from './modules/users/domain/entities/banUser.entity';
 import { UsersDevicesSessions } from './modules/users/domain/entities/usersDevices.entity';
 import { Users } from './modules/users/domain/entities/user.entity';
+import { Blogs } from './modules/blogs/domain/entities/blogs.entity';
+import { BanUsersBlogs } from './modules/blogs/domain/entities/banUsersBlogs.entity';
+import { PostDislikesData, PostLikesData, Posts } from './modules/posts/domain/entities/posts.entity';
 // import { MailerModule2 } from "../../swagger-static";
 
 export const adminUseCases = [
@@ -268,28 +271,28 @@ export const moduleImports = [
     ttl: 1,
     limit: 5000
   }),
-  // TypeOrmModule.forRoot({
-  //   type: 'postgres',
-  //   host: 'localhost',
-  //   port: +settingsEnv.PORT_PG,
-  //   username: settingsEnv.LOGIN_PG,
-  //   password: settingsEnv.PASS_PG,
-  //   database: settingsEnv.DB_NAME,
-  //   entities: [
-  //     // "src/entity/**/*.ts"
-  //   ],
-  //   autoLoadEntities: true,
-  //   synchronize: true,
-  // }),
   TypeOrmModule.forRoot({
     type: 'postgres',
-    url: settingsEnv.DATABASE_URL,
-    password: settingsEnv.DATABASE_PASS,
-    entities: [],
+    host: 'localhost',
+    port: +settingsEnv.PORT_PG,
+    username: settingsEnv.LOGIN_PG,
+    password: settingsEnv.PASS_PG,
+    database: settingsEnv.DB_NAME,
+    entities: [
+      // "src/entity/**/*.ts"
+    ],
     autoLoadEntities: true,
     synchronize: true,
-    poolSize: 4,
   }),
+  // TypeOrmModule.forRoot({
+  //   type: 'postgres',
+  //   url: settingsEnv.DATABASE_URL,
+  //   password: settingsEnv.DATABASE_PASS,
+  //   entities: [],
+  //   autoLoadEntities: true,
+  //   synchronize: true,
+  //   poolSize: 4,
+  // }),
   // TypeOrmModule.forRoot({
   //   type: 'postgres',
   //   // url: process.env.POSTGRES_URL,
@@ -302,7 +305,10 @@ export const moduleImports = [
   //   autoLoadEntities: true,
   //   synchronize: true,
   // }),
-  TypeOrmModule.forFeature([Users, BanUserInfo, UsersDevicesSessions]),
+  TypeOrmModule.forFeature([
+      Users, BanUserInfo, UsersDevicesSessions, BanUsersBlogs, Blogs,
+    Posts,PostLikesData, PostDislikesData
+  ]),
   MongooseModule.forRoot(settingsEnv.MONGO_URL),
   MongooseModule.forFeature(allMongooseModels),
   JwtModule.register({

@@ -2,7 +2,7 @@ import { ParamsUsersType, QueryUsersPaginator, UserOutputModelType } from '../mo
 import * as bcrypt from 'bcrypt';
 import { User } from '../modules/users/domain/entities/users.schema';
 import { PostLikesType } from '../modules/posts/type/postsType';
-import { PostDocument } from '../modules/posts/type/posts.schema';
+import { PostDocument } from '../modules/posts/domain/entities/posts.schema';
 import { Types } from 'mongoose';
 import { CommentDocument } from '../modules/comments/type/comments.schema';
 import { LikesType } from '../modules/comments/type/commentsType';
