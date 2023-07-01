@@ -1,19 +1,17 @@
-import { BlogsRepository } from "../../../../blogs/infrastructure/blogs.repository";
-import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { ParamsType } from "../../../../../types/types";
-import { pagesCounter, parseQueryPaginator, skipPage, validateObjectId } from "../../../../../utils/helpers";
-import { totalCountBanUsersForBlogFilter } from "../../../../../utils/filters/user.filters";
-import { Types } from "mongoose";
-import { ForbiddenException, NotFoundException } from "@nestjs/common";
-import { UserDocument } from "../../../domain/entities/users.schema";
-import { BlogsQueryRepository } from "../../../../blogs/infrastructure/blogs.query-repository";
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { PaginationType, ParamsType } from '../../../../../types/types';
+import { pagesCounter, parseQueryPaginator, skipPage, validateIdByUUID } from '../../../../../utils/helpers';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { FindUserType, GetBanUserForBlog } from '../../../type/usersTypes';
+import { BlogsQuerySqlRepository } from '../../../../blogs/infrastructure/blogs.sql.query-repository';
+import { BlogsSqlRepository } from '../../../../blogs/infrastructure/blogs.sql-repository';
 
 
 export class getBannedUsersForBlogCommand {
   constructor(
       public blogId: string,
       public query: ParamsType,
-      public user: UserDocument,
+      public user: FindUserType,
   ) {
   }
 }
@@ -21,21 +19,22 @@ export class getBannedUsersForBlogCommand {
 @CommandHandler(getBannedUsersForBlogCommand)
 export class getBannedUsersForBlogUseCase implements ICommandHandler<getBannedUsersForBlogCommand>{
   constructor(
-    protected blogsRepository: BlogsRepository,
-    protected blogsQueryRepository: BlogsQueryRepository,
+    protected blogsSqlRepository: BlogsSqlRepository,
+    protected blogsQuerySqlRepository: BlogsQuerySqlRepository,
   ) {
   }
-  async execute(command: getBannedUsersForBlogCommand): Promise<any> {
-    const { searchNameTerm, pageSize, pageNumber, sortDirection, sortBy } = parseQueryPaginator(command.query);
-    const blogObjectId = validateObjectId(command.blogId)
-    const blog = await this.blogsQueryRepository.findBlogById(new Types.ObjectId(command.blogId))
+  async execute(command: getBannedUsersForBlogCommand): Promise<PaginationType<GetBanUserForBlog>> {
+    const { searchLoginTerm, pageSize, pageNumber, sortDirection, sortBy } = parseQueryPaginator(command.query);
+    if(!validateIdByUUID(command.blogId)) {throw new NotFoundException()}
+    const blog = await this.blogsQuerySqlRepository.findBlogById(command.blogId)
     if(!blog) throw new NotFoundException()
-    if(blog.blogOwnerInfo.userLogin !== command.user.accountData.login) throw new ForbiddenException()
-    const filter = totalCountBanUsersForBlogFilter(searchNameTerm, true, blogObjectId)
-    const getTotalCountBlogs = await this.blogsQueryRepository.getTotalCountBanUsersBlogs(filter);
+    if(blog.BlogOwnerLogin !== command.user.login) throw new ForbiddenException()
+    const getTotalCountBlogs = await this.blogsQuerySqlRepository
+        .getTotalCountBanUsersBlogs(command.blogId, searchLoginTerm);
     const skip = skipPage(pageNumber, pageSize);
     const pagesCount = pagesCounter(getTotalCountBlogs, pageSize);
-    const getBlogs = await this.blogsQueryRepository.getBannedUsers(skip, pageSize, filter, sortBy, sortDirection);
+    const getBlogs = await this.blogsQuerySqlRepository
+        .getBannedUsers(skip, pageSize, sortBy, sortDirection, searchLoginTerm, command.blogId);
     return {
       pagesCount: pagesCount,
       page: pageNumber,
