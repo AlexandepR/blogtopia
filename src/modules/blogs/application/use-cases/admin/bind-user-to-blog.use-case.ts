@@ -1,14 +1,23 @@
 import { PaginationType, ParamsType } from "../../../../../types/types";
 import { UserDocument } from "../../../../users/domain/entities/users.schema";
-import { BlogDocument } from "../../../domain/entities/blogs.schema";
-import { filterByNameTermOrUserLogin, pagesCounter, parseQueryPaginator, skipPage } from "../../../../../utils/helpers";
+import { BlogDocument } from "../../../domain/blogs.schema";
+import {
+  filterByNameTermOrUserLogin,
+  pagesCounter,
+  parseQueryPaginator,
+  skipPage,
+  validateIdByUUID
+} from '../../../../../utils/helpers';
 import { BlogsRepository } from "../../../infrastructure/blogs.repository";
-import { BadRequestException, Injectable, Param } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException, Param } from '@nestjs/common';
 import { CreatePostInputClassModel } from "../../../../posts/type/postsType";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { Types } from "mongoose";
 import { UsersRepository } from "../../../../users/infrastructure/users.repository";
 import { BlogsQueryRepository } from "../../../infrastructure/blogs.query-repository";
+import { BlogsSqlRepository } from '../../../infrastructure/blogs.sql-repository';
+import { BlogsQuerySqlRepository } from '../../../infrastructure/blogs.sql.query-repository';
+import { UsersSqlRepository } from '../../../../users/infrastructure/users.sql-repository';
 
 
 export class BindUserToBlogCommand {
@@ -21,16 +30,16 @@ export class BindUserToBlogCommand {
 @CommandHandler(BindUserToBlogCommand)
 export class BindUserToBlogByAdminUseCase implements ICommandHandler<BindUserToBlogCommand>{
   constructor(
-    protected blogsRepository: BlogsRepository,
-    protected blogsQueryRepository: BlogsQueryRepository,
-    protected usersRepository: UsersRepository,
+    protected blogsSqlRepository: BlogsSqlRepository,
+    protected blogsQuerySqlRepository: BlogsQuerySqlRepository,
+    protected usersSqlRepository: UsersSqlRepository,
     ) {
   }
-  async execute(command: BindUserToBlogCommand) {
-    const blog = await this.blogsQueryRepository.findBlogById(new Types.ObjectId(command.blogId))
-    const user = await this.usersRepository.findUserById(new Types.ObjectId(command.userId))
-    if (blog.blogOwnerInfo.userId !== '' || !blog || !user) throw new BadRequestException()
-    blog.bindUserToBlog(user)
-    return await this.blogsRepository.save(blog);
+  async execute(command: BindUserToBlogCommand): Promise<boolean> {
+    if(!validateIdByUUID(command.blogId) || !validateIdByUUID(command.userId)) {throw new NotFoundException()}
+    const blog = await this.blogsQuerySqlRepository.findBlogById(command.blogId)
+    const user = await this.usersSqlRepository.findUserById(command.userId)
+    if (blog.BlogOwnerId !== '' || !blog || !user) throw new BadRequestException()
+    return await this.blogsSqlRepository.bindUserToBlog(command.blogId, user)
   }
 }
