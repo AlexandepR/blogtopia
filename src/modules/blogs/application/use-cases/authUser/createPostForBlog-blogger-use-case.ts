@@ -1,13 +1,8 @@
-import { UserDocument } from "../../../../users/domain/entities/users.schema";
-import { BlogsRepository } from "../../../infrastructure/blogs.repository";
 import { ForbiddenException, HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
-import { PostForBlogBloggerInputClassModel } from "../../../type/blogsType";
-import { outputPostModelType, PostType } from '../../../../posts/type/postsType';
-import { validateOrRejectModel } from "../../../../../utils/validation.helpers";
-import { Types } from "mongoose";
-import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { PostsRepository } from "../../../../posts/infrastructure/posts.repository";
-import { BlogsQueryRepository } from "../../../infrastructure/blogs.query-repository";
+import { PostForBlogBloggerInputClassModel } from '../../../type/blogsType';
+import { outputPostModelType } from '../../../../posts/type/postsType';
+import { validateOrRejectModel } from '../../../../../utils/validation.helpers';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { BlogsQuerySqlRepository } from '../../../infrastructure/blogs.sql.query-repository';
 import { validateIdByUUID } from '../../../../../utils/helpers';
 import { FindUserType } from '../../../../users/type/usersTypes';
