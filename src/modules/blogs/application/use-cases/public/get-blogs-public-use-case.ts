@@ -1,15 +1,14 @@
-import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { PaginationType, ParamsTypeClassModel } from "../../../../../types/types";
-import { BlogsRepository } from "../../../infrastructure/blogs.repository";
-import { pagesCounter, parseQueryPaginator, skipPage } from "../../../../../utils/helpers";
-import { BlogDocument } from "../../../domain/entities/blogs.schema";
-import { UsersRepository } from "../../../../users/infrastructure/users.repository";
-import { GetBlogsPublicFilter } from "../../../../../utils/filters/blog.filters";
-import { BlogsQueryRepository } from "../../../infrastructure/blogs.query-repository";
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { PaginationType, ParamsType, ParamsTypeClassModel } from '../../../../../types/types';
+import { pagesCounter, parseQueryPaginator, skipPage } from '../../../../../utils/helpers';
+import { GetBlogsPublicFilter } from '../../../../../utils/filters/blog.filters';
+import { BlogsQuerySqlRepository } from '../../../infrastructure/blogs.sql.query-repository';
+import { UsersSqlRepository } from '../../../../users/infrastructure/users.sql-repository';
+import { BlogType } from '../../../type/blogsType';
 
 export class GetBlogsCommand {
   constructor(
-    public query: ParamsTypeClassModel
+    public query: ParamsType
   ) {
   }
 }
@@ -17,20 +16,17 @@ export class GetBlogsCommand {
 @CommandHandler(GetBlogsCommand)
 export class GetBlogsPublicUseCase implements ICommandHandler<GetBlogsCommand> {
   constructor(
-    protected blogsRepository: BlogsRepository,
-    protected blogsQueryRepository: BlogsQueryRepository,
-    protected usersRepository: UsersRepository,
+    protected blogsQuerySqlRepository: BlogsQuerySqlRepository,
+    protected usersSqlRepository: UsersSqlRepository,
   ) {
   }
-  async execute(command: GetBlogsCommand): Promise<PaginationType<BlogDocument[]>> {
+  async execute(command: GetBlogsCommand): Promise<PaginationType<BlogType[]>> {
     const { searchNameTerm, pageSize, pageNumber, sortDirection, sortBy } = parseQueryPaginator(command.query);
-    const banUsers: Array<string> = await this.usersRepository.getBannedUsers();
-    const banBlogs = await this.blogsQueryRepository.getArrayIdBanBlogs();
-    const filter = GetBlogsPublicFilter(banUsers, banBlogs, searchNameTerm);
-    const getTotalCountBlogs = await this.blogsQueryRepository.getTotalCountBlogs(filter);
+    const filter = GetBlogsPublicFilter(searchNameTerm);
+    const getTotalCountBlogs = await this.blogsQuerySqlRepository.getTotalCountPublicBlogs(filter);
     const skip = skipPage(pageNumber, pageSize);
     const pagesCount = pagesCounter(getTotalCountBlogs, pageSize);
-    const getBlogs = await this.blogsQueryRepository.getBlogs(skip, pageSize, filter, sortBy, sortDirection);
+    const getBlogs = await this.blogsQuerySqlRepository.getBlogs(skip, pageSize, filter, sortBy, sortDirection);
     return {
       pagesCount: pagesCount,
       page: pageNumber,

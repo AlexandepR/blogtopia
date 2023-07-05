@@ -66,15 +66,20 @@ export class BanInfoBlogInputClassModel {
 }
 
 export type BlogType = {
-  id: string
+  ID: string
   name: string
   description: string
   websiteUrl: string
   createdAt: Date
   isMembership: boolean
+  BlogOwnerId: string
+  BlogOwnerLogin: string
+  isBanned: false
+  banDate: Date
 }
 export type QueryType = {
   searchNameTerm?: string,
+  searchLoginTerm?: string,
   pageSize: number,
   pageNumber: number,
   sortDirection: "asc" | "desc",
@@ -99,4 +104,13 @@ export type updatePostForBlogInputModel = {
   title: string,
   shortDescription: string,
   content: string
+}
+
+export type GetBlogById = {
+  id: string,
+  name: string,
+  description: string,
+  websiteUrl: string,
+  createdAt: Date,
+  isMembership: boolean
 }
