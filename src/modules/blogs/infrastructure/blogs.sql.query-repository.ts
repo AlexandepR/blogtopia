@@ -1,11 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Blog, BlogDocument, BlogModelType } from '../domain/blogs.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { ObjectId } from 'mongodb';
 import { Post, PostModelType } from '../../posts/domain/posts.schema';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { BlogType } from '../type/blogsType';
+import { BanUsersBlogsType, BlogType } from '../type/blogsType';
 import { GetBanUserForBlog } from '../../users/type/usersTypes';
 
 @Injectable()
@@ -35,11 +34,32 @@ export class BlogsQuerySqlRepository {
     `;
         return await this.dataSource.query(getQuery);
     }
-    async getArrayIdBanBlogs() {
-        const blogs = await this.BlogModel
-            .find({ 'banInfo.isBanned': true });
-        const arrBlogsId = blogs.map((blog) => blog._id);
-        return arrBlogsId;
+    async getBlogsByAdmin (
+        skip: number,
+        pageSize: number,
+        filter: any,
+        sortBy: string,
+        sortDirection: 'asc' | 'desc',
+        searchNameTerm?: string,
+        userId?: string
+    ): Promise<BlogType[]> {
+        const getQuery = `
+    SELECT "ID" as "id", "name", "description", "websiteUrl", "createdAt", "isMembership",
+    json_build_object (
+        'userId', b."BlogOwnerId",
+        'userLogin', b. "BlogOwnerLogin"
+    ) as "blogOwnerInfo",
+    json_build_object(
+        'isBanned', b."isBanned",
+        'banDate', b."banDate"
+    ) as "banInfo"
+    FROM public."Blogs" b
+    ${filter}
+    ORDER BY ${sortBy === 'createdAt' ? 'b."createdAt"' : `"${sortBy}" COLLATE "C"`} ${sortDirection}
+    LIMIT ${pageSize}
+    OFFSET ${skip}
+    `;
+        return await this.dataSource.query(getQuery);
     }
     async getBannedUsers(
         skip: number,
@@ -50,11 +70,12 @@ export class BlogsQuerySqlRepository {
         blogId: string
     ): Promise<GetBanUserForBlog> {
         let whereCondition = ''
+        if (sortBy === 'login') {sortBy = 'userLogin'}
         if (searchLoginTerm) {
             whereCondition = ` AND LOWER(bu."userLogin") ILIKE LOWER('%${searchLoginTerm}%')`
         }
         const getQuery = `
-        SELECT "ID" as "id", "userLogin" as "login",
+        SELECT "ID" as id, bu."userLogin" as "login",
         json_build_object(
                         'isBanned', bu."isBanned",
                         'banDate', bu."banDate",
@@ -63,17 +84,12 @@ export class BlogsQuerySqlRepository {
         FROM public."BanUsersBlogs" bu
         WHERE bu."blogId" = '${blogId}'
         ${whereCondition}
-        ORDER BY ${sortBy === 'createdAt' ? 'bu."banDate"' : `"${sortBy}" COLLATE "C"`} ${sortDirection}
+        ORDER BY ${sortBy === 'createdAt' ? 'bu."banDate"' : `bu."${sortBy}" COLLATE "C"`} ${sortDirection}
         LIMIT ${pageSize}
         OFFSET ${skip}
         `
-        return await this.dataSource.query(getQuery);
-    }
-    async findBlogByIdForBlogger(blogId: ObjectId, filter?): Promise<BlogDocument> {
-        const query = { $and: [{ _id: blogId }, filter] };
-        const blog = await this.BlogModel
-            .findOne(query);
-        return blog;
+        const result = await this.dataSource.query(getQuery);
+        return result
     }
     async findBlogByAdmin(blogId: string): Promise<BlogType | null> {
         const findQuery = `
@@ -85,6 +101,16 @@ export class BlogsQuerySqlRepository {
         if (findBlog.length > 0) return findBlog[0];
         return null;
     }
+    async findBanUserForBlog(userId: string): Promise<BanUsersBlogsType | null> {
+        const getQuery =  `
+        SELECT *
+        FROM public."BanUsersBlogs" b
+        WHERE b."userId" = '${userId}'
+        `
+        const findUser = await this.dataSource.query(getQuery)
+        if (findUser.length > 0) return findUser[0];
+        return null;
+        }
     async findBlogById(blogId: string): Promise<BlogType> {
         const findQuery = `
             SELECT *
@@ -130,9 +156,6 @@ export class BlogsQuerySqlRepository {
             ${filter}
             `;
         const count = await this.dataSource.query(getCountBlogsQuery);
-        // ${whereCondition}
-        // WHERE b."isBanned" != true
-        // AND LOWER(b."name") ILIKE LOWER('%${searchNameTerm}%')
         return count.length;
     }
     async getTotalCountBlogs(searchNameTerm: string, userId?: string): Promise<number> {
