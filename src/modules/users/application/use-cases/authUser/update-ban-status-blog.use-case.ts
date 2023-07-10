@@ -1,20 +1,19 @@
-import { BlogsRepository } from "../../../../blogs/infrastructure/blogs.repository";
-import { BanInfoInputClassModel } from "../../../../blogs/type/blogsType";
-import { validateOrRejectModel } from "../../../../../utils/validation.helpers";
-import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { UserDocument } from "../../../domain/entities/users.schema";
-import { Types } from "mongoose";
-import { ForbiddenException, HttpException, HttpStatus, NotFoundException } from "@nestjs/common";
-import { UsersRepository } from "../../../infrastructure/users.repository";
-import { validateObjectId } from "../../../../../utils/helpers";
-import { BlogsQueryRepository } from "../../../../blogs/infrastructure/blogs.query-repository";
+import { BanInfoInputClassModel } from '../../../../blogs/type/blogsType';
+import { validateOrRejectModel } from '../../../../../utils/validation.helpers';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { ForbiddenException, HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
+import { validateIdByUUID } from '../../../../../utils/helpers';
+import { FindUserType } from '../../../type/usersTypes';
+import { BlogsQuerySqlRepository } from '../../../../blogs/infrastructure/blogs.sql.query-repository';
+import { BlogsSqlRepository } from '../../../../blogs/infrastructure/blogs.sql-repository';
+import { UsersSqlRepository } from '../../../infrastructure/users.sql-repository';
 
 
 export class UpdateBanStatusCommand {
   constructor(
       public userId: string,
       public dto: BanInfoInputClassModel,
-      public user: UserDocument,
+      public user: FindUserType,
   ) {
   }
 }
@@ -22,33 +21,24 @@ export class UpdateBanStatusCommand {
 @CommandHandler(UpdateBanStatusCommand)
 export class UpdateBanStatusUseCase implements ICommandHandler<UpdateBanStatusCommand>{
   constructor(
-    protected blogsRepository: BlogsRepository,
-    protected blogsQueryRepository: BlogsQueryRepository,
-    protected usersRepository: UsersRepository,
+    protected blogsSqlRepository: BlogsSqlRepository,
+    protected blogsQuerySqlRepository: BlogsQuerySqlRepository,
+    protected usersSqlRepository: UsersSqlRepository,
   ) {
   }
-  async execute(command: UpdateBanStatusCommand): Promise<any> {
-    await validateOrRejectModel(command.dto, BanInfoInputClassModel)
-    const getUserId = validateObjectId(command.userId)
-    const blog = await this.blogsQueryRepository.findBlogById(new Types.ObjectId(command.dto.blogId))
-    if(!blog) throw new NotFoundException()
-    if(blog.blogOwnerInfo.userLogin !== command.user.accountData.login) throw new ForbiddenException()
-    const getUser = await  this.usersRepository.findUserById(getUserId)
-    if(!getUser) {throw new NotFoundException()}
-    const findUser = blog.banUsersInfo
-      .find((ban) => ban.login === getUser.accountData.login
-        // && ban.banInfo.isBanned === command.dto.isBanned
-      )
-    // if(findUser) {
-    //   await this.blogsRepository.banUser(new Types.ObjectId(command.dto.blogId), getUser.accountData.login)
-    // }
-    // if(command.dto.isBanned) {
-    if(!findUser) {
-    blog.banUser(command.dto, getUser.accountData.login, new Types.ObjectId(command.userId))
-    return await this.blogsRepository.save(blog)
+  async execute({dto, userId, user: { login }}: UpdateBanStatusCommand): Promise<any> {
+    await validateOrRejectModel(dto, BanInfoInputClassModel)
+    if(!validateIdByUUID(userId)) throw new NotFoundException()
+    const user = await  this.usersSqlRepository.findUserById(userId)
+    const blog = await this.blogsQuerySqlRepository.findBlogById(dto.blogId)
+    if(!user || !blog) throw new NotFoundException()
+    if(blog.BlogOwnerLogin !== login) throw new ForbiddenException()
+    const findBanUserForBlog = await this.blogsQuerySqlRepository.findBanUserForBlog(userId)
+    if (findBanUserForBlog?.isBanned === dto.isBanned) throw new HttpException('', HttpStatus.NO_CONTENT)
+    if (dto.isBanned) {
+      return this.blogsSqlRepository.banUserForBlog(user, dto)
     } else {
-      return await this.blogsRepository.unBanUser(new Types.ObjectId(command.dto.blogId), getUser.accountData.login, command.dto.isBanned);
-      // return await this.blogsRepository.save(blog)
+      return await this.blogsSqlRepository.deleteBanUserBlog(userId)
     }
   }
 }

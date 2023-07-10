@@ -1,17 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { Blog, BlogDocument, BlogModelType } from '../domain/blogs.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import {
-    BanInfoInputClassModel,
-    BlogInputClassModel,
-    BlogType,
-    CreateBlogInputModelType,
-    createPostForBlogInputModel
-} from '../type/blogsType';
+import { BanInfoInputClassModel, BlogInputClassModel, BlogType, CreateBlogInputModelType } from '../type/blogsType';
 import { ObjectId } from 'mongodb';
 import { Post, PostModelType } from '../../posts/domain/posts.schema';
-import { UserDocument } from '../../users/domain/entities/users.schema';
-import { Types } from 'mongoose';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { FindUserType } from '../../users/type/usersTypes';
@@ -121,6 +113,7 @@ export class BlogsSqlRepository {
         const rowCount = result ? result[1] : 0;
         return rowCount > 0;
     }
+
     async findBlogById(blogId: ObjectId): Promise<BlogDocument> {
         const blog = await this.BlogModel
             .findOne({ _id: blogId });
@@ -139,9 +132,10 @@ export class BlogsSqlRepository {
         return rowCount > 0;
     }
     async updateBanStatusForBlog(banStatus: boolean, blogId: string):Promise<boolean> {
+        const date = new Date().toISOString();
         const updateQuery = `
         UPDATE public."Blogs" b
-        SET "isBanned" = '${banStatus}'
+        SET "isBanned" = '${banStatus}', "banDate" = '${date}'
         WHERE b."ID" = '${blogId}'
         `
         const result = await this.dataSource.query(updateQuery);
@@ -162,20 +156,14 @@ export class BlogsSqlRepository {
         const values = [user.login, dto.isBanned, date, dto.banReason, user.ID, dto.blogId]
         return await this.dataSource.query(createQuery, values)
     }
-    async unBanUser(blogId: Types.ObjectId, login: string, banStatus: boolean): Promise<boolean> {
-        const unBanUser = await this.BlogModel
-            .updateOne(
-                {
-                    _id: blogId,
-                    banUsersInfo: {
-                        $elemMatch: { login: login }
-                    }
-                },
-                {
-                    $set: { 'banUsersInfo.$.banInfo.isBanned': banStatus }
-                }
-            );
-        return unBanUser.modifiedCount > 0;
+    async deleteBanUserBlog (userId: string) {
+        const delQuery = `
+        DELETE FROM public."BanUsersBlogs" b
+        WHERE b."userId" = '${userId}'
+        `
+        const result = await this.dataSource.query(delQuery)
+        const rowCount = result ? result[1] : 0;
+        return rowCount > 0;
     }
     async deleteBlog(id: string): Promise<boolean> {
         const delQuery = `
