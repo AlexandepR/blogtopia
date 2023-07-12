@@ -1,17 +1,14 @@
-import { CommentReturnType } from "../../type/commentsType";
-import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { CommentsRepository } from "../comments.repository";
-import { filterBanCommentLikesInfo } from "../../../../utils/helpers";
-import { HttpException, HttpStatus } from "@nestjs/common";
-import { Types } from "mongoose";
-import { UserDocument } from "../../../users/domain/entities/users.schema";
-import { UsersRepository } from "../../../users/infrastructure/users.repository";
-
+import { CommentDataType } from '../../type/commentsType';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { validateIdByUUID } from '../../../../utils/helpers';
+import { HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
+import { FindUserType } from '../../../users/type/usersTypes';
+import { CommentsSqlRepository } from '../../infrastructure/comments.sql-repository';
 
 export class GetCommentCommand {
   constructor(
-    public user: UserDocument,
-    public id: string,
+    public user: FindUserType,
+    public commentId: string,
   ) {
   }
 }
@@ -19,38 +16,13 @@ export class GetCommentCommand {
 @CommandHandler(GetCommentCommand)
 export class GetCommentUseCase implements ICommandHandler<GetCommentCommand> {
   constructor(
-    protected commentsRepository: CommentsRepository,
-    protected usersRepository: UsersRepository,
+      protected commentsSqlRepository: CommentsSqlRepository
   ) {
   }
-  async execute(command: GetCommentCommand): Promise<CommentReturnType> {
-    // if(command.user) {}
-    const userId = command.user ? command.user._id : null
-    const commentId = new Types.ObjectId(command.id)
-    const banUsers: Array<string> = await this.usersRepository.getBannedUsers();
-    const filter = (
-        { "commentatorInfo.userLogin": { $nin: banUsers }
-    });
-    const comment = await this.commentsRepository.getCommentsById(commentId,filter,banUsers);
+  async execute({ user, commentId }: GetCommentCommand): Promise<CommentDataType> {
+    if(!validateIdByUUID(commentId)) throw new NotFoundException()
+    const comment = await this.commentsSqlRepository.getCommentById(commentId, user?.ID);
     if (!comment) throw new HttpException('', HttpStatus.NOT_FOUND)
-    const filterBanUserLikes = filterBanCommentLikesInfo(comment,banUsers)
-    if (filterBanUserLikes) {
-      const getMyStatusLikeInfo = await this.commentsRepository.getMyStatusLikeInfo(commentId, userId);
-      return {
-        id: filterBanUserLikes._id.toString(),
-        content: filterBanUserLikes.content,
-        commentatorInfo: {
-          userId: filterBanUserLikes.commentatorInfo.userId.toString(),
-          userLogin: filterBanUserLikes.commentatorInfo.userLogin
-        },
-        createdAt: filterBanUserLikes.createdAt,
-        likesInfo: {
-          likesCount: filterBanUserLikes.likesInfo.likesCount,
-          dislikesCount: filterBanUserLikes.likesInfo.dislikesCount,
-          myStatus: getMyStatusLikeInfo,
-        }
-      };
-    }
-    return null;
+    return comment
   }
 }
