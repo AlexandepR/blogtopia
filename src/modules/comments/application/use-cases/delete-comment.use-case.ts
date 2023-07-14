@@ -1,15 +1,14 @@
-import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { CommentsRepository } from "../comments.repository";
-import { validateObjectId } from "../../../../utils/helpers";
-import { HttpException, HttpStatus } from "@nestjs/common";
-import { UserDocument } from "../../../users/domain/entities/users.schema";
-import { CommentsService } from "../comments.service";
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { validateIdByUUID } from '../../../../utils/helpers';
+import { ForbiddenException, HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
+import { CommentsSqlRepository } from '../../infrastructure/comments.sql-repository';
+import { FindUserType } from '../../../users/type/usersTypes';
 
 
 export class DeleteCommentCommand {
   constructor(
-    public user: UserDocument,
-    public id: string,
+    public user: FindUserType,
+    public commentId: string,
   ) {
   }
 }
@@ -17,18 +16,14 @@ export class DeleteCommentCommand {
 @CommandHandler(DeleteCommentCommand)
 export class DeleteCommentUseCase implements ICommandHandler<DeleteCommentCommand> {
   constructor(
-    protected commentsRepository: CommentsRepository,
-    protected commentsService: CommentsService,
+    protected commentsSqlRepository: CommentsSqlRepository,
   ) {}
-  async execute(command: DeleteCommentCommand): Promise<void> {
-    const commentId = validateObjectId(command.id);
-    const userId = command.user._id
-    const getComment = await this.commentsService.getComment(commentId, userId);
+  async execute({ user, commentId }: DeleteCommentCommand): Promise<void> {
+    if(!validateIdByUUID(commentId)) throw new NotFoundException()
+    const getComment = await this.commentsSqlRepository.getCommentById(commentId);
     if (!getComment) {throw new HttpException('', HttpStatus.NOT_FOUND)}
-    if (userId.toString() !== getComment?.commentatorInfo.userId) {
-      throw new HttpException('', HttpStatus.FORBIDDEN)
-    }
-    const isDeleted = await this.commentsRepository.deleteComment(commentId);
+    if (user.ID !== getComment?.commentatorInfo.userId) throw new ForbiddenException()
+    const isDeleted = await this.commentsSqlRepository.deleteComment(commentId);
     if (isDeleted) {throw new HttpException('', HttpStatus.NO_CONTENT)} else {
       throw new HttpException('', HttpStatus.NOT_FOUND)}}
 }
