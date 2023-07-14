@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Blogs } from '../../../blogs/domain/entities/blogs.entity';
 
 @Entity('Users')
 export class Users {
@@ -34,4 +35,7 @@ export class Users {
 
     @Column('varchar', { array: true, default: [] })
     expRefreshToken: string[];
+
+    @OneToMany(() => Blogs, (blog) => blog.user)
+    blogs: Blogs[];
 }

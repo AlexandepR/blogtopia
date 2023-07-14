@@ -11,17 +11,18 @@ import {
   Put,
   Query,
   UseGuards
-} from "@nestjs/common";
-import { BasicAuth, Public } from '../../../utils/public.decorator';
-import { CreateUserInputClassModel, InfoBanStatusClassModel, ParamsUsersType } from "../type/usersTypes";
-import { GetUsersByAdminCommand } from "../application/use-cases/admin/get-users.use-case";
-import { CommandBus } from "@nestjs/cqrs";
-import { UpdateBanInfoByAdminCommand } from "../application/use-cases/admin/update-ban-status.use-case";
-import { CheckLoginOrEmailGuard } from "../../../middleware/middleware";
-import { CreateUserByAdminCommand } from "../application/use-cases/admin/create-user.use-case";
-import { DeleteUserByAdminCommand } from "../application/use-cases/admin/delete-user.use-case";
-import { DeleteAllUsersByAdminCommand } from "../application/use-cases/admin/delete-all.use-case";
-import { UsersRepository } from "../infrastructure/users.repository";
+} from '@nestjs/common';
+import { BasicAuth } from '../../../utils/public.decorator';
+import { CreateUserInputClassModel, InfoBanStatusClassModel, ParamsUsersType } from '../type/usersTypes';
+import { GetUsersByAdminCommand } from '../application/use-cases/admin/get-users.use-case';
+import { CommandBus } from '@nestjs/cqrs';
+import { UpdateBanInfoByAdminCommand } from '../application/use-cases/admin/update-ban-status.use-case';
+import { CheckLoginOrEmailGuard } from '../../../middleware/middleware';
+import { CreateUserByAdminCommand } from '../application/use-cases/admin/create-user.use-case';
+import { DeleteUserByAdminCommand } from '../application/use-cases/admin/delete-user.use-case';
+import { DeleteAllUsersByAdminCommand } from '../application/use-cases/admin/delete-all.use-case';
+import { UsersRepository } from '../infrastructure/users.repository';
+import { Throttle } from '@nestjs/throttler';
 
 
 @BasicAuth()
