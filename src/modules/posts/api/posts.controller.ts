@@ -28,62 +28,58 @@ import { CreatePostCommand } from "../application/use-cases/create-post.use-case
 import { UpdatePostCommand } from "../application/use-cases/update-post.use-case";
 import { DeletePostByIdCommand } from "../application/use-cases/delete-post-by-id.use-case";
 import { DeleteAllPostsCommand } from "../application/use-cases/delete-all-post.use-case";
+import { FindUserType } from '../../users/type/usersTypes';
 
 @Controller("posts")
 export class PostsController {
   constructor(
-    protected postsService: PostsService,
     protected commandBus: CommandBus,
   ) {
   }
   @Public()
   @Get()
   async getPosts(
-    @UserFromRequestDecorator() user: UserDocument,
+    @UserFromRequestDecorator() user: FindUserType,
     @Query() query: ParamsType
   ) {
     const command = new GetPostsCommand(query,user)
     return await this.commandBus.execute(command)
-    // return this.postsService.findAll(query, req);
   }
   @Public()
   @Get(":id")
   async getPost(
-    // @Req() req: Request,
-    @UserFromRequestDecorator() user: UserDocument,
+    @UserFromRequestDecorator() user: FindUserType,
     @Param('id')
       id: string
   ) {
     if(!id) throw new NotFoundException()
     const command = new GetPostByIdCommand(id,user)
     return await this.commandBus.execute(command)
-    // return await this.postsService.getPost(id,req);
   }
   @Public()
   @Get("/:id/comments")
   async getCommentByPost(
+    @UserFromRequestDecorator() user: FindUserType,
     @Param('id')
       id: string,
     @Query()
       query: ParamsType
   ) {
     if(!id) throw new NotFoundException()
-    const command = new GetCommentsByPostCommand(query,id)
+    const command = new GetCommentsByPostCommand(query,id, user)
     return await this.commandBus.execute(command)
-    // return await this.postsService.getCommentsByPost(id,query);
   }
   @Post('/:postId/comments')
   async createCommentForPost(
     @Req() req: Request,
-    @UserFromRequestDecorator() user: UserDocument,
+    @UserFromRequestDecorator() user: FindUserType,
     @Param('postId')
       id: string,
     @Body() dto:CreateCommentInputClassModel
   ){
     if(!id) throw new NotFoundException()
-    const command = new CreateCommentForPostCommand(id,dto,user)
+    const command = new CreateCommentForPostCommand(id, user, dto)
     return await this.commandBus.execute(command)
-    // return await this.postsService.createCommentForPost(postId,dto, user)
   }
   @Post()
   async createPost(
@@ -92,7 +88,6 @@ export class PostsController {
   ) {
     const command = new CreatePostCommand(dto,user)
     return await this.commandBus.execute(command)
-    // return await this.postsService.createPost(dto,user);
   }
   @Put(":id")
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -104,14 +99,11 @@ export class PostsController {
     if(!id) throw new NotFoundException()
     const command = new UpdatePostCommand(dto,id)
     return await this.commandBus.execute(command)
-     // await this.postsService.updatePost(id, dto);
-     // return
   }
   @Put("/:id/like-status")
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateLikesInfoByPostId(
-    // @Req() req: Request,
-    @UserFromRequestDecorator()user:UserDocument,
+    @UserFromRequestDecorator()user:FindUserType,
     @Param("id")
       id: string,
     @Body() dto: likeStatusInputClassModel
@@ -119,7 +111,6 @@ export class PostsController {
     if(!id) throw new NotFoundException()
     const command = new UpdatePostLikeStatusCommand(dto, id, user)
       return await this.commandBus.execute(command)
-      // return await this.postsService.updateLikesInfo(dto,params.id,req)
   }
   @BasicAuth()
   @Delete(":id")
@@ -132,14 +123,11 @@ export class PostsController {
     if(!id) throw new NotFoundException()
     const command = new DeletePostByIdCommand(id)
     return await this.commandBus.execute(command)
-    // return await this.postsService.deletePost(id);
-    // return `This blog #${id} removes`;
   }
   @BasicAuth()
   @Delete()
   async deleteAllPost() {
     const command = new DeleteAllPostsCommand()
     return await this.commandBus.execute(command)
-    // await this.postsService.deleteAllPost();
   }
 }
