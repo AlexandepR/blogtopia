@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Comment, CommentModelType } from '../domain/comments.schema';
-import { CommentDataType } from '../type/commentsType';
+import { CommentDataType, CommentsOwnerType } from '../type/commentsType';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { likeStatusInputClassModel } from '../../posts/type/postsType';
@@ -80,6 +80,63 @@ export class CommentsSqlRepository {
         OFFSET ${skip}
     `;
         return await this.dataSource.query(getQuery, [postId]);
+    }
+    async getOwnComments(
+        pageSize: number,
+        skip: number,
+        sortBy: string,
+        sortDirection: 'desc' | 'asc',
+        userId: string): Promise<CommentsOwnerType[]>{
+        const getQuery = `
+        SELECT c."ID" as id, c."content",
+        json_build_object(
+             'userId', c."commentatorId",
+             'userLogin', c."commentatorLogin"
+        ) as "commentatorInfo",
+        c."createdAt",
+        json_build_object(
+            'likesCount', 
+            (
+            SELECT COUNT(*)
+            FROM public."CommentLikesData" cld
+            WHERE cld."commentId" = c."ID"
+            ),
+            'dislikesCount',
+            (
+            SELECT COUNT(*)
+            FROM public."CommentDislikesData" cdd
+            WHERE cdd."commentId" = c."ID"
+            ),
+            'myStatus', 
+            CASE
+                WHEN EXISTS (
+                    SELECT 1
+                    FROM public."CommentLikesData" cld
+                    WHERE cld."commentId" = c."ID"
+                    AND cld."userId" = '${userId}'
+                ) THEN 'Like'
+                WHEN EXISTS (
+                    SELECT 1
+                    FROM public."CommentDislikesData" cdd
+                    WHERE cdd."commentId" = c."ID"
+                    AND cdd."userId" = '${userId}'
+                ) THEN 'Dislike'
+                  ELSE 'None'
+            END 
+           ) as "likesInfo",
+           json_build_object(
+           'id', c."postId",
+           'title', p."title",
+           'blogId', p."blogId",
+           'blogName', p."blogName"
+           ) as "postInfo"
+        FROM public."Comments" c
+        JOIN public."Posts" p ON p."ID" = c."postId"
+        ORDER BY ${sortBy === 'createdAt' ? 'c."createdAt"' : `"${sortBy}" COLLATE "C"`} ${sortDirection}
+        LIMIT ${pageSize}
+        OFFSET ${skip}
+        `
+        return await this.dataSource.query(getQuery);
     }
     async getCommentById(commentId: string, id?: string): Promise<CommentDataType | null> {
         let whereCondition = ''
@@ -173,6 +230,16 @@ export class CommentsSqlRepository {
         const result = await this.dataSource.query(getQuery, [postId]);
         const count = parseInt(result[0].count, 10);
         return count;
+    }
+    async getTotalOwnCommentsForBlogs(userId: string) {
+        const getQuery = `
+            SELECT COUNT(*)
+            FROM public."Comments" c
+            JOIN public."Posts" p ON p."postOwnerId" = '${userId}'
+            WHERE c."postId" = p."ID"
+      `;
+        const result = await this.dataSource.query(getQuery);
+        return parseInt(result[0].count, 10);
     }
     async createCommentLikesData(userId: string, userLogin: string, commentId: string, dto: likeStatusInputClassModel): Promise<boolean> {
         const date = new Date().toISOString();
