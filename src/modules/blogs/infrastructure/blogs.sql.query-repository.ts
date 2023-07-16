@@ -75,7 +75,7 @@ export class BlogsQuerySqlRepository {
             whereCondition = ` AND LOWER(bu."userLogin") ILIKE LOWER('%${searchLoginTerm}%')`
         }
         const getQuery = `
-        SELECT "ID" as id, bu."userLogin" as "login",
+        SELECT "userId" as id, bu."userLogin" as "login",
         json_build_object(
                         'isBanned', bu."isBanned",
                         'banDate', bu."banDate",
@@ -88,8 +88,7 @@ export class BlogsQuerySqlRepository {
         LIMIT ${pageSize}
         OFFSET ${skip}
         `
-        const result = await this.dataSource.query(getQuery);
-        return result
+        return await this.dataSource.query(getQuery)
     }
     async findBlogByAdmin(blogId: string): Promise<BlogType | null> {
         const findQuery = `
@@ -131,6 +130,16 @@ export class BlogsQuerySqlRepository {
     async save(blog: BlogDocument) {
         return await blog.save();
     }
+    async getBanUsersByBlogs(blogId:string) {
+        const parameters = [blogId];
+        const getQuery = `
+            SELECT *
+            FROM public."BanUsersBlogs" bb
+            WHERE bb."blogId" = $1
+            AND bb."isBanned" = true
+        `;
+        return await this.dataSource.query(getQuery, parameters);
+    }
     async getTotalCountBanUsersBlogs(blogId: string, searchLoginTerm: string): Promise<number> {
         let whereCondition = '';
         const parameters = [blogId];
@@ -146,8 +155,7 @@ export class BlogsQuerySqlRepository {
             ${whereCondition}
         `;
         const result = await this.dataSource.query(getQuery, parameters);
-        const count = parseInt(result[0].count, 10);
-        return count;
+        return parseInt(result[0].count, 10);
     }
     async getTotalCountPublicBlogs (filter:string){
         const getCountBlogsQuery = `
