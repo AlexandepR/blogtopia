@@ -77,6 +77,15 @@ export type BlogType = {
   isBanned: false
   banDate: Date
 }
+export type BanUsersBlogsType = {
+  ID: string
+  userId: string
+  userLogin: string
+  isBanned: boolean
+  banDate: string
+  banReason: boolean
+  blogId: string
+}
 export type QueryType = {
   searchNameTerm?: string,
   searchLoginTerm?: string,
