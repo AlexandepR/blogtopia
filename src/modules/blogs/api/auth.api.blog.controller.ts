@@ -16,6 +16,8 @@ import { GetBlogByIdCommand } from "../application/use-cases/authUser/getBlogByI
 import {
   GetAllCommentsForBloggerCommand
 } from "../application/use-cases/authUser/getAllCommentsForAllPosts-blogger-use-case";
+import { UserType } from '../../users/type/usersTypes';
+import { GetPostsByBlogBloggerCommand } from '../application/use-cases/authUser/GetPostsByBlogBloggerCommand.use-case';
 
 
 @Controller({
@@ -29,7 +31,7 @@ export class BlogsBloggerController {
   @Get('')
   async getBlogs(
     @Query() query: ParamsType,
-  @UserFromRequestDecorator()user:UserDocument,
+  @UserFromRequestDecorator()user:UserType,
   ) {
     const command = new GetBlogsCommand(query, user);
     return this.commandBus.execute(command);
@@ -37,7 +39,7 @@ export class BlogsBloggerController {
   @Get('comments')
   async getAllComments(
     @Query() query: ParamsPaginationType,
-    @UserFromRequestDecorator()user:UserDocument,
+    @UserFromRequestDecorator()user:UserType,
   ){
     const command = new GetAllCommentsForBloggerCommand(query, user)
     return this.commandBus.execute(command)
@@ -51,10 +53,20 @@ export class BlogsBloggerController {
     const command = new GetBlogByIdCommand(id, user);
     return this.commandBus.execute(command);
   }
+  @Get(":id/posts")
+  async GetPostsByBlog(
+      @UserFromRequestDecorator()user:UserType,
+      @Param("id")
+          id: string,
+      @Query() query: ParamsType
+  ) {
+    const command = new GetPostsByBlogBloggerCommand(id, query, user)
+    return await this.commandBus.execute(command);
+  }
   @Post('')
   async createBlog(
     @Body() dto: BlogInputClassModel,
-    @UserFromRequestDecorator()user:UserDocument,
+    @UserFromRequestDecorator()user:UserType,
   ) {
     const command = new CreateBlogCommand(user, dto);
     return await this.commandBus.execute(command)
@@ -63,7 +75,7 @@ export class BlogsBloggerController {
   async createPostForBlog(
     @Param("blogId")
       blogId: string,
-    @UserFromRequestDecorator()user:UserDocument,
+    @UserFromRequestDecorator()user:UserType,
     @Body() dto: PostForBlogBloggerInputClassModel,
   ) {
     const command = new CreatePostByBlogCommand(user, dto, blogId);
@@ -72,7 +84,7 @@ export class BlogsBloggerController {
   @Put(":id")
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateBlog(
-    @UserFromRequestDecorator()user:UserDocument,
+    @UserFromRequestDecorator()user:UserType,
     @Param("id")
       id: string,
     @Body() dto: BlogInputClassModel,
@@ -83,7 +95,7 @@ export class BlogsBloggerController {
   @Put(":blogId/posts/:postId")
   @HttpCode(HttpStatus.NO_CONTENT)
   async updatePost(
-    @UserFromRequestDecorator()user:UserDocument,
+    @UserFromRequestDecorator()user:UserType,
     @Param("blogId") blogId: string,
     @Param("postId") postId: string,
     @Body() dto: CreatePostForBlogInputClassModel,
@@ -94,7 +106,7 @@ export class BlogsBloggerController {
   @Delete(":id")
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteBlog (
-    @UserFromRequestDecorator()user:UserDocument,
+    @UserFromRequestDecorator()user:UserType,
     @Param('id')
       id: string) {
     return await this.commandBus.execute(new DeleteBlogCommand(id, user));
@@ -102,7 +114,7 @@ export class BlogsBloggerController {
   @Delete(":blogId/posts/:postId")
   @HttpCode(HttpStatus.NO_CONTENT)
   async deletePostByBlog (
-    @UserFromRequestDecorator()user:UserDocument,
+    @UserFromRequestDecorator()user:UserType,
     @Param("blogId") blogId: string,
     @Param("postId") postId: string,
   ){
