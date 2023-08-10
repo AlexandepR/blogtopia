@@ -5,7 +5,7 @@ import * as jwt from 'jsonwebtoken';
 import { UserDocument } from "../../users/domain/entities/users.schema";
 import { Types } from "mongoose";
 import { Request } from "express";
-import { FindUserType } from '../../users/type/usersTypes';
+import { UserType } from '../../users/type/usersTypes';
 import { UsersSqlRepository } from '../../users/infrastructure/users.sql-repository';
 
 @Injectable()
@@ -15,7 +15,7 @@ export class JwtService {
     protected usersSqlRepository: UsersSqlRepository
   ) {
   }
-  async сreateJWT(user: FindUserType) {
+  async сreateJWT(user: UserType) {
     const token = jwt.sign(
       {userId: user.ID},
       settingsEnv.JWT_SECRET,
@@ -24,7 +24,7 @@ export class JwtService {
       token: token
     }
   }
-  async createRefreshToken(user: FindUserType, deviceId: string) {
+  async createRefreshToken(user: UserType, deviceId: string) {
     const refreshToken = jwt.sign(
       {userId: user.ID, deviceId},
       settingsEnv.JWT_REFRESH_TOKEN_SECRET,
@@ -84,7 +84,7 @@ export class JwtService {
       return null
     }
   }
-  async refreshTokenToDeprecated(user: FindUserType, refreshToken: string):Promise<boolean> {
+  async refreshTokenToDeprecated(user: UserType, refreshToken: string):Promise<boolean> {
     try {
       const userId: string = user.ID
       await this.usersSqlRepository.addExpiredRefreshToken(userId, refreshToken)
