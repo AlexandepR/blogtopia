@@ -36,7 +36,7 @@ export class RegistrationAuthUseCase implements ICommandHandler<RegistrationAuth
         try {
             await this.emailService.sendEmailConfirmationMessage(user);
         } catch (error) {
-                await this.usersSqlRepository.deleteUser(user.ID);
+                await this.usersSqlRepository.deleteUser(user.id);
             throw new HttpException('', HttpStatus.BAD_REQUEST);
         }
         throw new HttpException('', HttpStatus.NO_CONTENT);
