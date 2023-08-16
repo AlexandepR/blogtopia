@@ -2,12 +2,12 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { validateIdByUUID } from '../../../../utils/helpers';
 import { ForbiddenException, HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
 import { CommentsSqlRepository } from '../../infrastructure/comments.sql-repository';
-import { FindUserType } from '../../../users/type/usersTypes';
+import { UserType } from '../../../users/type/usersTypes';
 
 
 export class DeleteCommentCommand {
   constructor(
-    public user: FindUserType,
+    public user: UserType,
     public commentId: string,
   ) {
   }
