@@ -7,7 +7,7 @@ import { UpdateCommentLikeStatusCommand } from '../application/use-cases/update-
 import { DeleteCommentCommand } from '../application/use-cases/delete-comment.use-case';
 import { UpdateCommentCommand } from '../application/use-cases/update-comment.use-case';
 import { GetCommentCommand } from '../application/use-cases/get-comments.use-case';
-import { FindUserType } from '../../users/type/usersTypes';
+import { UserType } from '../../users/type/usersTypes';
 
 @Controller("comments")
 export class CommentsController {
@@ -19,7 +19,7 @@ export class CommentsController {
   @Public()
   @Get(":id")
   async getComment(
-    @UserFromRequestDecorator() user: FindUserType,
+    @UserFromRequestDecorator() user: UserType,
     @Param("id")
       id: string
   ) {
@@ -30,7 +30,7 @@ export class CommentsController {
   async updateComment(
     @Param("id")
       id: string,
-    @UserFromRequestDecorator() user: FindUserType,
+    @UserFromRequestDecorator() user: UserType,
     @Body() dto: commentContentInputClassModel
   ) {
     const command = new UpdateCommentCommand(dto, id, user);
@@ -40,7 +40,7 @@ export class CommentsController {
   @Put(':id/like-status')
   async updateLikeByCommentId(
     @Body() dto: likeStatusInputClassModel,
-    @UserFromRequestDecorator() user: FindUserType,
+    @UserFromRequestDecorator() user: UserType,
     @Param('id') id: string,
   ) {
     const command = new UpdateCommentLikeStatusCommand(dto, id, user);
@@ -50,7 +50,7 @@ export class CommentsController {
   async deleteCommentById(
     @Param("id") id: string,
     // @Req() req:Request,
-    @UserFromRequestDecorator() user: FindUserType,
+    @UserFromRequestDecorator() user: UserType,
   )
   {
     const command = new DeleteCommentCommand(user, id);
