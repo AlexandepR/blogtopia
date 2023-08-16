@@ -1,80 +1,34 @@
-import { LikesType } from "../../type/commentsType";
-import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { CommentsRepository } from "../comments.repository";
-import { validateOrRejectModel } from "../../../../utils/validation.helpers";
-import { updateCommentLikesInfo, validateObjectId } from "../../../../utils/helpers";
-import { HttpException, HttpStatus } from "@nestjs/common";
-import { Types } from "mongoose";
-import { UserDocument } from "../../../users/domain/entities/users.schema";
-import { likeStatusInputClassModel } from "../../../posts/type/postsType";
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { validateOrRejectModel } from '../../../../utils/validation.helpers';
+import { validateIdByUUID } from '../../../../utils/helpers';
+import { HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
+import { likeStatusInputClassModel } from '../../../posts/type/postsType';
+import { UserType } from '../../../users/type/usersTypes';
+import { CommentsSqlRepository } from '../../infrastructure/comments.sql-repository';
 
 
 export class UpdateCommentLikeStatusCommand {
   constructor(
     public dto: likeStatusInputClassModel,
-    public id: string,
-    public user: UserDocument
+    public commentId: string,
+    public user: UserType
   ) {
   }
 }
 
 @CommandHandler(UpdateCommentLikeStatusCommand)
-export class UpdateOmmentLikeStatusUseCase implements ICommandHandler<UpdateCommentLikeStatusCommand> {
+export class UpdateCommentLikeStatusUseCase implements ICommandHandler<UpdateCommentLikeStatusCommand> {
   constructor(
-    protected commentsRepository: CommentsRepository,
+    protected commentsSqlRepository: CommentsSqlRepository,
   ) {}
-  async execute(command: UpdateCommentLikeStatusCommand): Promise<void> {
-    await validateOrRejectModel(command.dto, likeStatusInputClassModel);
-    const likeStatus = command.dto.likeStatus
-    const commentId = validateObjectId(command.id);
-    const userId = command.user._id
-    if (!userId) throw new HttpException('', HttpStatus.UNAUTHORIZED)
-    const comment = await this.commentsRepository.getCommentsById(commentId);
-    if (!comment) throw new HttpException('', HttpStatus.NOT_FOUND)
-    const newLikesData: LikesType = {
-      _id: new Types.ObjectId(),
-      createdAt: new Date().toISOString(),
-      userId: userId,
-      userLogin: command.user.accountData.login,
-    };
-    if (likeStatus === 'Like') {
-      const checkDislikes = await this.commentsRepository.checkLikes(commentId, userId, 'dislikesData');
-      if (checkDislikes) {
-        const comment = await this.commentsRepository.getCommentsById(commentId);
-        const updateCommentLikesCount = updateCommentLikesInfo(comment!, likeStatus, newLikesData);
-        const updateLike = await this.commentsRepository.updateCommentLikesInfo(updateCommentLikesCount!, commentId);
-        throw new HttpException('', HttpStatus.NO_CONTENT)
-      }
-      await this.commentsRepository.checkLikes(commentId, userId, 'likesData');
-      const comment = await this.commentsRepository.getCommentsById(commentId);
-      const updateCommentLikesCount = updateCommentLikesInfo(comment!, likeStatus, newLikesData);
-      const updateLike = await this.commentsRepository.updateCommentLikesInfo(updateCommentLikesCount!, commentId);
-      throw new HttpException('', HttpStatus.NO_CONTENT)
-    }
-    if (likeStatus === 'Dislike') {
-      const checkLikes = await this.commentsRepository.checkLikes(commentId, userId, 'likesData');
-      if (checkLikes) {
-        const comment = await this.commentsRepository.getCommentsById(commentId);
-        const updateCommentLikesCount = updateCommentLikesInfo(comment!, likeStatus, newLikesData);
-        const updateLike = await this.commentsRepository.updateCommentLikesInfo(updateCommentLikesCount!, commentId);
-        throw new HttpException('', HttpStatus.NO_CONTENT);
-      }
-      await this.commentsRepository.checkLikes(commentId, userId, 'dislikesData');
-      const comment = await this.commentsRepository.getCommentsById(commentId);
-      const updateCommentLikesCount = updateCommentLikesInfo(comment!, likeStatus, newLikesData);
-      const updateLike = await this.commentsRepository.updateCommentLikesInfo(updateCommentLikesCount!, commentId);
-      throw new HttpException('', HttpStatus.NO_CONTENT)
-
-    }
-    if (likeStatus === 'None') {
-      await this.commentsRepository.checkLikes(commentId, userId, 'dislikesData');
-      await this.commentsRepository.checkLikes(commentId, userId, 'likesData');
-      const comment = await this.commentsRepository.getCommentsById(commentId);
-      comment!.likesInfo.dislikesCount = comment!.likesInfo.dislikesData.length;
-      comment!.likesInfo.likesCount = comment!.likesInfo.likesData.length;
-      const updateLike = await this.commentsRepository.updateLikeComment(comment!, commentId);
-      if (updateLike) throw new HttpException('', HttpStatus.NO_CONTENT)
-    }
-    throw new HttpException('', HttpStatus.BAD_REQUEST)
+  async execute({dto, commentId, user}: UpdateCommentLikeStatusCommand): Promise<boolean> {
+    await validateOrRejectModel(dto, likeStatusInputClassModel);
+    if (!validateIdByUUID(commentId)) throw new NotFoundException()
+    const comment = await this.commentsSqlRepository.getCommentById(commentId);
+    if (!user || !comment || user.banInfo.isBanned) throw new NotFoundException()
+    if (dto.likeStatus === 'None') return await this.commentsSqlRepository.deleteLikesStatus(user.ID, commentId);
+    const updateLikesStatus = await this.commentsSqlRepository.createCommentLikesData(user.ID, user.login, commentId, dto);
+    if (updateLikesStatus) return true
+    throw new HttpException('', HttpStatus.NOT_FOUND);
   }
 }
