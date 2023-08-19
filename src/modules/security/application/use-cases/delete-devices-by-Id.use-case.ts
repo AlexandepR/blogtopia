@@ -1,13 +1,13 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
-import { SecuritySqlRepository } from '../../infrastructure/security.sql-repository';
-import { FindUserType } from '../../../users/type/usersTypes';
+import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
+import { HttpException, HttpStatus, NotFoundException } from "@nestjs/common";
+import { UserType } from "../../../users/type/usersTypes";
+import { SecurityOrmRepository } from "../../infrastructure/security.orm-repository";
 
 
 export class DeleteDeviceByIdCommand {
   constructor(
-    public user: FindUserType,
-    public deviceId: string,
+    public user: UserType,
+    public deviceId: string
   ) {
   }
 }
@@ -15,16 +15,19 @@ export class DeleteDeviceByIdCommand {
 @CommandHandler(DeleteDeviceByIdCommand)
 export class DeleteDeviceByIdUseCase implements ICommandHandler<DeleteDeviceByIdCommand> {
   constructor(
-    protected securitySqlRepository: SecuritySqlRepository,
+    protected securityOrmRepository: SecurityOrmRepository
   ) {
   }
-  async execute(command: DeleteDeviceByIdCommand) {
-    const session = await this.securitySqlRepository.findSessionByDeviceId(command.deviceId);
-    if(!session) throw new NotFoundException()
-    if (command.user.ID !== session.userId) {
-      throw new HttpException('', HttpStatus.FORBIDDEN);}
-    const terminateSession = await this.securitySqlRepository.terminateSessionByDeviceId(command.deviceId, command.user.ID);
-    if (terminateSession) {throw new HttpException('', HttpStatus.NO_CONTENT)}
-    throw new HttpException('', HttpStatus.NOT_FOUND);
+  async execute({ deviceId, user }: DeleteDeviceByIdCommand) {
+    const session = await this.securityOrmRepository.findSessionByDeviceId(deviceId);
+    if (!session) throw new NotFoundException();
+    if (user.ID !== session.userId) {
+      throw new HttpException("", HttpStatus.FORBIDDEN);
+    }
+    const terminateSession = await this.securityOrmRepository.terminateSessionByDeviceId(deviceId, user.ID);
+    if (terminateSession) {
+      throw new HttpException("", HttpStatus.NO_CONTENT);
+    }
+    throw new HttpException("", HttpStatus.NOT_FOUND);
   }
 }
