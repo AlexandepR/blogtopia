@@ -1,38 +1,38 @@
 import { UnauthorizedException } from "@nestjs/common";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { JwtService } from "../jwt.service";
-import { SecurityService } from "../../../security/application/security.service";
 import { Request } from "express";
-import { SecuritySqlRepository } from '../../../security/infrastructure/security.sql-repository';
+import { SecurityOrmRepository } from "../../../security/infrastructure/security.orm-repository";
 
 export class RefreshTokenAuthCommand {
   constructor(
-    public req: Request,
-  ) {}
+    public req: Request
+  ) {
+  }
 }
 
 @CommandHandler(RefreshTokenAuthCommand)
 export class RefreshTokenAuthUseCase implements ICommandHandler<RefreshTokenAuthCommand> {
   constructor(
     protected jwtService: JwtService,
-    protected securitySqlRepository: SecuritySqlRepository,
+    protected securityOrmRepository: SecurityOrmRepository
   ) {
   }
-  async execute(command: RefreshTokenAuthCommand) {
-    const refreshToken = command.req.cookies.refreshToken;
-    const user = command.req.requestUser
+  async execute({ req: { cookies, requestUser } }: RefreshTokenAuthCommand) {
+    const refreshToken = cookies.refreshToken;
+    const user = requestUser;
     const date = new Date().toISOString();
     const updateRefreshToken = await this.jwtService.updateRefreshToken(refreshToken);
-    const getDeviceId = await this.jwtService.deviceIdByRefreshToken(refreshToken)
+    const getDeviceId = await this.jwtService.deviceIdByRefreshToken(refreshToken);
     if (user && updateRefreshToken) {
-      await this.securitySqlRepository.updateDateSession(date, getDeviceId);
+      await this.securityOrmRepository.updateDateSession(date, getDeviceId);
       await this.jwtService.refreshTokenToDeprecated(user, refreshToken);
-      const token = await this.jwtService.сreateJWT(user);
+      const token = await this.jwtService.createJWT(user);
       const refreshTokenCookie = `refreshToken=${updateRefreshToken}; HttpOnly; Secure`;
       // const refreshTokenCookie = `refreshToken=${updateRefreshToken}`;
       return { refreshTokenCookie, token };
     }
-    throw new UnauthorizedException()
+    throw new UnauthorizedException();
   }
 
 }
