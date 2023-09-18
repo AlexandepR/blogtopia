@@ -1,9 +1,7 @@
-import { Test, TestingModule } from "@nestjs/testing";
-import { AppModule } from "../../app.module";
-import { addSettingsApp } from "../../addSettingsApp";
 import request from "supertest";
 import { INestApplication } from "@nestjs/common";
 import { settingsEnv } from "../../settings/settings";
+import { getAppAndCleanDB } from "./test-utils";
 
 
 describe("Test admin for users", () => {
@@ -11,15 +9,7 @@ describe("Test admin for users", () => {
   let httpServer;
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule]
-    }).compile();
-    app = moduleFixture.createNestApplication();
-    addSettingsApp(app);
-    await app.init();
-    httpServer = app.getHttpServer();
-    await request(httpServer)
-      .delete("/testing/all-data");
+    httpServer = await getAppAndCleanDB();
   });
 
   afterAll(async () => {
@@ -44,15 +34,94 @@ describe("Test admin for users", () => {
       .expect(200);
     expect(response.body.items).toEqual([]);
   });
-  it("should create user", async () => {
+  it("should create user1", async () => {
+    await new Promise(resolve => setTimeout(resolve, 2000));
     const response = await request(httpServer)
       .post("/sa/users")
       .set("Authorization", `Basic ${basicAuth}`)
       .send(createUser(1))
       .expect(201);
     expect(response.body.login).toEqual("user1");
+    expect(response.body).toEqual({
+        "id": expect.any(String),
+        "login": "user1",
+        "email": "user1@gmail.com",
+        "createdAt": expect.any(String),
+      }
+    );
     userId1 = response.body.id;
-    console.log(userId1);
+  });
+  it("should create user2", async () => {
+    const response = await request(httpServer)
+      .post("/sa/users")
+      .set("Authorization", `Basic ${basicAuth}`)
+      .send(createUser(2))
+      .expect(201);
+    expect(response.body.login).toEqual("user2");
+    expect(response.body).toEqual({
+        "id": expect.any(String),
+        "login": "user2",
+        "email": "user2@gmail.com",
+        "createdAt": expect.any(String),
+      }
+    );
+    userId2 = response.body.id;
+  });
+  it("get array with two users by sort createdAt DESC", async () => {
+    const response = await request(httpServer)
+      .get("/sa/users")
+      .query({ sortDirection: "DESC" })
+      .set("Authorization", `Basic ${basicAuth}`)
+      .expect(200);
+    console.log(response.body, 'body--DESC---');
+    expect(response.body).toEqual({
+      "pagesCount": 1,
+      "page": 1,
+      "pageSize": 10,
+      "totalCount": 2,
+      "items": [
+        {
+          "id": userId2,
+          "login": "user2",
+          "email": "user2@gmail.com",
+          "createdAt": expect.any(String)
+        },
+        {
+          "id": userId1,
+          "login": "user1",
+          "email": "user1@gmail.com",
+          "createdAt": expect.any(String)
+        },
+      ]
+    });
+  });
+  it("get array with two users by sort createdAt ASC", async () => {
+    const response = await request(httpServer)
+      .get("/sa/users")
+      .query({ sortDirection: "ASC" })
+      .set("Authorization", `Basic ${basicAuth}`)
+      .expect(200);
+    console.log(response.body, 'body--ASC---');
+    expect(response.body).toEqual({
+      "pagesCount": 1,
+      "page": 1,
+      "pageSize": 10,
+      "totalCount": 2,
+      "items": [
+        {
+          "id": userId1,
+          "login": "user1",
+          "email": "user1@gmail.com",
+          "createdAt": expect.any(String)
+        },
+        {
+          "id": userId2,
+          "login": "user2",
+          "email": "user2@gmail.com",
+          "createdAt": expect.any(String)
+        }
+      ]
+    });
   });
   it("should update ban status user", async () => {
     await request(httpServer)
@@ -66,7 +135,8 @@ describe("Test admin for users", () => {
   });
   it("get banned user", async () => {
     const response = await request(httpServer)
-      .get("/sa/users")
+      .get("/sa/users/banned")
+      .query({ sortDirection: "ASC" })
       .set("Authorization", `Basic ${basicAuth}`)
       .expect(200);
     expect(response.body.items[0].login).toEqual("user1");
