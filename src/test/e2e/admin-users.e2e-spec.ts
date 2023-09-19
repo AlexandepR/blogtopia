@@ -1,7 +1,7 @@
 import request from "supertest";
 import { INestApplication } from "@nestjs/common";
 import { settingsEnv } from "../../settings/settings";
-import { getAppAndCleanDB } from "./test-utils";
+import { basicAuth, createUser, getAppAndCleanDB } from "./test-utils";
 
 
 describe("Test admin for users", () => {
@@ -16,14 +16,6 @@ describe("Test admin for users", () => {
     await app.close();
   });
 
-  const basicAuth = Buffer.from(`${settingsEnv.BASIC_LOGIN}:${settingsEnv.BASIC_PASS}`).toString("base64");
-  const createUser = (num: number) => {
-    return {
-      login: "user" + num,
-      email: "user" + num + "@gmail.com",
-      password: "123456"
-    };
-  };
   let userId1;
   let userId2;
 
@@ -46,7 +38,7 @@ describe("Test admin for users", () => {
         "id": expect.any(String),
         "login": "user1",
         "email": "user1@gmail.com",
-        "createdAt": expect.any(String),
+        "createdAt": expect.any(String)
       }
     );
     userId1 = response.body.id;
@@ -62,7 +54,7 @@ describe("Test admin for users", () => {
         "id": expect.any(String),
         "login": "user2",
         "email": "user2@gmail.com",
-        "createdAt": expect.any(String),
+        "createdAt": expect.any(String)
       }
     );
     userId2 = response.body.id;
@@ -73,7 +65,6 @@ describe("Test admin for users", () => {
       .query({ sortDirection: "DESC" })
       .set("Authorization", `Basic ${basicAuth}`)
       .expect(200);
-    console.log(response.body, 'body--DESC---');
     expect(response.body).toEqual({
       "pagesCount": 1,
       "page": 1,
@@ -91,7 +82,7 @@ describe("Test admin for users", () => {
           "login": "user1",
           "email": "user1@gmail.com",
           "createdAt": expect.any(String)
-        },
+        }
       ]
     });
   });
@@ -101,7 +92,6 @@ describe("Test admin for users", () => {
       .query({ sortDirection: "ASC" })
       .set("Authorization", `Basic ${basicAuth}`)
       .expect(200);
-    console.log(response.body, 'body--ASC---');
     expect(response.body).toEqual({
       "pagesCount": 1,
       "page": 1,
@@ -118,6 +108,28 @@ describe("Test admin for users", () => {
           "id": userId2,
           "login": "user2",
           "email": "user2@gmail.com",
+          "createdAt": expect.any(String)
+        }
+      ]
+    });
+  });
+  it("get user by searchLoginTerm = user1", async () => {
+    const response = await request(httpServer)
+      .get("/sa/users")
+      .query({ searchLoginTerm: "user1" })
+      .query({ sortBy: "login" })
+      .set("Authorization", `Basic ${basicAuth}`)
+      .expect(200);
+    expect(response.body).toEqual({
+      "pagesCount": 1,
+      "page": 1,
+      "pageSize": 10,
+      "totalCount": 1,
+      "items": [
+        {
+          "id": userId1,
+          "login": "user1",
+          "email": "user1@gmail.com",
           "createdAt": expect.any(String)
         }
       ]
@@ -154,5 +166,94 @@ describe("Test admin for users", () => {
       .set("Authorization", `Basic ${basicAuth}`)
       .expect(200);
     expect(response.body.items).toEqual([]);
+  });
+  it("should create 7 user", async () => {
+    await request(httpServer)
+      .post("/sa/users")
+      .set("Authorization", `Basic ${basicAuth}`)
+      .send({
+      login: "loSer",
+      email: "email2p@gg.om",
+      password: "123456"
+  })
+    await request(httpServer)
+      .post("/sa/users")
+      .set("Authorization", `Basic ${basicAuth}`)
+      .send({
+        login: "log01",
+        email: "emai@gg.com",
+        password: "123456"
+      })
+    await request(httpServer)
+      .post("/sa/users")
+      .set("Authorization", `Basic ${basicAuth}`)
+      .send({
+        login: "log02",
+        email: "email2p@g.com",
+        password: "123456"
+      })
+    await request(httpServer)
+      .post("/sa/users")
+      .set("Authorization", `Basic ${basicAuth}`)
+      .send({
+        login: "uer15",
+        email: "emarrr1@gg.com",
+        password: "123456"
+      })
+    await request(httpServer)
+      .post("/sa/users")
+      .set("Authorization", `Basic ${basicAuth}`)
+      .send({
+        login: "user01",
+        email: "email1p@gg.cm",
+        password: "123456"
+      })
+    await request(httpServer)
+      .post("/sa/users")
+      .set("Authorization", `Basic ${basicAuth}`)
+      .send({
+        login: "user02",
+        email: "email1p@gg.com",
+        password: "123456"
+      })
+    await request(httpServer)
+      .post("/sa/users")
+      .set("Authorization", `Basic ${basicAuth}`)
+      .send({
+        login: "user03",
+        email: "email1p@gg.cou",
+        password: "123456"
+      })
+  });
+  it("get all users with query", async () => {
+    const response = await request(httpServer)
+      .get("/sa/users")
+      .query({ searchLoginTerm: "seR" })
+      .query({ searchEmailTerm: ".com" })
+      .query({ sortBy: "login" })
+      .query({ sortDirection: "asc" })
+      .set("Authorization", `Basic ${basicAuth}`)
+      .expect(200);
+    console.log(response.body, "many userssssss--");
+    expect(response.body).toEqual({
+      "pagesCount": 1,
+      "page": 1,
+      "pageSize": 10,
+      "totalCount": 2,
+      "items": [
+        {
+          id: expect.any(String),
+          login: 'loSer',
+          email: 'email2p@gg.om',
+          createdAt: expect.any(String)
+        },
+        {
+          id: expect.any(String),
+          login: 'log01',
+          email: 'emai@gg.com',
+          createdAt: expect.any(String)
+        },
+      ]
+    });
   });
 });
