@@ -1,15 +1,18 @@
 import { UserDocument } from "../../../../users/domain/entities/users.schema";
 import { BlogsRepository } from "../../../infrastructure/blogs.repository";
-import { HttpException, HttpStatus } from "@nestjs/common";
+import { HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { Types } from "mongoose";
 import { BlogType } from "../../../type/blogsType";
 import { BlogsQueryRepository } from "../../../infrastructure/blogs.query-repository";
+import { BlogsSqlRepository } from '../../../infrastructure/blogs.sql-repository';
+import { BlogsQuerySqlRepository } from '../../../infrastructure/blogs.sql.query-repository';
+import { validateIdByUUID } from '../../../../../utils/helpers';
 
 
 export class GetBlogByIdCommand {
   constructor(
-    public id: string,
+    public blogId: string,
     public user: UserDocument,
   ) {}
 }
@@ -17,17 +20,16 @@ export class GetBlogByIdCommand {
 @CommandHandler(GetBlogByIdCommand)
 export class GetBlogByIdByBloggerUseCase implements ICommandHandler<GetBlogByIdCommand>{
   constructor(
-    protected blogsRepository: BlogsRepository,
-    protected blogsQueryRepository: BlogsQueryRepository,
+    protected blogsSqlRepository: BlogsSqlRepository,
+    protected blogsQuerySqlRepository: BlogsQuerySqlRepository,
     ) {
   }
-  async execute(command: GetBlogByIdCommand): Promise<BlogType> {
-    const blogId = new Types.ObjectId(command.id);
-    const blog = await this.blogsQueryRepository.findBlogById(blogId);
-    // if(blog.blogOwnerInfo.userLogin !== command.user.accountData.login) throw new ForbiddenException()
+  async execute(command: GetBlogByIdCommand): Promise<BlogType | any> {
+    if(!validateIdByUUID(command.blogId)) throw new NotFoundException()
+    const blog = await this.blogsQuerySqlRepository.findBlogById(command.blogId);
     if (!blog) throw new HttpException("", HttpStatus.NOT_FOUND);
     return {
-      id: blog._id.toString(),
+      id: blog.ID,
       name: blog.name,
       description: blog.description,
       websiteUrl: blog.websiteUrl,
