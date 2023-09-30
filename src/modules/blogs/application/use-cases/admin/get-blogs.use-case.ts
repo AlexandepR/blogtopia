@@ -10,7 +10,6 @@ export class getBlogsByAdminCommand {
     public query: ParamsType,
   ) {}
 }
-
 @CommandHandler(getBlogsByAdminCommand)
 export class GetBlogsByAdminUseCase implements ICommandHandler<getBlogsByAdminCommand>{
   constructor(
