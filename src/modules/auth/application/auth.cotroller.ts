@@ -60,6 +60,7 @@ export class AuthController {
   }
 
   @Public()
+  @Throttle(5, 10)
   @HttpCode(HttpStatus.OK)
   @Post("/login")
   async login(
