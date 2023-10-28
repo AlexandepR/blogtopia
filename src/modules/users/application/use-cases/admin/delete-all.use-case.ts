@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { UsersRepository } from "../../../infrastructure/users.repository";
+import { UsersOrmRepository } from "../../../infrastructure/users.orm-repository";
 
 export class DeleteAllUsersByAdminCommand {
   constructor(
@@ -10,10 +10,10 @@ export class DeleteAllUsersByAdminCommand {
 @CommandHandler(DeleteAllUsersByAdminCommand)
 export class DeleteAllUsersByAdminUseCase implements ICommandHandler<DeleteAllUsersByAdminCommand> {
   constructor(
-    protected usersRepository: UsersRepository,
+    protected usersOrmRepository: UsersOrmRepository,
   ) {
   }
   async execute(command: DeleteAllUsersByAdminCommand) {
-    return await this.usersRepository.deleteAllUser();
+    return await this.usersOrmRepository.deleteAllUser();
   }
 }
