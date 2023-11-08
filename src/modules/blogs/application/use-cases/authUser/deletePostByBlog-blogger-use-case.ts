@@ -4,7 +4,7 @@ import { Types } from 'mongoose';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PostsRepository } from '../../../../posts/infrastructure/posts.repository';
 import { BlogsQueryRepository } from '../../../infrastructure/blogs.query-repository';
-import { FindUserType } from '../../../../users/type/usersTypes';
+import { UserType } from '../../../../users/type/usersTypes';
 import { BlogsSqlRepository } from '../../../infrastructure/blogs.sql-repository';
 import { BlogsQuerySqlRepository } from '../../../infrastructure/blogs.sql.query-repository';
 import { PostsSqlRepository } from '../../../../posts/infrastructure/posts.sql-repository';
@@ -14,7 +14,7 @@ export class DeletePostByBlogCommand {
   constructor(
       public blogId: string,
       public postId: string,
-      public user: FindUserType,
+      public user: UserType,
   ){}
 }
 
