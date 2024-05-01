@@ -50,7 +50,7 @@ import { RefreshTokenAuthUseCase } from "./modules/auth/application/use-cases/re
 import { GetCommentUseCase } from "./modules/comments/application/use-cases/get-comments.use-case";
 import { UpdateCommentUseCase } from "./modules/comments/application/use-cases/update-comment.use-case";
 import {
-  UpdateOmmentLikeStatusUseCase
+  UpdateCommentLikeStatusUseCase
 } from "./modules/comments/application/use-cases/update-сomment-like-status.use-case";
 import { DeleteCommentUseCase } from "./modules/comments/application/use-cases/delete-comment.use-case";
 import { GetPostsUseCase } from "./modules/posts/application/use-cases/get-posts.use-case";
@@ -87,18 +87,18 @@ import { BlogsBloggerController } from "./modules/blogs/api/auth.api.blog.contro
 import { BlogsPublicController } from "./modules/blogs/api/public.api.blog.controller";
 import { PostsController } from "./modules/posts/api/posts.controller";
 import { SecurityController } from "./modules/security/application/security.controller";
-import { CommentsController } from "./modules/comments/application/comments.controller";
+import { CommentsController } from "./modules/comments/api/comments.controller";
 import { TestingController } from "./modules/test/application/testing.controller";
 import { BlogsRepository } from "./modules/blogs/infrastructure/blogs.repository";
 import { PostsRepository } from "./modules/posts/infrastructure/posts.repository";
 import { UsersRepository } from "./modules/users/infrastructure/users.repository";
-import { CommentsRepository } from "./modules/comments/application/comments.repository";
+import { CommentsRepository } from "./modules/comments/infrastructure/comments.repository";
 import { TestingRepository } from "./modules/test/application/testing.repository";
 import { SecurityRepository } from "./modules/security/infrastructure/security.repository";
 import { GetBlogsPublicUseCase } from "./modules/blogs/application/use-cases/public/get-blogs-public-use-case";
-import { Blog, BlogSchema } from "./modules/blogs/domain/entities/blogs.schema";
-import { Post, PostSchema } from "./modules/posts/domain/entities/posts.schema";
-import { Comment, CommentSchema } from "./modules/comments/type/comments.schema";
+import { Blog, BlogSchema } from "./modules/blogs/domain/blogs.schema";
+import { Post, PostSchema } from "./modules/posts/domain/posts.schema";
+import { Comment, CommentSchema } from "./modules/comments/domain/comments.schema";
 import { User, UserSchema } from "./modules/users/domain/entities/users.schema";
 import { Security, SecuritySchema } from "./modules/security/type/security.schema";
 import { CqrsModule } from "@nestjs/cqrs";
@@ -121,7 +121,7 @@ import {
 } from "./modules/users/application/use-cases/authUser/get-ban-users-forBlog.use-case";
 import { UsersBloggerController } from "./modules/users/api/auth.api.user.controller";
 import { BlogsQueryRepository } from "./modules/blogs/infrastructure/blogs.query-repository";
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { UsersSqlRepository } from './modules/users/infrastructure/users.sql-repository';
 import { SecuritySqlRepository } from './modules/security/infrastructure/security.sql-repository';
 import { BanUserInfo } from './modules/users/domain/entities/banUser.entity';
@@ -130,10 +130,36 @@ import { Users } from './modules/users/domain/entities/user.entity';
 import { Blogs } from './modules/blogs/domain/entities/blogs.entity';
 import { BanUsersBlogs } from './modules/blogs/domain/entities/banUsersBlogs.entity';
 import { PostDislikesData, PostLikesData, Posts } from './modules/posts/domain/entities/posts.entity';
+import { CommentDislikesData, CommentLikesData, Comments } from './modules/comments/domain/entities/comments.entity';
+import { BlogsSqlRepository } from './modules/blogs/infrastructure/blogs.sql-repository';
+import { BlogsQuerySqlRepository } from './modules/blogs/infrastructure/blogs.sql.query-repository';
+import { PostsSqlRepository } from './modules/posts/infrastructure/posts.sql-repository';
+import {
+  GetPostsByBlogBloggerUseCase
+} from './modules/blogs/application/use-cases/authUser/GetPostsByBlogBloggerCommand.use-case';
+import { CommentsSqlRepository } from './modules/comments/infrastructure/comments.sql-repository';
+import { UsersOrmRepository } from "./modules/users/infrastructure/users.orm-repository";
+import { SecurityOrmRepository } from "./modules/security/infrastructure/security.orm-repository";
+import { GetBannedUsersByAdminUseCase } from "./modules/users/application/use-cases/admin/getBanned-users.use-case";
+import { CreateBlogByAdminUseCase } from "./modules/blogs/application/use-cases/admin/create-blog-admin.use-case";
+import { BlogsOrmRepository } from "./modules/blogs/infrastructure/blogs.orm-repository";
+import { DeleteBlogByAdminUseCase } from "./modules/blogs/application/use-cases/admin/delete-blog.use-case";
+import { BlogsOrmQueryRepository } from "./modules/blogs/infrastructure/blogs.orm.query-repository";
+import { UpdateBlogByAdminUseCase } from "./modules/blogs/application/use-cases/admin/update-blog-use-case";
+import {
+  CreatePostForBlogByAdminUseCase
+} from "./modules/blogs/application/use-cases/admin/create-post-for-blog-use-case";
+import { PostsOrmRepository } from "./modules/posts/infrastructure/posts.orm-repository";
+import { GetPostsForBlogByAdminUseCase } from "./modules/blogs/application/use-cases/admin/get-posts-forBlog.use-case";
 // import { MailerModule2 } from "../../swagger-static";
 
 export const adminUseCases = [
   GetBlogsByAdminUseCase,
+  GetPostsForBlogByAdminUseCase,
+  CreateBlogByAdminUseCase,
+  CreatePostForBlogByAdminUseCase,
+  UpdateBlogByAdminUseCase,
+  DeleteBlogByAdminUseCase,
   BindUserToBlogByAdminUseCase,
   UpdateBanInfoByAdminUseCase,
 ];
@@ -144,6 +170,7 @@ export const blogsUseCases = [
   GetBlogsByBloggerUseCase,
   GetBlogByIdByBloggerUseCase,
   GetAllCommentsForBloggerUseCase,
+  GetPostsByBlogBloggerUseCase,
   CreateBlogByBloggerUseCase,
   CreatePostByBlogByBloggerUseCase,
   UpdateBanInfoBlogUseCase,
@@ -151,12 +178,13 @@ export const blogsUseCases = [
   UpdateBlogByBloggerUseCase,
   UpdatePostByBlogByBloggerUseCase,
   DeleteBlogByBloggerUseCase,
-  DeletePostByBlogByBloggerUseCase
+  DeletePostByBlogByBloggerUseCase,
 ];
 export const usersUseCases = [
   getBannedUsersForBlogUseCase,
   DeleteAllUsersByAdminUseCase,
   DeleteUserByAdminUseCase,
+  GetBannedUsersByAdminUseCase,
   GetUsersByAdminUseCase,
   CreateUserByAdminUseCase
 ]
@@ -174,7 +202,7 @@ export const authUseCases = [
 export const commentsUseCases = [
   GetCommentUseCase,
   UpdateCommentUseCase,
-  UpdateOmmentLikeStatusUseCase,
+  UpdateCommentLikeStatusUseCase,
   DeleteCommentUseCase
 ];
 export const postsUseCases = [
@@ -245,12 +273,17 @@ export const controllers = [
   CommentsController,
   TestingController];
 export const repo = [
-  BlogsRepository,
-  PostsRepository,
-  UsersRepository,
-  CommentsRepository,
   TestingRepository,
+  CommentsRepository,
+  CommentsSqlRepository,
+  PostsRepository,
+  PostsSqlRepository,
+  PostsOrmRepository,
   SecurityRepository,
+  SecuritySqlRepository,
+  SecurityOrmRepository,
+  UsersRepository,
+  UsersOrmRepository,
   UsersSqlRepository,
   SecuritySqlRepository,
 ];
@@ -271,7 +304,7 @@ export const moduleImports = [
     ttl: 1,
     limit: 5000
   }),
-  TypeOrmModule.forRoot({
+  TypeOrmModule.forRoot ({
     type: 'postgres',
     host: 'localhost',
     port: +settingsEnv.PORT_PG,

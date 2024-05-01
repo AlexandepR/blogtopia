@@ -2,6 +2,10 @@ import { UsersService } from "../modules/users/application/users.service";
 import { CanActivate, ExecutionContext, HttpException, HttpStatus, Injectable, NestMiddleware } from "@nestjs/common";
 import { UsersRepository } from "../modules/users/infrastructure/users.repository";
 import { UsersSqlRepository } from '../modules/users/infrastructure/users.sql-repository';
+import { InjectRepository } from "@nestjs/typeorm";
+import { Users } from "../modules/users/domain/entities/user.entity";
+import { Repository } from "typeorm";
+import { UsersOrmRepository } from "../modules/users/infrastructure/users.orm-repository";
 
 // @Injectable()
 // export class EmailConfirmMiddleware implements NestMiddleware {
@@ -38,14 +42,14 @@ export class EmailConfirmGuard implements CanActivate {
 
 @Injectable()
 export class CheckLoginOrEmailGuard implements CanActivate {
-  constructor(private usersService: UsersService) {}
+  constructor(private usersOrmRepository: UsersOrmRepository) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
     const login = req.body.login;
     const email = req.body.email;
     if (email || login) {
-      const findUserEmail = await this.usersService.findUserByLoginOrEmail(email);
-      const findUserLogin = await this.usersService.findUserByLoginOrEmail(login);
+      const findUserEmail = await this.usersOrmRepository.findByLoginOrEmail(email);
+      const findUserLogin = await this.usersOrmRepository.findByLoginOrEmail(login);
       if (findUserEmail || findUserLogin) {
         throw new HttpException('', HttpStatus.FORBIDDEN);
       }

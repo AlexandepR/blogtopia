@@ -14,11 +14,11 @@ export class BlogInputClassModel {
   @IsNotEmpty()
   @Transform(({ value }) => value.trim())
   description: string;
+  @MaxLength(100)
   @IsUrl()
   @IsNotEmpty()
   @Transform(({ value }) => value.trim())
   @IsString()
-    // @ValidateInputBlog()
   websiteUrl: string;
 }
 export class updatePostForBlogInputClassModel {
@@ -41,7 +41,7 @@ export class updatePostForBlogInputClassModel {
   @Transform(({ value }) => value.trim())
   blogId: string
 }
-export class PostForBlogBloggerInputClassModel {
+export class PostForBlogInputClassModel {
   @MaxLength(30)
   @Transform(({ value }) => value.trim())
   title: string
@@ -72,10 +72,21 @@ export type BlogType = {
   websiteUrl: string
   createdAt: Date
   isMembership: boolean
-  BlogOwnerId: string
+  BlogOwnerId?: string
   BlogOwnerLogin: string
-  isBanned: false
+  isBanned: boolean
   banDate: Date
+  blogId?: string
+  user?: any
+  updateBlog?: any
+}
+export type BlogResponseType = {
+  id: string
+  name: string
+  description: string
+  websiteUrl: string
+  createdAt: Date
+  isMembership: boolean
 }
 export type BanUsersBlogsType = {
   ID: string
@@ -89,9 +100,10 @@ export type BanUsersBlogsType = {
 export type QueryType = {
   searchNameTerm?: string,
   searchLoginTerm?: string,
+  searchEmailTerm?: string,
   pageSize: number,
   pageNumber: number,
-  sortDirection: "asc" | "desc",
+  sortDirection: "ASC" | "DESC",
   sortBy: string
 }
 export type CreateBlogInputModelType = {
