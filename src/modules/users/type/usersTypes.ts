@@ -40,10 +40,20 @@ export class CreateUserInputClassModel {
   password: string;
 }
 
+export class ParamsUsersClassModel {
+  pageSize: number;
+  pageNumber: number;
+  sortDirection: "ASC" | "DESC";
+  sortBy: string;
+  searchLoginTerm: string;
+  searchEmailTerm: string;
+  banStatus?: "all" | "banned" | "notBanned";
+}
+
 export type ParamsUsersType = {
   pageSize: number,
   pageNumber: number,
-  sortDirection: "asc" | "desc",
+  sortDirection: "ASC" | "DESC",
   sortBy: string,
   searchLoginTerm: string,
   searchEmailTerm: string,
@@ -53,16 +63,9 @@ export type QueryUsersPaginator = {
   filter: Record<string, any>,
   pageSize: number,
   pageNumber: number,
-  sortDirection: "asc" | "desc",
+  sortDirection: "ASC" | "DESC",
   sortBy: string,
   banStatus: any,
-}
-
-export type UserType = {
-  id: string,
-  login: string,
-  email: string,
-  createdAt: string
 }
 export type CreateUserInputModelType = {
   login: string,
@@ -71,11 +74,25 @@ export type CreateUserInputModelType = {
 }
 
 export type GetUsersOutputModelType = {
-  ID: string,
+  // ID: string,
+  id?: string
   login: string,
   email: string,
   createdAt: Date | string,
-  confirmationCode: string | null
+  confirmationCode?: string | null
+  banInfo: {
+    isBanned: boolean,
+    banDate: Date | string,
+    banReason: string
+  }
+}
+export type GetBanUsersOutputModelType = {
+  // ID: string,
+  id?: string
+  login: string,
+  email: string,
+  createdAt: Date | string,
+  confirmationCode?: string | null
   banInfo: {
     isBanned: boolean,
     banDate: Date | string,
@@ -86,7 +103,7 @@ export type InfoBanStatusType = {
   isBanned: boolean;
   banReason: string
 }
-export type FindUserType = {
+export type UserType = {
   ID: string;
   login: string;
   email: string;
@@ -94,10 +111,10 @@ export type FindUserType = {
   passwordHash: string;
   isConfirmed: boolean;
   confirmationCode: string | null;
-  expConfirmCodeDate: string | null;
+  expConfirmCodeDate: Date | null;
   passRecoveryCode: string | null;
   sendEmails: string[] | null;
-  expRefreshToken: string | null;
+  expRefreshToken: string[] | null;
   banInfo: {
     isBanned: boolean;
     banDate: string;
@@ -109,17 +126,26 @@ export type FindUserType = {
     title: string | null;
     lastActiveDate: string | null;
     expirationTokenDate?: string | null;
-  };
+  }[];
 }
 export type UserOutputModelType = {
   ID: string;
   login: string;
   email: string;
-  created_at: Date;
+  createdAt: Date;
   passwordHash: string;
   isConfirmed: boolean;
   confirmationCode: string;
   expConfirmCodeDate: Date;
   passRecoveryCode: string | null;
-  sendEmails: string | null;
+  sendEmails: string[] | null;
+}
+export type GetBanUserForBlog = {
+  id: string;
+  login: string;
+  banInfo: {
+    isBanned: boolean;
+    banDate: string;
+    banReason: string;
+  };
 }
